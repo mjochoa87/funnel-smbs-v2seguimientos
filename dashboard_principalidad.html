@@ -907,10 +907,10 @@ function fetchGASData() {
     delete window[CB];
     _fetching = false;
     setGasStatus('error',
-      '⏱ Tiempo agotado (60s) — ' +
+      '⏱ Tiempo agotado (3 min) — ' +
       '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
     );
-  }, 60000);
+  }, 180000); // 3 minutos — GAS tarda en hacer cold start + leer planillas grandes
 
   window[CB] = function(data) {
     clearTimeout(_timeout);
