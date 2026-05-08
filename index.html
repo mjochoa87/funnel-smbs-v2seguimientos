@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Principalidad — Engagement SMBs | MercadoPago</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--dark:#1a1f36;--dark2:#2d3555;--blue:#7ab3f0;--blue-l:#dbeafe;--blue-d:#1e40af;--green:#8ecf8a;--green-l:#dcfce7;--green-d:#166534;--purple:#b5a8f5;--purple-l:#ede9fe;--purple-d:#5b21b6;--amber:#f5c971;--amber-l:#fef3c7;--amber-d:#92400e;--teal:#80d4ba;--teal-l:#ccfbf1;--teal-d:#115e59;--red:#f5a0a0;--red-l:#fee2e2;--red-d:#991b1b;--g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#6b7280;--g800:#374151;--g900:#111827;--w:#fff;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;--r:10px;--rl:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:#eef0f6;color:var(--g900);font-size:14px}
+.app{max-width:1400px;margin:0 auto;padding:16px}
+.shell{background:var(--w);border-radius:var(--rl);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.header{background:var(--dark);color:#fff;padding:14px 22px;display:flex;align-items:center;justify-content:space-between}
+.h-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:10px}
+.h-right{font-size:12px;color:rgba(255,255,255,.45);text-align:right}
+.h-right strong{color:rgba(255,255,255,.85);display:block;font-size:13px}
+.main-tabs{display:flex;border-bottom:1px solid var(--g200);background:var(--w);overflow-x:auto}
+.mtab{flex:1;min-width:100px;padding:13px 8px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--g600);display:flex;align-items:center;justify-content:center;gap:5px;border-bottom:3px solid transparent;transition:all .15s;font-family:var(--font);white-space:nowrap}
+.mtab:hover:not(.active){background:var(--g50)}
+.mtab.active.tb{color:var(--blue-d);border-bottom-color:var(--blue);background:#f0f7ff}
+.mtab.active.tp{color:var(--purple-d);border-bottom-color:var(--purple);background:#f5f3ff}
+.mtab.active.tg{color:var(--green-d);border-bottom-color:var(--green);background:#f0fdf4}
+.mtab.active.ta{color:var(--amber-d);border-bottom-color:var(--amber);background:#fffbeb}
+.mtab.active.tr{color:var(--red-d);border-bottom-color:var(--red);background:#fff5f5}
+.mtab.active.tt{color:var(--teal-d);border-bottom-color:var(--teal);background:#f0fdfa}
+.adot{width:7px;height:7px;border-radius:50%;background:#ef4444;display:none}
+.adot.show{display:inline-block}
+.body{background:#eef0f6;padding:18px;min-height:400px}
+.sec{display:none}.sec.active{display:block}
+.stabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.stab{padding:6px 16px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--g200);background:var(--w);color:var(--g600);transition:all .15s;font-family:var(--font)}
+.stab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.card{background:var(--w);border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:600;color:var(--dark);margin-bottom:14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--g100);padding-bottom:10px;flex-wrap:wrap}
+.gr{display:grid;gap:12px;margin-bottom:12px}
+.gr.c2{grid-template-columns:1fr 1fr}.gr.c3{grid-template-columns:1fr 1fr 1fr}.gr.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;color:var(--g600);font-weight:600;letter-spacing:.2px}
+input,select,textarea{font-size:13px;padding:8px 11px;border:1.5px solid var(--g200);border-radius:8px;background:var(--w);color:var(--dark);width:100%;font-family:var(--font);transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+input[readonly]{background:#f5f3ff;color:var(--purple-d);font-weight:600;border-color:#ddd6fe;cursor:default}
+input.auto-filled{background:#f0fdf4;color:#166534;font-weight:600;border-color:#86efac}
+input:disabled{opacity:.4;background:var(--g50);cursor:not-allowed}
+textarea{resize:vertical;min-height:60px}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--g200);background:var(--w);color:var(--g800);transition:all .15s;font-family:var(--font)}
+.btn:hover{background:var(--g50)}
+.btn-dark{background:var(--dark);color:#fff;border-color:var(--dark)}.btn-dark:hover{background:var(--dark2)}
+.btn-green{background:#16a34a;color:#fff;border-color:#16a34a}.btn-green:hover{background:#15803d}
+.btn-sm{padding:4px 10px;font-size:11px}
+.dc-box{background:var(--purple-l);border-radius:10px;padding:14px 18px;margin-top:4px}
+.dc-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(139,92,246,.15)}
+.dc-row:last-child{border-bottom:none}
+.dc-row.tot{padding-top:8px;font-weight:600;font-size:15px}
+.dc-row.sub{color:var(--purple-d);font-size:11px}
+.dc-val{font-family:var(--mono);font-weight:600;color:var(--purple-d)}
+.dc-val.green{color:#16a34a}.dc-val.red{color:#dc2626}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.bb{background:var(--blue-l);color:var(--blue-d)}.ba{background:var(--amber-l);color:var(--amber-d)}
+.bg{background:var(--green-l);color:var(--green-d)}.br{background:var(--red-l);color:var(--red-d)}
+.bp{background:var(--purple-l);color:var(--purple-d)}.bt{background:var(--teal-l);color:var(--teal-d)}
+.bgr{background:var(--g100);color:var(--g800)}
+.funnel-stages{display:grid;gap:8px;margin-bottom:16px}
+.funnel-stages.c5{grid-template-columns:repeat(5,1fr)}
+.funnel-stages.c4{grid-template-columns:repeat(4,1fr)}
+.funnel-stages.c3{grid-template-columns:repeat(3,1fr)}
+.stage{background:var(--w);border-radius:10px;padding:12px 8px;text-align:center;border-top:4px solid var(--g200)}
+.stage.s1{border-top-color:var(--blue)}.stage.s2{border-top-color:var(--amber)}.stage.s3{border-top-color:var(--teal)}.stage.s4{border-top-color:var(--green)}.stage.s5{border-top-color:#5b21b6}
+.stage-n{font-size:20px;font-weight:700;color:var(--dark);font-family:var(--mono)}
+.stage-l{font-size:10px;font-weight:600;color:var(--g400);margin-top:2px;letter-spacing:.3px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{font-size:10px;font-weight:600;color:var(--g400);text-align:left;padding:7px 10px;border-bottom:1px solid var(--g200);background:var(--g50);letter-spacing:.3px;white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid var(--g100);color:var(--dark);vertical-align:middle}
+tr:hover td{background:#fafbff}
+.pb{height:6px;border-radius:3px;background:var(--g200);overflow:hidden;min-width:60px}
+.pf{height:100%;border-radius:3px;transition:width .4s}
+.pf.good{background:#16a34a}.pf.warn{background:#ca8a04}.pf.bad{background:#dc2626}
+.ar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.achip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .15s;font-family:var(--font)}
+.semaforo{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700}
+.sem-v{background:#dcfce7;color:#15803d;border:1.5px solid #86efac}
+.sem-a{background:#fef9c3;color:#a16207;border:1.5px solid #fde047}
+.sem-r{background:#fee2e2;color:#b91c1c;border:1.5px solid #fca5a5}
+.sem-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sem-v .sem-dot{background:#16a34a}.sem-a .sem-dot{background:#ca8a04}.sem-r .sem-dot{background:#dc2626}
+.obj-wrap{background:var(--g100);border-radius:8px;padding:10px 14px;margin-bottom:10px}
+.obj-bar-bg{height:10px;border-radius:5px;background:var(--g200);overflow:hidden;margin:6px 0 4px}
+.obj-bar-fill{height:100%;border-radius:5px;transition:width .5s}
+.obj-bar-fill.good{background:#16a34a}.obj-bar-fill.warn{background:#ca8a04}.obj-bar-fill.bad{background:#dc2626}
+.obj-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--g600)}
+.rg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.rm{border-radius:10px;padding:14px;border:1.5px solid}
+.rm.rojo{background:var(--red-l);border-color:#fca5a5}.rm.amarillo{background:var(--amber-l);border-color:#fcd34d}
+.rm.verde{background:var(--green-l);border-color:#86efac}.rm.azul{background:var(--blue-l);border-color:#93c5fd}
+.rm-l{font-size:11px;font-weight:600;margin-bottom:4px}
+.rm.rojo .rm-l{color:#dc2626}.rm.amarillo .rm-l{color:#d97706}.rm.verde .rm-l{color:#16a34a}.rm.azul .rm-l{color:#2563eb}
+.rm-v{font-size:26px;font-weight:700;font-family:var(--mono)}
+.rm.rojo .rm-v{color:#dc2626}.rm.amarillo .rm-v{color:#d97706}.rm.verde .rm-v{color:#16a34a}.rm.azul .rm-v{color:#2563eb}
+.cf-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.cf{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--g200);cursor:pointer;background:var(--w);color:var(--g600);font-family:var(--font);transition:all .15s}
+.cf.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.ai{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--g100)}
+.ai:last-child{border-bottom:none}
+.ai-ico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.ai-r{background:var(--red-l);color:#dc2626}.ai-a{background:var(--amber-l);color:#d97706}
+.ai-b{background:var(--blue-l);color:#2563eb}.ai-g{background:var(--green-l);color:#16a34a}
+.cohort-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:12px 16px;border-radius:10px}
+.seg-mes{background:var(--g50);border-radius:10px;padding:12px 14px;border-left:4px solid var(--g200)}
+.seg-mes.ok{border-left-color:#16a34a}.seg-mes.pend{border-left-color:var(--amber)}
+.seg-mes-title{font-size:11px;font-weight:700;color:var(--g600);margin-bottom:10px;letter-spacing:.3px}
+.csv-banner{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.csv-banner.warn{background:#fffbeb;border-color:#fcd34d}
+.csv-info{font-size:12px;color:#166534;font-weight:500}
+.csv-banner.warn .csv-info{color:#92400e}
+.autocomplete-hint{font-size:11px;color:#16a34a;margin-top:3px;display:none}
+.autocomplete-hint.show{display:block}
+/* GESTION CRITICOS */
+.gestion-card{background:var(--w);border-radius:12px;border:1.5px solid #fca5a5;margin-bottom:12px;overflow:hidden}
+.gestion-header{background:var(--red-l);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.gestion-body{padding:14px 16px}
+.comment-item{background:var(--g50);border-radius:8px;padding:10px 12px;margin-bottom:8px;border-left:3px solid var(--blue)}
+.comment-meta{font-size:11px;color:var(--g400);margin-bottom:4px}
+.comment-text{font-size:13px;color:var(--dark)}
+/* RANKING POSITIVAS */
+.ranking-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--g100)}
+.ranking-item:last-child{border-bottom:none}
+.ranking-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.rank-1{background:#fef3c7;color:#92400e}
+.rank-2{background:var(--g100);color:var(--g800)}
+.rank-3{background:#faeeda;color:#854F0B}
+.rank-other{background:var(--g50);color:var(--g600)}
+
+.fac-alerta{display:flex;align-items:center;gap:8px;background:#fee2e2;border:1.5px solid #fca5a5;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#991b1b;font-weight:600}
+.fac-ok{display:flex;align-items:center;gap:8px;background:#dcfce7;border:1.5px solid #86efac;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#166534;font-weight:600}
+.fac-warn{display:flex;align-items:center;gap:8px;background:#fef9c3;border:1.5px solid #fde047;border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#a16207;font-weight:600}
+.empty{text-align:center;padding:2rem 1rem;color:var(--g400);font-size:13px}
+.divider{border:none;border-top:1px solid var(--g200);margin:10px 0}
+.rowf{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.save-ok{font-size:13px;color:#16a34a;font-weight:600;display:none;margin-top:8px}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+@media(max-width:700px){.gr.c3,.gr.c4{grid-template-columns:1fr 1fr}.gr.c2{grid-template-columns:1fr}.funnel-stages.c5{grid-template-columns:repeat(3,1fr)}.rg{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app"><div class="shell">
+<div class="header">
+  <div class="h-title">📈 Dashboard Principalidad — Engagement SMBs</div>
+  <div class="h-right"><strong id="hdr-fecha"></strong><span id="hdr-eq"></span></div>
+</div>
+<div class="main-tabs">
+  <button class="mtab tb active" onclick="goTab('pipeline',this)">📋 Pipeline</button>
+  <button class="mtab tp" onclick="goTab('alertas',this)">🔔 Alertas <span class="adot" id="dot-al"></span></button>
+  <button class="mtab tg" onclick="goTab('seguimiento',this)">📅 Seguimiento</button>
+  <button class="mtab tr" onclick="goTab('gestion',this)">⚠️ Gestión <span class="adot" id="dot-gest"></span></button>
+  <button class="mtab tt" onclick="goTab('positivas',this)">🏆 Positivas</button>
+  <button class="mtab ta" onclick="goTab('equipo',this)">👥 Vista líder</button>
+</div>
+<div class="body">
+
+<!-- ══ PIPELINE ══ -->
+<div id="tab-pipeline" class="sec active">
+  <div class="stabs">
+    <button class="stab active" onclick="goSub('pipeline','resumen',this)">Resumen</button>
+    <button class="stab" onclick="goSub('pipeline','cargar',this)">➕ Cargar comercio</button>
+    <button class="stab" onclick="goSub('pipeline','calc',this)">🧮 Calculadora DC</button>
+  </div>
+
+  <div id="sub-pipeline-resumen">
+    <div class="ar"><strong style="font-size:13px;color:var(--g600)">Asesor:</strong><div id="chips-pipe"></div></div>
+    <div class="funnel-stages c5">
+      <div class="stage s1"><div class="stage-n" id="cnt-neg">0</div><div class="stage-l">NEGOCIACIÓN</div></div>
+      <div class="stage s2"><div class="stage-n" id="cnt-reneg">0</div><div class="stage-l">RENEGOCIACIÓN</div></div>
+      <div class="stage s3"><div class="stage-n" id="cnt-seg2">0</div><div class="stage-l">CONVERTIDOS</div></div>
+      <div class="stage s4"><div class="stage-n" id="cnt-dc-t">$0</div><div class="stage-l">DC TEÓRICO</div></div>
+      <div class="stage s5"><div class="stage-n" id="cnt-inc">$0</div><div class="stage-l">DC INCREMENTAL</div></div>
+    </div>
+    <!-- GRAFICO DC TEORICO VS OBJETIVO POR ASESOR / COHORTE -->
+    <div class="card">
+      <div class="card-title">📊 DC teórico vs objetivo — por asesor y cohorte</div>
+      <div style="position:relative;width:100%;height:320px">
+        <canvas id="chart-cohort" role="img" aria-label="Gráfico de barras DC teórico vs objetivo por asesor y cohorte"></canvas>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">📋 Cartera</div>
+      <div class="tw"><table>
+        <thead><tr><th>Comercio</th><th>Cust ID</th><th>Asesor</th><th>Cohorte</th><th>Estado</th><th>Acción</th><th>Tasa proc.</th><th>Round</th><th>DC Teórico</th><th>DC M-1</th><th>DC Increm.</th><th>Días sin fac.</th><th></th></tr></thead>
+        <tbody id="pipe-body"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div id="sub-pipeline-cargar" style="display:none">
+    <div class="card"><div class="card-title">📂 Base de datos M-1 (CSV)</div>
+      <div id="csv-banner" class="csv-banner warn">
+        <div><div class="csv-info">⚠ Sin planilla cargada — TPV M-1 y DC M-1 se completarán manualmente.</div>
+          <div style="font-size:11px;color:#92400e;margin-top:2px">CSV con columnas: cust_id, tpv_m1, dc_m1</div></div>
+        <label class="btn btn-green btn-sm" style="cursor:pointer">📂 Cargar CSV<input type="file" accept=".csv" id="csv-input" style="display:none" onchange="loadCSV(this)"></label>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">🏪 Datos del comercio</div>
+      <div class="gr c3">
+        <div class="fg">
+          <label>Cust ID * <span id="cid-hint" class="autocomplete-hint">✓ Datos encontrados en planilla</span></label>
+          <input type="text" id="c-custid" placeholder="Ej: 123456789" oninput="onCustIdChange()">
+        </div>
+        <div class="fg"><label>Nombre del comercio *</label><input type="text" id="c-nombre" placeholder="Ej: Ferretería López"></div>
+        <div class="fg"><label>Asesor responsable *</label><select id="c-asesor"><option value="">Seleccionar...</option></select></div>
+      </div>
+      <div class="gr c3">
+        <div class="fg"><label>Mes de conversión (cohorte)</label><input type="month" id="c-mes-conv"></div>
+        <div class="fg"><label>Rubro</label><input type="text" id="c-rubro" placeholder="Ej: Ferretería"></div>
+        <div class="fg"><label>Estado</label>
+          <select id="c-estado">
+            <option value="negociacion">Negociación</option>
+            <option value="renegociacion">Renegociación</option>
+            <option value="seguimiento">Seguimiento (convertido)</option>
+          </select>
+        </div>
+      </div>
+      <div class="gr c2">
+        <div class="fg"><label>Acción</label>
+          <select id="c-accion"><option value="base">Base</option><option value="promo_cuotas">Promo Cuotas</option><option value="ri_tasa5">RI Tasa 5</option><option value="ri_tasa6">RI Tasa 6</option><option value="calentamiento">Calentamiento de Leads</option></select>
+        </div>
+        <div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:8px;padding:10px 12px;font-size:12px;color:#166534">
+          💡 Si cargás el estado como <strong>Seguimiento</strong>, el comercio aparecerá automáticamente en la pestaña de Seguimiento y Alertas por cohorte.
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">💳 Tasas aplicadas</div>
+      <div class="gr c2">
+        <div class="fg"><label>Tasa de procesamiento (débito + 1 pago)</label>
+          <select id="c-tasa-proc" onchange="calcDCForm()">
+            <option value="">Seleccionar tasa proc...</option>
+            <optgroup label="── Estándar ──">
+              <option value="mar_abierto">Mar abierto — 2,03%</option>
+              <option value="nivel1">Nivel 1 — 2,03%</option><option value="nivel2">Nivel 2 — 1,75%</option>
+              <option value="nivel3">Nivel 3 — 1,47%</option><option value="nivel4">Nivel 4 — 1,24%</option>
+              <option value="nivel5">Nivel 5 — 0,82%</option><option value="nivel6">Nivel 6 — 0,45%</option>
+            </optgroup>
+            <optgroup label="── Tasas Ecosistémicas ──">
+              <option value="eco_n1">Ecosist. N1 — 2,03%</option><option value="eco_n2">Ecosist. N2 — 1,75%</option>
+              <option value="eco_n3">Ecosist. N3 — 1,47%</option><option value="eco_n4">Ecosist. N4 — 1,24%</option>
+              <option value="eco_n5">Ecosist. N5 — 0,82%</option><option value="eco_n6">Ecosist. N6 — 0,45%</option>
+            </optgroup>
+            <optgroup label="── Especiales ──">
+              <option value="plazos_largos">Plazos Largos — 0,30%</option>
+              <option value="tag_pl_n1">Tag PL-N1 — 2,03%</option><option value="tag_pl_n3">Tag PL-N3 — 1,47%</option>
+              <option value="tag_pl_n6">Tag PL-N6 — 0,45%</option>
+              <option value="promo_cuotas_t">Promo Cuotas — 0,45%</option>
+              <option value="a1">1 a 1 — 0,35%</option>
+              <option value="suscripciones">Suscripciones — 0,45%</option>
+              <option value="promo_3meses">Promo 3 meses — 0,40%</option>
+              <option value="promo_parity">Promo Parity Nave — 0,35%</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="fg"><label>Tasa de financing (round)</label>
+          <select id="c-tasa-round" onchange="calcDCForm()">
+            <option value="">Seleccionar round/financing...</option>
+            <optgroup label="── Mar abierto ──">
+              <option value="mar_abierto_fin">Mar abierto — 7,04%</option>
+              <option value="r3_mar">R3 Mar abierto — 5,31%</option><option value="r4_mar">R4 Mar abierto — 4,71%</option><option value="r5_mar">R5 Mar abierto — 3,73%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 1 ──">
+              <option value="r3_n1">R3 N1 — 5,12%</option><option value="r4_n1">R4 N1 — 4,52%</option><option value="r5_n1">R5 N1 — 3,55%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 2 ──">
+              <option value="r3_n2">R3 N2 — 5,03%</option><option value="r4_n2">R4 N2 — 4,43%</option><option value="r5_n2">R5 N2 — 3,46%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 3 ──">
+              <option value="r3_n3">R3 N3 — 4,94%</option><option value="r4_n3">R4 N3 — 4,34%</option><option value="r5_n3">R5 N3 — 3,36%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 4 ──">
+              <option value="r3_n4">R3 N4 — 4,47%</option><option value="r4_n4">R4 N4 — 3,87%</option><option value="r5_n4">R5 N4 — 2,90%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 5 ──">
+              <option value="r3_n5">R3 N5 — 4,01%</option><option value="r4_n5">R4 N5 — 3,41%</option><option value="r5_n5">R5 N5 — 2,44%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 6 ──">
+              <option value="r3_n6">R3 N6 — 3,98%</option><option value="r4_n6">R4 N6 — 3,42%</option><option value="r5_n6">R5 N6 — 2,45%</option>
+              <option value="r5_plus">R5 Plus — Promo Cuotas — 1,70%</option>
+            </optgroup>
+            <optgroup label="── Rounds Ecosistémicas ──">
+              <option value="r3_eco_n1">R3 Eco N1 — 5,12%</option><option value="r3_eco_n2">R3 Eco N2 — 5,03%</option><option value="r3_eco_n3">R3 Eco N3 — 4,94%</option>
+              <option value="r3_eco_n4">R3 Eco N4 — 4,47%</option><option value="r3_eco_n5">R3 Eco N5 — 4,01%</option><option value="r3_eco_n6">R3 Eco N6 — 3,98%</option>
+              <option value="r4_eco_n1">R4 Eco N1 — 4,52%</option><option value="r4_eco_n2">R4 Eco N2 — 4,43%</option><option value="r4_eco_n3">R4 Eco N3 — 4,34%</option>
+              <option value="r4_eco_n4">R4 Eco N4 — 3,87%</option><option value="r4_eco_n5">R4 Eco N5 — 3,41%</option><option value="r4_eco_n6">R4 Eco N6 — 3,42%</option>
+              <option value="r5_eco_n1">R5 Eco N1 — 3,55%</option><option value="r5_eco_n2">R5 Eco N2 — 3,46%</option><option value="r5_eco_n3">R5 Eco N3 — 3,36%</option>
+              <option value="r5_eco_n4">R5 Eco N4 — 2,90%</option><option value="r5_eco_n5">R5 Eco N5 — 2,44%</option><option value="r5_eco_n6">R5 Eco N6 — 2,45%</option>
+            </optgroup>
+            <optgroup label="── Especiales ──">
+              <option value="promo_cuotas_fin">Promo Cuotas — 5,43%</option>
+              <option value="pl_mar">PL Mar abierto — 5,14%</option><option value="pl_n1">PL N1 — 6,74%</option><option value="pl_n3">PL N3 — 6,46%</option><option value="pl_n6">PL N6 — 5,43%</option>
+              <option value="a1_mar">1a1 Mar abierto — 5,14%</option><option value="a1_n1">1a1 N1 — 6,74%</option><option value="a1_n3">1a1 N3 — 6,46%</option><option value="a1_n6">1a1 N6 — 5,43%</option>
+              <option value="suscripciones_fin">Suscripciones fin. — 5,43%</option>
+              <option value="promo_3m_fin">Promo 3 meses fin. — 5,43%</option>
+              <option value="promo_parity_fin">Promo Parity fin. — 5,14%</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card"><div class="card-title">💰 TPV y cálculo de DC</div>
+      <div class="gr c3">
+        <div class="fg"><label>TPV declarado ($)</label><input type="number" id="c-tpv" placeholder="0" oninput="calcDCForm()"></div>
+        <div class="fg"><label>Share débito + 1 pago (%)</label><input type="number" id="c-share-deb" placeholder="Ej: 60" min="0" max="100" oninput="calcDCForm()"></div>
+        <div class="fg"><label>Share cuotas (%)</label><input type="number" id="c-share-cuotas" placeholder="Ej: 40" min="0" max="100" oninput="calcDCForm()"></div>
+      </div>
+      <div class="gr c2">
+        <div class="fg"><label>TPV M-1 ($) <span id="tpvm1-src" style="font-size:10px;color:#16a34a;display:none">📂 planilla</span></label>
+          <input type="number" id="c-tpv-m1" placeholder="0"></div>
+        <div class="fg"><label>DC M-1 ($) <span id="dcm1-src" style="font-size:10px;color:#16a34a;display:none">📂 planilla</span></label>
+          <input type="number" id="c-dc-m1" placeholder="0" oninput="calcDCForm()"></div>
+      </div>
+      <div class="dc-box">
+        <div class="dc-row sub"><span>Tasa proc.</span><span style="font-family:var(--mono)" id="r-proc-lbl">—</span></div>
+        <div class="dc-row sub"><span>Tasa round</span><span style="font-family:var(--mono)" id="r-round-lbl">—</span></div>
+        <div class="dc-row sub"><span>DC débito/1p</span><span id="r-deb">$0</span></div>
+        <div class="dc-row sub"><span>DC cuotas</span><span id="r-cuotas">$0</span></div>
+        <div class="dc-row tot"><span>DC teórico / mes</span><span class="dc-val" id="r-dc-teorico">$0</span></div>
+        <div class="divider"></div>
+        <div class="dc-row sub"><span>DC M-1</span><span id="r-dc-m1-show">$0</span></div>
+        <div class="dc-row"><span style="font-weight:600">DC incremental</span><span class="dc-val" id="r-dc-inc">$0</span></div>
+      </div>
+    </div>
+    <div class="rowf" style="justify-content:flex-end;gap:8px">
+      <button class="btn" onclick="clearForm()">✕ Limpiar</button>
+      <button class="btn btn-dark" onclick="guardar()">✓ Guardar comercio</button>
+    </div>
+    <div class="save-ok" id="save-msg">✓ Guardado. Si el estado es "Seguimiento", ya aparece en la pestaña correspondiente.</div>
+  </div>
+
+  <div id="sub-pipeline-calc" style="display:none">
+    <div class="card"><div class="card-title">🧮 Calculadora de DC teórico</div>
+      <div class="gr c2">
+        <div class="fg"><label>Tasa de procesamiento</label>
+          <select id="calc-tasa-proc" onchange="calcSt()">
+            <option value="">Seleccionar...</option>
+            <option value="mar_abierto">Mar abierto — 2,03%</option><option value="nivel1">Nivel 1 — 2,03%</option>
+            <option value="nivel2">Nivel 2 — 1,75%</option><option value="nivel3">Nivel 3 — 1,47%</option>
+            <option value="nivel4">Nivel 4 — 1,24%</option><option value="nivel5">Nivel 5 — 0,82%</option>
+            <option value="nivel6">Nivel 6 — 0,45%</option><option value="plazos_largos">Plazos Largos — 0,30%</option>
+            <option value="promo_cuotas_t">Promo Cuotas — 0,45%</option><option value="suscripciones">Suscripciones — 0,82%</option>
+          </select>
+        </div>
+        <div class="fg"><label>Tasa de financing (round)</label>
+          <select id="calc-tasa-round" onchange="calcSt()">
+            <option value="">Seleccionar round...</option>
+            <option value="mar_abierto_fin">Mar abierto fin. — 7,04%</option>
+            <option value="r1_mar">R1 Mar abierto — 6,74%</option><option value="r1_n3">R1 Nivel 3 — 6,46%</option><option value="r1_n5">R1 Nivel 5 — 5,90%</option><option value="r1_n6">R1 Nivel 6 — 5,43%</option>
+            <option value="r2_mar">R2 Mar abierto — 6,01%</option><option value="r2_n5">R2 Nivel 5 — 5,17%</option><option value="r2_n6">R2 Nivel 6 — 4,70%</option>
+            <option value="r3_mar">R3 Mar abierto — 5,31%</option><option value="r3_n5">R3 Nivel 5 — 4,01%</option>
+            <option value="r4_mar">R4 Mar abierto — 4,71%</option><option value="r5_mar">R5 Mar abierto — 3,73%</option>
+            <option value="r5_plus">R5 Plus (Promo Cuotas) — 1,70%</option>
+            <option value="r6_n6">R6 Nivel 6 — 1,70%</option>
+            <option value="a1_mar">1 a 1 Mar abierto — 3,82%</option><option value="a1_n6">1 a 1 Nivel 6 — 2,51%</option>
+          </select>
+        </div>
+      </div>
+      <div class="gr c2">
+        <div class="fg"><label>Asesor</label><select id="calc-asesor" onchange="calcSt()"><option value="">Sin comparar</option></select></div>
+        <div class="fg"><label>DC M-1 ($)</label><input type="number" id="calc-dcm1" placeholder="0" oninput="calcSt()"></div>
+      </div>
+      <div class="gr c3">
+        <div class="fg"><label>TPV total ($)</label><input type="number" id="calc-tpv" placeholder="0" oninput="calcSt()"></div>
+        <div class="fg"><label>Share débito + 1p (%)</label><input type="number" id="calc-sd" placeholder="60" oninput="calcSt()"></div>
+        <div class="fg"><label>Share cuotas (%)</label><input type="number" id="calc-sc" placeholder="40" oninput="calcSt()"></div>
+      </div>
+      <div class="dc-box">
+        <div class="dc-row sub"><span>DC débito/1p</span><span id="calc-r-deb">$0</span></div>
+        <div class="dc-row sub"><span>DC cuotas</span><span id="calc-r-cuotas">$0</span></div>
+        <div class="dc-row tot"><span>DC teórico / mes</span><span class="dc-val" id="calc-total">$0</span></div>
+        <div class="divider"></div>
+        <div class="dc-row sub"><span>DC M-1</span><span id="calc-m1-show">$0</span></div>
+        <div class="dc-row"><span style="font-weight:600">DC incremental</span><span class="dc-val" id="calc-inc">$0</span></div>
+        <div id="calc-obj-sec" style="display:none">
+          <div class="divider"></div>
+          <div class="dc-row"><span id="calc-obj-lbl">% objetivo</span><span id="calc-obj-pct" style="font-weight:700;color:var(--purple-d)">0%</span></div>
+          <div style="height:8px;background:rgba(139,92,246,.2);border-radius:4px;overflow:hidden;margin-top:8px"><div id="calc-obj-bar" style="height:100%;border-radius:4px;transition:width .4s;width:0%"></div></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:8px" id="calc-obj-badge"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ALERTAS ══ -->
+<div id="tab-alertas" class="sec">
+  <div class="rg" id="al-metrics"></div>
+  <div style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:600;color:var(--dark);margin-bottom:12px">🎯 Alcance de objetivo por cohorte</div>
+    <div id="cohort-alertas"></div>
+  </div>
+  <div class="cf-wrap">
+    <button class="cf active" onclick="fAl('todas',this)">Todas</button>
+    <button class="cf" onclick="fAl('critica',this)">🔴 Críticas</button>
+    <button class="cf" onclick="fAl('atencion',this)">🟡 Atención</button>
+    <button class="cf" onclick="fAl('gestion',this)">🔵 Gestión</button>
+    <button class="cf" onclick="fAl('positiva',this)">🟢 Positivas</button>
+  </div>
+  <div class="card" id="al-cont"></div>
+</div>
+
+<!-- ══ SEGUIMIENTO ══ -->
+<div id="tab-seguimiento" class="sec">
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">📊 Reporte de facturación diaria (BigQuery)</div>
+    <div id="csv-fac-banner" class="csv-banner warn">
+      <div>
+        <div class="csv-info">⚠ Sin reporte cargado — las alertas de inactividad no estarán disponibles.</div>
+        <div style="font-size:11px;color:#92400e;margin-top:2px">CSV exportado desde BigQuery con columnas: <strong>cust_id</strong>, <strong>ultima_fecha_fac</strong>, <strong>dias_sin_facturar</strong></div>
+      </div>
+      <label class="btn btn-green btn-sm" style="cursor:pointer">📊 Cargar reporte<input type="file" accept=".csv" style="display:none" onchange="loadCSVFac(this)"></label>
+    </div>
+    <div style="font-size:11px;color:var(--g400)">Actualizá este reporte cada mañana. Alerta crítica a partir de <strong>3 días</strong> sin facturar 🚨, advertencia a partir de 1-2 días ⚠.</div>
+  </div>
+  <div class="ar"><strong style="font-size:13px;color:var(--g600)">Asesor:</strong><div id="chips-seg"></div></div>
+  <div id="seg-content"></div>
+</div>
+
+<!-- ══ GESTIÓN (CRÍTICOS) ══ -->
+<div id="tab-gestion" class="sec">
+  <div style="background:var(--red-l);border:1.5px solid #fca5a5;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#991b1b">
+    ⚠️ Esta hoja muestra los asesores con menos del <strong>80%</strong> de su objetivo. Podés agregar comentarios y planes de acción para el seguimiento.
+  </div>
+  <div id="gestion-content"></div>
+</div>
+
+<!-- ══ POSITIVAS ══ -->
+<div id="tab-positivas" class="sec">
+  <div style="background:var(--green-l);border:1.5px solid #86efac;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#166534">
+    🏆 Ranking de asesores que superaron el <strong>100%</strong> de su objetivo, por cohorte.
+  </div>
+  <div id="positivas-content"></div>
+</div>
+
+<!-- ══ VISTA LÍDER ══ -->
+<div id="tab-equipo" class="sec">
+  <div class="funnel-stages c4">
+    <div class="stage s1"><div class="stage-n" id="eq-tot">0</div><div class="stage-l">COMERCIOS</div></div>
+    <div class="stage s3"><div class="stage-n" id="eq-dc">$0</div><div class="stage-l">DC TEÓRICO</div></div>
+    <div class="stage s5"><div class="stage-n" id="eq-inc">$0</div><div class="stage-l">DC INCREMENTAL</div></div>
+    <div class="stage s4"><div class="stage-n" id="eq-obj">$0</div><div class="stage-l">OBJETIVO EQUIPO</div></div>
+  </div>
+  <div class="card" style="margin-bottom:14px"><div class="card-title">👥 Rentabilidad por asesor</div>
+    <div class="tw"><table>
+      <thead><tr><th>Asesor</th><th>Comerc.</th><th>DC teórico</th><th>DC increm.</th><th>Objetivo</th><th>Cobertura</th><th>Semáforo</th><th>Faltante</th></tr></thead>
+      <tbody id="eq-body"></tbody>
+    </table></div>
+  </div>
+  <div class="card"><div class="card-title">⚙️ Asesores y objetivos</div>
+    <div id="asesores-cfg"></div>
+    <div class="divider"></div>
+    <div class="rowf">
+      <input type="text" id="new-nombre" placeholder="Nombre del asesor" style="width:180px">
+      <input type="number" id="new-obj" placeholder="Objetivo DC ($)" style="width:150px">
+      <button class="btn btn-dark btn-sm" onclick="addAsesor()">➕ Agregar</button>
+    </div>
+  </div>
+</div>
+
+</div></div></div>
+<script>
+const TASAS_PROC={
+  mar_abierto:{label:'Mar abierto',pct:2.03},
+  nivel1:{label:'Nivel 1',pct:2.03},nivel2:{label:'Nivel 2',pct:1.75},nivel3:{label:'Nivel 3',pct:1.47},
+  nivel4:{label:'Nivel 4',pct:1.24},nivel5:{label:'Nivel 5',pct:0.82},nivel6:{label:'Nivel 6',pct:0.45},
+  eco_n1:{label:'Tasas Ecosist. N1',pct:2.03},eco_n2:{label:'Tasas Ecosist. N2',pct:1.75},
+  eco_n3:{label:'Tasas Ecosist. N3',pct:1.47},eco_n4:{label:'Tasas Ecosist. N4',pct:1.24},
+  eco_n5:{label:'Tasas Ecosist. N5',pct:0.82},eco_n6:{label:'Tasas Ecosist. N6',pct:0.45},
+  plazos_largos:{label:'Plazos Largos',pct:0.30},
+  tag_pl_n1:{label:'Tag PL-N1',pct:2.03},tag_pl_n3:{label:'Tag PL-N3',pct:1.47},tag_pl_n6:{label:'Tag PL-N6',pct:0.45},
+  promo_cuotas_t:{label:'Promo Cuotas',pct:0.45},
+  a1:{label:'1 a 1',pct:0.35},
+  suscripciones:{label:'Suscripciones',pct:0.45},
+  promo_3meses:{label:'Promo 3 meses',pct:0.40},
+  promo_parity:{label:'Promo Parity Nave',pct:0.35}
+};
+const TASAS_ROUND={
+  mar_abierto_fin:{label:'Mar abierto',pct:7.04},
+  r3_mar:{label:'R3 Mar abierto',pct:5.31},r3_n1:{label:'R3 N1',pct:5.12},r3_n2:{label:'R3 N2',pct:5.03},r3_n3:{label:'R3 N3',pct:4.94},r3_n4:{label:'R3 N4',pct:4.47},r3_n5:{label:'R3 N5',pct:4.01},r3_n6:{label:'R3 N6',pct:3.98},
+  r3_eco_n1:{label:'R3 Eco N1',pct:5.12},r3_eco_n2:{label:'R3 Eco N2',pct:5.03},r3_eco_n3:{label:'R3 Eco N3',pct:4.94},r3_eco_n4:{label:'R3 Eco N4',pct:4.47},r3_eco_n5:{label:'R3 Eco N5',pct:4.01},r3_eco_n6:{label:'R3 Eco N6',pct:3.98},
+  r4_mar:{label:'R4 Mar abierto',pct:4.71},r4_n1:{label:'R4 N1',pct:4.52},r4_n2:{label:'R4 N2',pct:4.43},r4_n3:{label:'R4 N3',pct:4.34},r4_n4:{label:'R4 N4',pct:3.87},r4_n5:{label:'R4 N5',pct:3.41},r4_n6:{label:'R4 N6',pct:3.42},
+  r4_eco_n1:{label:'R4 Eco N1',pct:4.52},r4_eco_n2:{label:'R4 Eco N2',pct:4.43},r4_eco_n3:{label:'R4 Eco N3',pct:4.34},r4_eco_n4:{label:'R4 Eco N4',pct:3.87},r4_eco_n5:{label:'R4 Eco N5',pct:3.41},r4_eco_n6:{label:'R4 Eco N6',pct:3.42},
+  r5_mar:{label:'R5 Mar abierto',pct:3.73},r5_n1:{label:'R5 N1',pct:3.55},r5_n2:{label:'R5 N2',pct:3.46},r5_n3:{label:'R5 N3',pct:3.36},r5_n4:{label:'R5 N4',pct:2.90},r5_n5:{label:'R5 N5',pct:2.44},r5_n6:{label:'R5 N6',pct:2.45},
+  r5_eco_n1:{label:'R5 Eco N1',pct:3.55},r5_eco_n2:{label:'R5 Eco N2',pct:3.46},r5_eco_n3:{label:'R5 Eco N3',pct:3.36},r5_eco_n4:{label:'R5 Eco N4',pct:2.90},r5_eco_n5:{label:'R5 Eco N5',pct:2.44},r5_eco_n6:{label:'R5 Eco N6',pct:2.45},
+  promo_cuotas_fin:{label:'Promo Cuotas fin.',pct:5.43},
+  pl_mar:{label:'PL Mar abierto',pct:5.14},pl_n1:{label:'PL N1',pct:6.74},pl_n3:{label:'PL N3',pct:6.46},pl_n6:{label:'PL N6',pct:5.43},
+  a1_mar:{label:'1a1 Mar abierto',pct:5.14},a1_n1:{label:'1a1 N1',pct:6.74},a1_n3:{label:'1a1 N3',pct:6.46},a1_n6:{label:'1a1 N6',pct:5.43},
+  suscripciones_fin:{label:'Suscripciones fin.',pct:5.43},
+  promo_3m_fin:{label:'Promo 3 meses fin.',pct:5.43},
+  promo_parity_fin:{label:'Promo Parity fin.',pct:5.14}
+};
+
+const MESES_ES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+function getMesKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function getMesLabel(d){return MESES_ES[d.getMonth()]+' '+d.getFullYear();}
+const _hoy=new Date();
+const _m0=new Date(_hoy.getFullYear(),_hoy.getMonth(),1);
+const _m1=new Date(_hoy.getFullYear(),_hoy.getMonth()-1,1);
+const _m2=new Date(_hoy.getFullYear(),_hoy.getMonth()-2,1);
+const MES_ACTUAL=getMesKey(_m0);
+const COHORTS={
+  [getMesKey(_m0)]:{label:`M0 — ${getMesLabel(_m0)}`,tag:'M0',color:'#eff6ff',border:'#93c5fd',text:'#1e40af',chartColor:'rgba(122,179,240,0.8)'},
+  [getMesKey(_m1)]:{label:`M1 — ${getMesLabel(_m1)}`,tag:'M1',color:'#f5f3ff',border:'#c4b5fd',text:'#5b21b6',chartColor:'rgba(181,168,245,0.8)'},
+  [getMesKey(_m2)]:{label:`M2 — ${getMesLabel(_m2)}`,tag:'M2',color:'#f0fdf4',border:'#86efac',text:'#166534',chartColor:'rgba(142,207,138,0.8)'},
+};
+function getCohort(mes){return COHORTS[mes]||null;}
+
+const EQUIPO=[{nombre:'Julian Torres',objetivo:575000},{nombre:'Juan Cruz Rial',objetivo:1000000},{nombre:'Carol Delgado',objetivo:1000000},{nombre:'Soledad Maydana',objetivo:1000000},{nombre:'Rocio Angueira',objetivo:575000},{nombre:'Agustin Fernandez Diz',objetivo:1000000},{nombre:'Mariana Gonzalez',objetivo:1000000},{nombre:'Manuel Elizarraga',objetivo:1000000}];
+const CC=[{bg:'#dbeafe',tx:'#1e40af',ac:'#2563eb'},{bg:'#fef3c7',tx:'#92400e',ac:'#d97706'},{bg:'#dcfce7',tx:'#166534',ac:'#16a34a'},{bg:'#ede9fe',tx:'#5b21b6',ac:'#7c3aed'},{bg:'#fce7f3',tx:'#9d174d',ac:'#db2777'},{bg:'#ccfbf1',tx:'#115e59',ac:'#0d9488'},{bg:'#fef9c3',tx:'#713f12',ac:'#ca8a04'},{bg:'#e0e7ff',tx:'#3730a3',ac:'#4f46e5'}];
+const ACCIONES={base:'Base',promo_cuotas:'Promo Cuotas',ri_tasa5:'RI Tasa 5',ri_tasa6:'RI Tasa 6',calentamiento:'Calentamiento'};
+
+const saved=JSON.parse(localStorage.getItem('funnel_v11')||'null');
+let ST=saved||{asesores:EQUIPO,comercios:[],gestionComentarios:{}};
+if(!ST.gestionComentarios)ST.gestionComentarios={};
+if(saved&&saved.asesores&&saved.asesores[0]&&saved.asesores[0].nombre==='Asesor 1'){ST.asesores=EQUIPO;save();}
+let csvData={},csvFac={},fAlt='todas',fAs='todos',fSeg='todos';
+const DIAS_ALERTA=3;
+let cohortChart=null;
+
+function save(){localStorage.setItem('funnel_v11',JSON.stringify(ST))}
+function fmt(n){return '$'+Math.round(n).toLocaleString('es-AR')}
+function fmtPct(n){return n.toFixed(2).replace('.',',')+' %'}
+function ini(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
+function semaforo(p){
+  if(p>=100)return`<span class="semaforo sem-v"><span class="sem-dot"></span>✓ ${p}%</span>`;
+  if(p>=80)return`<span class="semaforo sem-a"><span class="sem-dot"></span>⚡ ${p}%</span>`;
+  return`<span class="semaforo sem-r"><span class="sem-dot"></span>↓ ${p}%</span>`;
+}
+function semCls(p){return p>=100?'good':p>=80?'warn':'bad';}
+function semColor(p){return p>=100?'#16a34a':p>=80?'#ca8a04':'#dc2626';}
+
+document.getElementById('hdr-fecha').textContent=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+document.getElementById('hdr-eq').textContent=ST.asesores.length+' asesores';
+
+function parseCSVRows(text){
+  // Parser CSV completo que respeta comillas y comas dentro de campos
+  const rows=[];const lines=text.split('\n');
+  for(const line of lines){
+    if(!line.trim())continue;
+    const cols=[];let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){
+        if(inQ&&line[i+1]==='"'){cur+='"';i++;}
+        else inQ=!inQ;
+      } else if(c===','&&!inQ){cols.push(cur);cur='';}
+      else cur+=c;
+    }
+    cols.push(cur);
+    rows.push(cols.map(c=>c.trim()));
+  }
+  return rows;
+}
+
+function loadCSV(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const rows=parseCSVRows(e.target.result);
+    if(rows.length<2)return;
+    const headers=rows[0].map(h=>h.toLowerCase().replace(/"/g,'').trim());
+    // Buscar índices por nombre de columna
+    function findIdx(keys){for(const k of keys){const i=headers.findIndex(h=>h===k||h.includes(k));if(i>=0)return i;}return -1;}
+    const useId=findIdx(['cust_id','custid','cust id']);
+    const useNombre=findIdx(['nombre_comercio','nombre comercio']);
+    const useTpv=findIdx(['tpv_point']);
+    const useDc=findIdx(['dc_point']);
+    if(useId<0){alert('No se encontró columna Cust_Id en el CSV');return;}
+    // Limpiar número formato argentino: 1.234.567,89 → 1234567.89
+    function cleanNum(s){if(!s)return 0;return parseFloat(s.replace(/\./g,'').replace(',','.'))||0;}
+    csvData={};
+    // Detectar y saltar fila de tipos si existe (empieza con 'string' o '1,')
+    let startRow=1;
+    if(rows.length>1){const r1=rows[1].join(',').toLowerCase();if(r1.startsWith('string')||r1.match(/^[0-9],[0-9]/))startRow=2;}
+    for(let i=startRow;i<rows.length;i++){
+      const cols=rows[i];
+      const id=String(cols[useId]||'').trim().replace(/"/g,'');
+      if(!id||id==='0'||id.toLowerCase()==='cust_id')continue;
+      csvData[id]={
+        nombre:useNombre>=0?(cols[useNombre]||'').replace(/"/g,''):'',
+        tpvM1:useTpv>=0?cleanNum(cols[useTpv]):0,
+        dcM1:useDc>=0?cleanNum(cols[useDc]):0
+      };
+    }
+    const n=Object.keys(csvData).length;
+    const sample=Object.entries(csvData).slice(0,2).map(([id,v])=>`${id}: ${v.nombre||'?'} | TPV: $${Math.round(parseFloat(v.tpvM1)||0).toLocaleString('es-AR')}`).join(' · ');
+    const b=document.getElementById('csv-banner');b.className='csv-banner';
+    b.innerHTML=`<div><div class="csv-info">✓ Planilla cargada — ${n} comercios. Ej: ${sample}</div></div><label class="btn btn-green btn-sm" style="cursor:pointer">🔄 Cambiar<input type="file" accept=".csv" style="display:none" onchange="loadCSV(this)"></label>`;
+  };
+  reader.readAsText(file);
+}
+function onCustIdChange(){
+  const id=document.getElementById('c-custid').value.trim();
+  const hint=document.getElementById('cid-hint');
+  if(csvData[id]){
+    hint.className='autocomplete-hint show';
+    const te=document.getElementById('c-tpv-m1'),de=document.getElementById('c-dc-m1');
+    const tpvVal=csvData[id].tpvM1||0;
+    const dcVal=csvData[id].dcM1||0;
+    te.value=tpvVal;de.value=dcVal;
+    te.className=tpvVal>0?'auto-filled':'';de.className=dcVal>0?'auto-filled':'';
+    const ne=document.getElementById('c-nombre');
+    if(csvData[id].nombre&&!ne.value){ne.value=csvData[id].nombre;ne.className='auto-filled';}
+    calcDCForm();
+    document.getElementById('tpvm1-src').style.display='inline';document.getElementById('dcm1-src').style.display='inline';
+    calcDCForm();
+  }else{hint.className='autocomplete-hint';document.getElementById('tpvm1-src').style.display='none';document.getElementById('dcm1-src').style.display='none';}
+}
+
+function loadCSVFac(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const lines=e.target.result.split('\n').filter(l=>l.trim());
+    if(!lines.length)return;
+    const headers=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/"/g,''));
+    const idxId=headers.findIndex(h=>h.includes('cust')||h==='id');
+    const idxFecha=headers.findIndex(h=>h.includes('ultima')||h.includes('fecha')||h.includes('last'));
+    const idxDias=headers.findIndex(h=>h.includes('dias')||h.includes('days')||h.includes('inactiv'));
+    const idxTpvAcc=headers.findIndex(h=>h.includes('tpv_ult')||h.includes('tpv_acc')||h.includes('acumulado'));
+    const idxCantDias=headers.findIndex(h=>h.includes('cant_dias')||h.includes('cant_d')||h.includes('periodo'));
+    if(idxId===-1){alert('No se encontró columna cust_id en el CSV de facturación');return;}
+    csvFac={};
+    for(let i=1;i<lines.length;i++){
+      const cols=lines[i].split(',').map(c=>c.trim().replace(/"/g,''));
+      const id=cols[idxId];if(!id)continue;
+      const dias=idxDias>=0?parseInt(cols[idxDias])||0:0;
+      const fecha=idxFecha>=0?cols[idxFecha]:'';
+      const tpvAcc=idxTpvAcc>=0?parseFloat(cols[idxTpvAcc])||0:0;
+      const cantDias=idxCantDias>=0?parseInt(cols[idxCantDias])||1:1;
+      csvFac[id]={dias,fecha,tpvAcc,cantDias};
+    }
+    const n=Object.keys(csvFac).length;
+    const sinFac=Object.values(csvFac).filter(v=>v.dias>=DIAS_ALERTA).length;
+    const b=document.getElementById('csv-fac-banner');b.className='csv-banner';
+    b.innerHTML=`<div><div class="csv-info">✓ Reporte cargado — ${n} comercios · <span style="color:#dc2626;font-weight:700">${sinFac} con ${DIAS_ALERTA}+ días sin facturar</span></div></div><label class="btn btn-green btn-sm" style="cursor:pointer">🔄 Actualizar<input type="file" accept=".csv" style="display:none" onchange="loadCSVFac(this)"></label>`;
+    renderSeg();renderAlertas();updateDots();
+  };
+  reader.readAsText(file);
+}
+
+function getFacAlerta(custId){
+  if(!custId||!csvFac[custId])return null;
+  return csvFac[custId];
+}
+function getFacHTML(custId){
+  const f=getFacAlerta(custId);
+  if(!f)return'';
+  if(f.dias>=DIAS_ALERTA)return`<div class="fac-alerta">🚨 ${f.dias} días sin facturar${f.fecha?' — última vez: '+f.fecha:''}</div>`;
+  if(f.dias>=1)return`<div class="fac-warn">⚠ ${f.dias} día${f.dias>1?'s':''} sin facturar${f.fecha?' — última vez: '+f.fecha:''}</div>`;
+  return`<div class="fac-ok">✓ Facturó ayer${f.fecha?' ('+f.fecha+')':''}</div>`;
+}
+
+function calcDCVal(tpv,sd,sc,pk,rk){
+  const tp=TASAS_PROC[pk],tr=TASAS_ROUND[rk];
+  const deb=tp?(tpv*(sd/100))*(tp.pct/100):0;
+  const cuotas=tr?(tpv*(sc/100))*(tr.pct/100):0;
+  return{deb,cuotas,total:deb+cuotas};
+}
+function getDC(c){return calcDCVal(parseFloat(c.tpv)||0,parseFloat(c.shareDeb)||0,parseFloat(c.shareCuotas)||0,c.tasaProc,c.tasaRound).total;}
+function getDCInc(c){
+  // DC incremental solo para convertidos en seguimiento
+  if(c.estado!=='seguimiento')return 0;
+  return getDC(c)-(parseFloat(c.dcM1)||0);
+}
+function getDCIncTotal(asesor){
+  return ST.comercios.filter(c=>c.asesor===asesor&&c.estado==='seguimiento').reduce((s,c)=>s+Math.max(0,getDCInc(c)),0);
+}
+
+function calcDCForm(){
+  const pk=document.getElementById('c-tasa-proc').value,rk=document.getElementById('c-tasa-round').value;
+  const tp=TASAS_PROC[pk],tr=TASAS_ROUND[rk];
+  document.getElementById('r-proc-lbl').textContent=tp?fmtPct(tp.pct):'—';
+  document.getElementById('r-round-lbl').textContent=tr?fmtPct(tr.pct):'—';
+  const tpv=parseFloat(document.getElementById('c-tpv').value)||0;
+  const sd=parseFloat(document.getElementById('c-share-deb').value)||0;
+  const sc=parseFloat(document.getElementById('c-share-cuotas').value)||0;
+  const dcm1=parseFloat(document.getElementById('c-dc-m1').value)||0;
+  const res=calcDCVal(tpv,sd,sc,pk,rk);
+  document.getElementById('r-deb').textContent=fmt(res.deb);
+  document.getElementById('r-cuotas').textContent=fmt(res.cuotas);
+  document.getElementById('r-dc-teorico').textContent=fmt(res.total);
+  document.getElementById('r-dc-m1-show').textContent=fmt(dcm1);
+  const inc=res.total-dcm1;
+  const el=document.getElementById('r-dc-inc');el.textContent=fmt(inc);el.className='dc-val'+(inc>=0?' green':' red');
+}
+function calcSt(){
+  const pk=document.getElementById('calc-tasa-proc').value,rk=document.getElementById('calc-tasa-round').value;
+  const tpv=parseFloat(document.getElementById('calc-tpv').value)||0;
+  const sd=parseFloat(document.getElementById('calc-sd').value)||0;
+  const sc=parseFloat(document.getElementById('calc-sc').value)||0;
+  const dcm1=parseFloat(document.getElementById('calc-dcm1').value)||0;
+  const res=calcDCVal(tpv,sd,sc,pk,rk);
+  document.getElementById('calc-r-deb').textContent=fmt(res.deb);
+  document.getElementById('calc-r-cuotas').textContent=fmt(res.cuotas);
+  document.getElementById('calc-total').textContent=fmt(res.total);
+  document.getElementById('calc-m1-show').textContent=fmt(dcm1);
+  const inc=res.total-dcm1;
+  const ie=document.getElementById('calc-inc');ie.textContent=fmt(inc);ie.className='dc-val'+(inc>=0?' green':' red');
+  const an=document.getElementById('calc-asesor').value,a=ST.asesores.find(x=>x.nombre===an);
+  const os=document.getElementById('calc-obj-sec');
+  if(a&&a.objetivo>0){
+    os.style.display='block';
+    const dcAc=ST.comercios.filter(c=>c.asesor===an).reduce((s,c)=>s+getDC(c),0);
+    const tot=dcAc+res.total,p=Math.min(Math.round(tot/a.objetivo*100),999);
+    document.getElementById('calc-obj-lbl').textContent=`% objetivo de ${an.split(' ')[0]}`;
+    document.getElementById('calc-obj-pct').textContent=p+'%';
+    const b=document.getElementById('calc-obj-bar');b.style.width=Math.min(p,100)+'%';b.style.background=semColor(p);
+    document.getElementById('calc-obj-badge').innerHTML=semaforo(p);
+  }else os.style.display='none';
+}
+
+function goTab(name,el){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');el.classList.add('active');
+  if(name==='pipeline'){renderChips('chips-pipe',renderPipeline);renderPipeline();}
+  if(name==='alertas')renderAlertas();
+  if(name==='seguimiento'){renderChips('chips-seg',renderSeg);renderSeg();}
+  if(name==='gestion')renderGestion();
+  if(name==='positivas')renderPositivas();
+  if(name==='equipo')renderEquipo();
+}
+function goSub(tab,sub,el){
+  ['resumen','cargar','calc'].forEach(s=>{const e=document.getElementById('sub-'+tab+'-'+s);if(e)e.style.display='none';});
+  document.getElementById('sub-'+tab+'-'+sub).style.display='block';
+  el.closest('.stabs').querySelectorAll('.stab').forEach(s=>s.classList.remove('active'));el.classList.add('active');
+  if(sub==='cargar'){fillAs('c-asesor');calcDCForm();}
+  if(sub==='calc')fillAs('calc-asesor');
+  if(sub==='resumen')renderPipeline();
+}
+function fillAs(id){const s=document.getElementById(id);if(!s)return;const v=s.value;s.innerHTML=id.includes('calc')?'<option value="">Sin comparar</option>':'<option value="">Seleccionar...</option>';ST.asesores.forEach(a=>{const o=document.createElement('option');o.value=a.nombre;o.textContent=a.nombre;s.appendChild(o);});s.value=v;}
+function renderChips(cId,cb){
+  const c=document.getElementById(cId);if(!c)return;
+  let h=`<button class="achip" style="background:var(--dark);color:#fff" onclick="setF('${cId}','todos',this,'')">Todos</button>`;
+  ST.asesores.forEach((a,i)=>{const cc=CC[i%CC.length];h+=`<button class="achip" style="background:${cc.bg};color:${cc.tx}" onclick="setF('${cId}','${a.nombre}',this,'${cc.ac}')">${ini(a.nombre)}</button>`;});
+  c.innerHTML=h;
+}
+function setF(cId,nombre,el,ac){
+  if(cId==='chips-pipe')fAs=nombre;else fSeg=nombre;
+  el.closest('div').querySelectorAll('.achip').forEach(c=>{c.style.background='';c.style.color='';});
+  el.style.background=ac||'var(--dark)';el.style.color='#fff';
+  if(cId==='chips-pipe')renderPipeline();else renderSeg();
+}
+
+function guardar(){
+  const nombre=document.getElementById('c-nombre').value.trim();
+  const asesor=document.getElementById('c-asesor').value;
+  if(!nombre||!asesor){alert('Completá nombre y asesor');return;}
+  ST.comercios.push({nombre,asesor,custId:document.getElementById('c-custid').value,mesConv:document.getElementById('c-mes-conv').value,rubro:document.getElementById('c-rubro').value,estado:document.getElementById('c-estado').value,accion:document.getElementById('c-accion').value,tasaProc:document.getElementById('c-tasa-proc').value,tasaRound:document.getElementById('c-tasa-round').value,tpv:document.getElementById('c-tpv').value,shareDeb:document.getElementById('c-share-deb').value,shareCuotas:document.getElementById('c-share-cuotas').value,tpvM1:document.getElementById('c-tpv-m1').value,dcM1:document.getElementById('c-dc-m1').value,seguimiento:[{mes:'M0',tpvDeb:'',tpvCuotas:''},{mes:'M1',tpvDeb:'',tpvCuotas:''},{mes:'M2',tpvDeb:'',tpvCuotas:''}]});
+  save();
+  const m=document.getElementById('save-msg');m.style.display='block';setTimeout(()=>m.style.display='none',4000);
+  clearForm();renderPipeline();updateDots();
+}
+function clearForm(){
+  ['c-nombre','c-custid','c-rubro','c-tpv','c-share-deb','c-share-cuotas','c-tpv-m1','c-dc-m1'].forEach(id=>{const el=document.getElementById(id);if(el){el.value='';el.className='';}});
+  document.getElementById('c-asesor').value='';document.getElementById('c-tasa-proc').value='';document.getElementById('c-tasa-round').value='';
+  document.getElementById('c-estado').value='negociacion';document.getElementById('c-accion').value='base';document.getElementById('c-mes-conv').value='';
+  document.getElementById('cid-hint').className='autocomplete-hint';document.getElementById('tpvm1-src').style.display='none';document.getElementById('dcm1-src').style.display='none';
+  calcDCForm();
+}
+
+function updateDots(){
+  const criticos=ST.asesores.filter(a=>a.objetivo>0&&getDCIncTotal(a.nombre)/a.objetivo<0.8).length;
+  document.getElementById('dot-al').classList.toggle('show',criticos>0);
+  document.getElementById('dot-gest').classList.toggle('show',criticos>0);
+}
+
+function esBadge(e){const m={negociacion:['bb','Negociación'],renegociacion:['ba','Renegociación'],seguimiento:['bg','Convertido']};const[c,l]=m[e]||['bgr',e];return`<span class="badge ${c}">${l}</span>`;}
+function acBadge(a){const m={base:'bgr',promo_cuotas:'bp',ri_tasa5:'bt',ri_tasa6:'bt',calentamiento:'ba'};return`<span class="badge ${m[a]||'bgr'}">${ACCIONES[a]||a}</span>`;}
+function cohortBadge(mes){const ch=getCohort(mes);if(!ch)return'<span class="badge bgr">—</span>';return`<span class="badge" style="background:${ch.color};color:${ch.text}">${ch.tag}</span>`;}
+
+function renderCohortChart(){
+  const canvas=document.getElementById('chart-cohort');
+  if(!canvas)return;
+  if(cohortChart){cohortChart.destroy();cohortChart=null;}
+  const asesores=fAs==='todos'?ST.asesores:ST.asesores.filter(a=>a.nombre===fAs);
+  const labels=asesores.map(a=>a.nombre.split(' ').slice(0,2).join(' '));
+  const cohortKeys=Object.keys(COHORTS);
+  const datasets=[];
+  // DC por cohorte
+  cohortKeys.forEach(mes=>{
+    const ch=COHORTS[mes];
+    const data=asesores.map(a=>{
+      const conv=ST.comercios.filter(c=>c.asesor===a.nombre&&c.mesConv===mes&&c.estado==='seguimiento');
+      return Math.round(conv.reduce((s,c)=>s+getDC(c),0));
+    });
+    datasets.push({label:`DC ${ch.tag}`,data,backgroundColor:ch.chartColor,borderColor:ch.chartColor.replace('0.8','1'),borderWidth:1,borderRadius:4});
+  });
+  // Línea objetivo
+  datasets.push({label:'Objetivo',data:asesores.map(a=>a.objetivo),type:'line',borderColor:'#dc2626',borderWidth:2,borderDash:[6,3],pointBackgroundColor:'#dc2626',pointRadius:4,fill:false,tension:0});
+
+  cohortChart=new Chart(canvas,{
+    type:'bar',
+    data:{labels,datasets},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`}}},
+      scales:{
+        x:{ticks:{font:{size:10},maxRotation:30}},
+        y:{ticks:{callback:v=>'$'+Math.round(v/1000)+'k',font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}}
+      }
+    }
+  });
+  // Leyenda manual
+  const legendDiv=document.createElement('div');
+  legendDiv.style.cssText='display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12px;';
+  cohortKeys.forEach(mes=>{const ch=COHORTS[mes];legendDiv.innerHTML+=`<span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;border-radius:3px;background:${ch.chartColor};display:inline-block"></span>${ch.label}</span>`;});
+  legendDiv.innerHTML+=`<span style="display:flex;align-items:center;gap:5px"><span style="width:20px;height:2px;background:#dc2626;display:inline-block;border-top:2px dashed #dc2626"></span>Objetivo</span>`;
+  canvas.parentNode.appendChild(legendDiv);
+}
+
+function renderPipeline(){
+  let list=ST.comercios;if(fAs!=='todos')list=list.filter(c=>c.asesor===fAs);
+  let dcT=0,incT=0,neg=0,reneg=0,seg=0;
+  list.forEach(c=>{dcT+=getDC(c);incT+=getDCInc(c);if(c.estado==='negociacion')neg++;if(c.estado==='renegociacion')reneg++;if(c.estado==='seguimiento')seg++;});
+  document.getElementById('cnt-neg').textContent=neg;document.getElementById('cnt-reneg').textContent=reneg;
+  document.getElementById('cnt-seg2').textContent=seg;document.getElementById('cnt-dc-t').textContent=fmt(dcT);document.getElementById('cnt-inc').textContent=fmt(incT);
+  renderCohortChart();
+  const tb=document.getElementById('pipe-body');
+  if(!list.length){tb.innerHTML=`<tr><td colspan="12"><div class="empty">Sin comercios cargados todavía.</div></td></tr>`;return;}
+  tb.innerHTML=list.map(c=>{
+    const idx=ST.comercios.indexOf(c);const dc=getDC(c);const inc=getDCInc(c);
+    const ai=ST.asesores.findIndex(a=>a.nombre===c.asesor);const cc=CC[ai>=0?ai%CC.length:0];
+    const tp=TASAS_PROC[c.tasaProc],tr=TASAS_ROUND[c.tasaRound];
+    return`<tr>
+      <td><strong style="font-size:12px">${c.nombre}</strong></td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--g600)">${c.custId||'—'}</td>
+      <td><span style="background:${cc.bg};color:${cc.tx};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${ini(c.asesor)}</span></td>
+      <td>${cohortBadge(c.mesConv)}</td>
+      <td>${esBadge(c.estado)}</td>
+      <td>${acBadge(c.accion)}</td>
+      <td style="font-size:11px;color:var(--purple-d);font-family:var(--mono)">${tp?fmtPct(tp.pct):'—'}</td>
+      <td style="font-size:11px;color:var(--teal-d);font-family:var(--mono)">${tr?tr.label:'—'}</td>
+      <td style="font-weight:700;color:var(--purple-d);font-family:var(--mono)">${fmt(dc)}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--g600)">${fmt(parseFloat(c.dcM1)||0)}</td>
+      <td style="font-weight:700;font-family:var(--mono);color:${inc>=0?'#16a34a':'#dc2626'}">${fmt(inc)}</td>
+      <td>${(()=>{const f=getFacAlerta(c.custId);if(!f)return'<span style="color:var(--g400);font-size:11px">—</span>';if(f.dias>=DIAS_ALERTA)return`<span style="color:#dc2626;font-weight:700;font-family:var(--mono)">${f.dias}d 🚨</span>`;if(f.dias>=1)return`<span style="color:#ca8a04;font-weight:700;font-family:var(--mono)">${f.dias}d ⚠</span>`;return'<span style="color:#16a34a;font-size:11px">✓ Ok</span>';})()}</td>
+      <td><button class="btn btn-sm" onclick="delC(${idx})" style="color:var(--g400);padding:3px 8px">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+function delC(idx){if(!confirm('¿Eliminar?'))return;ST.comercios.splice(idx,1);save();renderPipeline();updateDots();}
+
+function renderCohortAlertas(){
+  const cohortKeys=Object.keys(COHORTS);
+  let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:4px">';
+  cohortKeys.forEach(mes=>{
+    const ch=COHORTS[mes];
+    const conv=ST.comercios.filter(c=>c.mesConv===mes&&c.estado==='seguimiento');
+    const dcTotal=conv.reduce((s,c)=>s+getDC(c),0);
+    const asConCohort=ST.asesores.filter(a=>conv.some(c=>c.asesor===a.nombre));
+    const objTotal=asConCohort.reduce((s,a)=>s+a.objetivo,0);
+    const dcIncCohort=conv.reduce((s,c)=>s+Math.max(0,getDCInc(c)),0);
+    const pctCohort=objTotal>0?Math.min(Math.round(dcIncCohort/objTotal*100),999):0;
+    const byAsesor={};
+    conv.forEach(c=>{if(!byAsesor[c.asesor])byAsesor[c.asesor]=0;byAsesor[c.asesor]+=Math.max(0,getDCInc(c));});
+    html+=`<div style="background:${ch.color};border:1.5px solid ${ch.border};border-radius:10px;padding:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div><div style="font-size:12px;font-weight:700;color:${ch.text}">${ch.label}</div>
+          <div style="font-size:11px;color:var(--g600);margin-top:1px">${conv.length} convertidos</div></div>
+        ${semaforo(pctCohort)}
+      </div>
+      <div style="height:8px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;border-radius:4px;width:${Math.min(pctCohort,100)}%;background:${semColor(pctCohort)}"></div></div>
+      ${Object.entries(byAsesor).map(([nombre,dc])=>{
+        const a=ST.asesores.find(x=>x.nombre===nombre);
+        const dcAs=getDCIncTotal(nombre);
+        const p=a&&a.objetivo>0?Math.min(Math.round(dcAs/a.objetivo*100),999):0;
+        return`<div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;padding:3px 0;border-top:1px solid rgba(0,0,0,.05)">
+          <span style="color:var(--g800)">${nombre.split(' ').slice(0,2).join(' ')}</span>${semaforo(p)}</div>`;
+      }).join('')}
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('cohort-alertas').innerHTML=html;
+}
+
+function getAlertas(){
+  const lista=[];
+  ST.comercios.filter(c=>c.estado==='seguimiento').forEach(c=>{
+    const f=getFacAlerta(c.custId);
+    if(f&&f.dias>=DIAS_ALERTA){
+      lista.push({tipo:'critica',ico:'🚨',comercio:c.nombre,asesor:c.asesor,titulo:`Sin facturar hace ${f.dias} días`,desc:`Este comercio no tiene actividad de cobro hace ${f.dias} días consecutivos.`,meta:`Cust ID: ${c.custId||'—'}${f.fecha?' · Última fac: '+f.fecha:''}`});
+    }
+  });
+  ST.comercios.forEach(c=>{
+    const dc=getDC(c),inc=getDCInc(c);
+    if(!c.tasaProc)lista.push({tipo:'critica',ico:'⚠️',comercio:c.nombre,asesor:c.asesor,titulo:'Sin tasa de procesamiento',desc:'DC incompleto.',meta:''});
+    if(inc<0)lista.push({tipo:'critica',ico:'📉',comercio:c.nombre,asesor:c.asesor,titulo:'DC incremental negativo',desc:'DC teórico menor que DC M-1.',meta:`Increm: ${fmt(inc)}`});
+    if(c.estado==='seguimiento'&&(!c.seguimiento||c.seguimiento.every(s=>!s.tpvDeb&&!s.tpvCuotas)))lista.push({tipo:'critica',ico:'⏰',comercio:c.nombre,asesor:c.asesor,titulo:'Seguimiento sin TPV real',desc:'Convertido pero sin datos cargados.',meta:''});
+    if(inc>0&&inc<dc*0.2&&dc>0)lista.push({tipo:'atencion',ico:'📊',comercio:c.nombre,asesor:c.asesor,titulo:'DC incremental bajo',desc:'Incremento menor al 20% del DC teórico.',meta:`Increm: ${fmt(inc)}`});
+    if(!c.custId)lista.push({tipo:'gestion',ico:'🔍',comercio:c.nombre,asesor:c.asesor,titulo:'Sin Cust ID',desc:'Sin ID de cliente registrado.',meta:''});
+    if(inc>dc*0.5&&dc>0)lista.push({tipo:'positiva',ico:'🚀',comercio:c.nombre,asesor:c.asesor,titulo:'Excelente incremento',desc:'DC incremental supera el 50% del DC teórico.',meta:`Increm: ${fmt(inc)}`});
+  });
+  ST.asesores.forEach(a=>{
+    const dcInc=getDCIncTotal(a.nombre);
+    const p=a.objetivo>0?Math.min(Math.round(dcInc/a.objetivo*100),999):0;
+    if(a.objetivo>0){
+      let tipo,ico,titulo;
+      if(p>=100){tipo='positiva';ico='✅';titulo=`${a.nombre} — objetivo alcanzado`;}
+      else if(p>=80){tipo='atencion';ico='⚡';titulo=`${a.nombre} — en camino (${p}%)`;}
+      else{tipo='critica';ico='🎯';titulo=`${a.nombre} — bajo el 80%`;}
+      lista.push({tipo,ico,comercio:null,asesor:a.nombre,titulo,desc:'DC incremental acumulado de convertidos vs objetivo.',meta:`DC increm: ${fmt(dcInc)} / Obj: ${fmt(a.objetivo)}`,pct:p,esObj:true,dcInc});
+    }
+  });
+  return lista;
+}
+function fAl(tipo,el){fAlt=tipo;document.querySelectorAll('.cf').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderAlertas();}
+function renderAlertas(){
+  renderCohortAlertas();
+  const todas=getAlertas();
+  const cr=todas.filter(a=>a.tipo==='critica').length,at=todas.filter(a=>a.tipo==='atencion').length;
+  const gs=todas.filter(a=>a.tipo==='gestion').length,po=todas.filter(a=>a.tipo==='positiva').length;
+  document.getElementById('al-metrics').innerHTML=`<div class="rm rojo"><div class="rm-l">🔴 Críticas</div><div class="rm-v">${cr}</div></div><div class="rm amarillo"><div class="rm-l">🟡 Atención</div><div class="rm-v">${at}</div></div><div class="rm verde"><div class="rm-l">🟢 Positivas</div><div class="rm-v">${po}</div></div>`;
+  document.getElementById('dot-al').classList.toggle('show',cr>0);
+  const lista=fAlt==='todas'?todas:todas.filter(a=>a.tipo===fAlt);
+  const cm={critica:'ai-r',atencion:'ai-a',gestion:'ai-b',positiva:'ai-g'};
+  const bm={critica:'br',atencion:'ba',gestion:'bb',positiva:'bg'};
+  const lm={critica:'Crítica',atencion:'Atención',gestion:'Gestión',positiva:'Positiva'};
+  const cont=document.getElementById('al-cont');
+  if(!lista.length){cont.innerHTML='<div class="empty">Sin alertas en esta categoría.</div>';return;}
+  cont.innerHTML=lista.map(a=>`<div class="ai"><div class="ai-ico ${cm[a.tipo]}">${a.ico}</div>
+    <div style="flex:1">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px">
+        <span style="font-weight:600;font-size:13px">${a.titulo}</span><span class="badge ${bm[a.tipo]}">${lm[a.tipo]}</span>
+        ${a.esObj?semaforo(a.pct):''}
+      </div>
+      <div style="font-size:12px;color:var(--g600)">${a.desc}</div>
+      <div style="font-size:11px;color:var(--g400);margin-top:3px">${a.comercio?`🏪 ${a.comercio} · `:''}👤 ${a.asesor}${a.meta?' · '+a.meta:''}</div>
+      ${a.esObj?`<div style="height:6px;background:var(--g200);border-radius:3px;overflow:hidden;margin-top:6px"><div class="pf ${semCls(a.pct)}" style="width:${Math.min(a.pct,100)}%"></div></div>`:''}
+    </div></div>`).join('');
+}
+
+function getForecasted(custId,tasaProc,tasaRound,shareDeb,shareCuotas){
+  const f=csvFac[custId];
+  if(!f||!f.tpvAcc||!f.cantDias)return null;
+  const hoy=new Date();
+  const ultimoDia=new Date(hoy.getFullYear(),hoy.getMonth()+1,0).getDate();
+  const diasRestantes=ultimoDia-hoy.getDate();
+  const promDiario=f.tpvAcc/f.cantDias;
+  const tpvForecast=f.tpvAcc+(promDiario*diasRestantes);
+  const res=calcDCVal(tpvForecast,parseFloat(shareDeb)||0,parseFloat(shareCuotas)||0,tasaProc,tasaRound);
+  return{tpv:tpvForecast,dc:res.total,diasRestantes,promDiario};
+}
+
+function isPotenciado(c){
+  // Reglas: TPV real supera M-1 en $2M, +30%, DC incremental positivo
+  const f=csvFac[c.custId];
+  if(!f||!f.tpvAcc)return null; // sin datos
+  const tpvM1=parseFloat(c.tpvM1)||0;
+  const tpvReal=f.tpvAcc;
+  const dcInc=getDCInc(c);
+  const supera2M=(tpvReal-tpvM1)>=2000000;
+  const supera30pct=tpvM1>0?(tpvReal/tpvM1-1)>=0.30:false;
+  const dcPositivo=dcInc>0;
+  return{potenciado:supera2M&&supera30pct&&dcPositivo,supera2M,supera30pct,dcPositivo,tpvReal,tpvM1,dcInc};
+}
+function potenciadoBadge(c){
+  const r=isPotenciado(c);
+  if(!r)return'<span class="badge bgr" style="font-size:10px">Sin datos BQ</span>';
+  if(r.potenciado)return'<span class="badge bg" style="font-size:11px;font-weight:700">⚡ Potenciado</span>';
+  return`<span class="badge br" style="font-size:10px" title="TPV +$2M: ${r.supera2M?'✓':'✗'} | +30%: ${r.supera30pct?'✓':'✗'} | DC+: ${r.dcPositivo?'✓':'✗'}">No potenciado</span>`;
+}
+
+function renderSeg(){
+  const cohortKeys=Object.keys(COHORTS);
+  const div=document.getElementById('seg-content');let html='';
+  cohortKeys.forEach(mes=>{
+    const ch=COHORTS[mes];
+    let list=ST.comercios.filter(c=>c.mesConv===mes&&c.estado==='seguimiento');
+    if(fSeg!=='todos')list=list.filter(c=>c.asesor===fSeg);
+    const dcCohort=list.reduce((s,c)=>s+Math.max(0,getDCInc(c)),0); // suma DC incremental
+    const asConCohort=ST.asesores.filter(a=>list.some(c=>c.asesor===a.nombre));
+    const objCohort=asConCohort.reduce((s,a)=>s+a.objetivo,0);
+    const pctCohort=objCohort>0?Math.min(Math.round(dcCohort/objCohort*100),999):0;
+    html+=`<div class="cohort-header" style="background:${ch.color};border:1.5px solid ${ch.border}">
+      <div><div style="font-size:14px;font-weight:700;color:${ch.text}">${ch.label}</div>
+        <div style="font-size:11px;color:var(--g600);margin-top:2px">${list.length} convertidos en seguimiento</div></div>
+      ${list.length?semaforo(pctCohort):''}
+    </div>`;
+    if(!list.length){
+      html+=`<div style="text-align:center;padding:1rem;color:var(--g400);font-size:13px;margin-bottom:16px">Sin comercios convertidos en ${getMesLabel(new Date(mes+'-02'))}</div>`;
+    }else{
+      list.forEach(c=>{
+        const idx=ST.comercios.indexOf(c);
+        const tp=TASAS_PROC[c.tasaProc],tr=TASAS_ROUND[c.tasaRound];
+        const ai=ST.asesores.findIndex(a=>a.nombre===c.asesor);const cc=CC[ai>=0?ai%CC.length:0];
+        const seg=c.seguimiento||[{mes:'M0',tpvDeb:'',tpvCuotas:''},{mes:'M1',tpvDeb:'',tpvCuotas:''},{mes:'M2',tpvDeb:'',tpvCuotas:''}];
+        const asesorObj=ST.asesores.find(a=>a.nombre===c.asesor);
+        const dcAsesor=getDCIncTotal(c.asesor); // suma DC incremental de convertidos
+        const pctObj=asesorObj&&asesorObj.objetivo>0?Math.min(Math.round(dcAsesor/asesorObj.objetivo*100),999):0;
+        const forecast=getForecasted(c.custId,c.tasaProc,c.tasaRound,c.shareDeb,c.shareCuotas);
+        html+=`<div class="card" style="margin-bottom:12px">
+          <div class="card-title">
+            <span>${c.nombre}</span>
+            <span style="background:${cc.bg};color:${cc.tx};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700">${ini(c.asesor)}</span>
+            ${tp?`<span class="badge bp" style="font-size:10px">${tp.label}</span>`:''}
+            ${tr?`<span class="badge bt" style="font-size:10px">${tr.label}</span>`:''}
+            ${potenciadoBadge(c)}
+            <span style="font-size:11px;color:var(--g400);margin-left:auto">DC teórico: <strong style="color:var(--purple-d)">${fmt(getDC(c))}/mes</strong></span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+            <div style="background:var(--g50);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:600;color:var(--g400);margin-bottom:4px">CUST ID</div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--dark)">${c.custId||'—'}</div>
+            </div>
+            <div style="background:var(--g50);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:600;color:var(--g400);margin-bottom:4px">TPV M-1</div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--dark)">${fmt(parseFloat(c.tpvM1)||0)}</div>
+            </div>
+            <div style="background:var(--g50);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:600;color:var(--g400);margin-bottom:4px">DC M-1</div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:var(--dark)">${fmt(parseFloat(c.dcM1)||0)}</div>
+            </div>
+            <div style="background:var(--g50);border-radius:8px;padding:10px 12px">
+              <div style="font-size:10px;font-weight:600;color:var(--g400);margin-bottom:4px">DC INCREMENTAL</div>
+              <div style="font-family:var(--mono);font-size:13px;font-weight:600;color:${getDCInc(c)>=0?'#16a34a':'#dc2626'}">${fmt(getDCInc(c))}</div>
+            </div>
+          </div>
+          ${forecast?`<div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;gap:20px;flex-wrap:wrap;align-items:center">
+            <div style="font-size:11px;font-weight:700;color:var(--purple-d)">📈 FORECASTED AL CIERRE DEL MES</div>
+            <div style="font-size:12px;color:var(--dark)">TPV estimado: <strong style="font-family:var(--mono);color:var(--purple-d)">${fmt(forecast.tpv)}</strong></div>
+            <div style="font-size:12px;color:var(--dark)">DC estimado: <strong style="font-family:var(--mono);color:var(--purple-d)">${fmt(forecast.dc)}</strong></div>
+            <div style="font-size:11px;color:var(--g400)">Prom. diario: ${fmt(forecast.promDiario)} · ${forecast.diasRestantes} días restantes</div>
+          </div>`:''}
+          <div class="obj-wrap" style="margin-bottom:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+              <span style="font-size:11px;font-weight:600;color:var(--g600)">Objetivo de ${c.asesor.split(' ')[0]} — DC incremental: ${fmt(dcAsesor)} / objetivo: ${asesorObj?fmt(asesorObj.objetivo):'—'}</span>
+              ${semaforo(pctObj)}
+            </div>
+            <div class="obj-bar-bg"><div class="obj-bar-fill ${semCls(pctObj)}" style="width:${Math.min(pctObj,100)}%"></div></div>
+            <div class="obj-labels"><span>0%</span><span style="color:${semColor(pctObj)};font-weight:600">${pctObj}%</span><span>100%</span></div>
+          </div>
+          ${getFacHTML(c.custId)}
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            ${seg.map((s,mi)=>{
+              const td=parseFloat(s.tpvDeb)||0,tc=parseFloat(s.tpvCuotas)||0;
+              const dd=tp?td*(tp.pct/100):0,dc2=tr?tc*(tr.pct/100):0,dtot=dd+dc2;
+              const has=s.tpvDeb||s.tpvCuotas;
+              return`<div class="seg-mes${has?' ok':' pend'}">
+                <div class="seg-mes-title">${s.mes}</div>
+                <div class="gr c2" style="margin-bottom:6px">
+                  <div class="fg"><label>TPV déb/1p ($)</label><input type="number" placeholder="0" value="${s.tpvDeb||''}" oninput="updSeg(${idx},${mi},'tpvDeb',this.value)"></div>
+                  <div class="fg"><label>TPV cuotas ($)</label><input type="number" placeholder="0" value="${s.tpvCuotas||''}" oninput="updSeg(${idx},${mi},'tpvCuotas',this.value)"></div>
+                </div>
+                ${has?`<div style="background:#fff;border-radius:6px;padding:7px 10px;font-size:11px;display:flex;gap:10px;flex-wrap:wrap">
+                  <span>DC déb: <strong style="color:var(--purple-d);font-family:var(--mono)">${fmt(dd)}</strong></span>
+                  <span>DC cuotas: <strong style="color:var(--purple-d);font-family:var(--mono)">${fmt(dc2)}</strong></span>
+                  <span>Total: <strong style="color:var(--purple-d);font-family:var(--mono)">${fmt(dtot)}</strong></span>
+                </div>`:''}
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      });
+    }
+  });
+  div.innerHTML=html||'<div class="card"><div class="empty">Sin convertidos en seguimiento todavía.<br><span style="font-size:12px">Cargá un comercio con estado "Seguimiento" para verlo acá.</span></div></div>';
+}
+function updSeg(idx,mes,campo,val){
+  if(!ST.comercios[idx].seguimiento)ST.comercios[idx].seguimiento=[{mes:'M0',tpvDeb:'',tpvCuotas:''},{mes:'M1',tpvDeb:'',tpvCuotas:''},{mes:'M2',tpvDeb:'',tpvCuotas:''}];
+  ST.comercios[idx].seguimiento[mes][campo]=val;save();
+}
+
+function renderGestion(){
+  const criticos=ST.asesores.filter(a=>{
+    const dc=getDCIncTotal(a.nombre);
+    return a.objetivo>0&&(dc/a.objetivo)<0.8;
+  });
+  const div=document.getElementById('gestion-content');
+  if(!criticos.length){div.innerHTML='<div class="card"><div class="empty">🎉 Ningún asesor está por debajo del 80% del objetivo.</div></div>';return;}
+  div.innerHTML=criticos.map((a,ai)=>{
+    const dc=getDCIncTotal(a.nombre);
+    const p=Math.min(Math.round(dc/a.objetivo*100),999);
+    const key=`asesor_${a.nombre.replace(/\s/g,'_')}`;
+    const comentarios=ST.gestionComentarios[key]||[];
+    const idx_a=ST.asesores.indexOf(a);const cc=CC[idx_a%CC.length];
+    return`<div class="gestion-card">
+      <div class="gestion-header">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(a.nombre)}</div>
+          <div>
+            <div style="font-weight:700;font-size:14px;color:var(--dark)">${a.nombre}</div>
+            <div style="font-size:12px;color:var(--g600)">DC acumulado: <strong style="font-family:var(--mono)">${fmt(dc)}</strong> / Objetivo: <strong style="font-family:var(--mono)">${fmt(a.objetivo)}</strong></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${semaforo(p)}
+          <div style="width:100px">
+            <div class="pb"><div class="pf ${semCls(p)}" style="width:${Math.min(p,100)}%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="gestion-body">
+        <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:10px">Comercios activos (${ST.comercios.filter(c=>c.asesor===a.nombre).length})</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+          ${ST.comercios.filter(c=>c.asesor===a.nombre).map(c=>`
+            <span style="background:var(--g50);border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px">
+              ${c.nombre} <span style="color:var(--purple-d);font-family:var(--mono);font-weight:600">${fmt(getDC(c))}</span>
+              ${cohortBadge(c.mesConv)}
+            </span>`).join('')}
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:8px">📝 Planes de acción y comentarios</div>
+        <div id="comments-${key}" style="margin-bottom:10px">
+          ${comentarios.length?comentarios.map((cm,ci)=>`
+            <div class="comment-item">
+              <div class="comment-meta">${cm.autor} — ${cm.fecha}</div>
+              <div class="comment-text">${cm.texto}</div>
+              <button onclick="delComment('${key}',${ci})" style="background:none;border:none;color:var(--g400);cursor:pointer;font-size:11px;margin-top:4px">✕ eliminar</button>
+            </div>`).join(''):'<div style="font-size:12px;color:var(--g400);margin-bottom:8px">Sin comentarios aún.</div>'}
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <input type="text" id="comment-autor-${key}" placeholder="Tu nombre" style="width:140px;font-size:12px;padding:6px 10px">
+          <textarea id="comment-text-${key}" placeholder="Escribí el plan de acción o comentario..." style="flex:1;min-width:200px;min-height:52px;font-size:12px"></textarea>
+          <button class="btn btn-dark btn-sm" onclick="addComment('${key}')" style="align-self:flex-end">💬 Agregar</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addComment(key){
+  const autor=document.getElementById('comment-autor-'+key).value.trim();
+  const texto=document.getElementById('comment-text-'+key).value.trim();
+  if(!texto){alert('Escribí un comentario');return;}
+  if(!ST.gestionComentarios[key])ST.gestionComentarios[key]=[];
+  ST.gestionComentarios[key].push({autor:autor||'Anónimo',texto,fecha:new Date().toLocaleDateString('es-AR')});
+  save();renderGestion();
+}
+function delComment(key,idx){
+  ST.gestionComentarios[key].splice(idx,1);save();renderGestion();
+}
+
+function renderPositivas(){
+  const div=document.getElementById('positivas-content');
+  const cohortKeys=Object.keys(COHORTS);
+  let html='';
+  cohortKeys.forEach(mes=>{
+    const ch=COHORTS[mes];
+    const conv=ST.comercios.filter(c=>c.mesConv===mes&&c.estado==='seguimiento');
+    // Ranking: asesores que tienen >100% y tienen convertidos en esta cohorte
+    const ranking=ST.asesores.map(a=>{
+      const dcAs=ST.comercios.filter(c=>c.asesor===a.nombre).reduce((s,c)=>s+getDC(c),0);
+      const dcCohort=conv.filter(c=>c.asesor===a.nombre).reduce((s,c)=>s+getDC(c),0);
+      const p=a.objetivo>0?Math.min(Math.round(dcAs/a.objetivo*100),999):0;
+      return{nombre:a.nombre,dc:dcAs,dcCohort,objetivo:a.objetivo,pct:p};
+    }).filter(a=>a.pct>=100&&a.dcCohort>0).sort((a,b)=>b.pct-a.pct);
+
+    if(!ranking.length)return;
+    const ai_c=ST.asesores.findIndex(a=>a.nombre===ranking[0]?.nombre);
+    html+=`<div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="background:${ch.color};margin:-18px -20px 14px;padding:12px 16px;border-radius:12px 12px 0 0;border-bottom:1.5px solid ${ch.border}">
+        <span style="color:${ch.text};font-size:14px;font-weight:700">${ch.label}</span>
+        <span class="badge" style="background:${ch.color};color:${ch.text};border:1px solid ${ch.border};margin-left:auto">${ranking.length} sobre objetivo</span>
+      </div>
+      ${ranking.map((r,i)=>{
+        const pos=i+1;
+        const ai=ST.asesores.findIndex(a=>a.nombre===r.nombre);const cc=CC[ai>=0?ai%CC.length:0];
+        const rankCls=pos===1?'rank-1':pos===2?'rank-2':pos===3?'rank-3':'rank-other';
+        return`<div class="ranking-item">
+          <div class="ranking-num ${rankCls}">${pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos}</div>
+          <div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(r.nombre)}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:13px">${r.nombre}</div>
+            <div style="font-size:11px;color:var(--g600)">DC cohorte: <strong style="font-family:var(--mono);color:var(--purple-d)">${fmt(r.dcCohort)}</strong> · DC total: <strong style="font-family:var(--mono)">${fmt(r.dc)}</strong></div>
+          </div>
+          <div style="text-align:right">
+            ${semaforo(r.pct)}
+            <div style="font-size:11px;color:var(--g400);margin-top:3px">Obj: ${fmt(r.objetivo)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  });
+  div.innerHTML=html||'<div class="card"><div class="empty">🎯 Aún no hay asesores que superaron el 100% del objetivo en ninguna cohorte.</div></div>';
+}
+
+function renderEquipo(){
+  const dcT=ST.comercios.reduce((a,c)=>a+getDC(c),0),incT=ST.comercios.reduce((a,c)=>a+getDCInc(c),0);
+  const objT=ST.asesores.reduce((a,x)=>a+x.objetivo,0);
+  document.getElementById('eq-tot').textContent=ST.comercios.length;
+  document.getElementById('eq-dc').textContent=fmt(dcT);
+  document.getElementById('eq-inc').textContent=fmt(incT);
+  document.getElementById('eq-obj').textContent=fmt(objT);
+  document.getElementById('eq-body').innerHTML=ST.asesores.map((a,i)=>{
+    const mis=ST.comercios.filter(c=>c.asesor===a.nombre);
+    const dc=mis.reduce((s,c)=>s+getDC(c),0),inc=getDCIncTotal(a.nombre);
+    const p=a.objetivo>0?Math.min(Math.round(inc/a.objetivo*100),999):0;
+    const faltante=Math.max(0,a.objetivo-dc);const cc=CC[i%CC.length];
+    return`<tr>
+      <td><div style="display:flex;align-items:center;gap:7px"><div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(a.nombre)}</div><strong style="font-size:12px">${a.nombre}</strong></div></td>
+      <td>${mis.length}</td>
+      <td style="font-weight:700;color:var(--purple-d);font-family:var(--mono)">${fmt(dc)}</td>
+      <td style="font-weight:700;font-family:var(--mono);color:${inc>=0?'#16a34a':'#dc2626'}">${fmt(inc)}</td>
+      <td style="color:var(--g600);font-family:var(--mono)">${fmt(a.objetivo)}</td>
+      <td><div style="display:flex;align-items:center;gap:6px"><div class="pb" style="width:80px"><div class="pf ${semCls(p)}" style="width:${Math.min(p,100)}%"></div></div><span style="font-size:12px;font-family:var(--mono)">${p}%</span></div></td>
+      <td>${semaforo(p)}</td>
+      <td style="font-size:12px;font-family:var(--mono);color:${faltante>0?'#dc2626':'#16a34a'}">${faltante>0?'-'+fmt(faltante):'✓ Ok'}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('asesores-cfg').innerHTML=ST.asesores.map((a,i)=>{const cc=CC[i%CC.length];return`<div class="rowf" style="margin-bottom:8px"><div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(a.nombre)}</div><input type="text" value="${a.nombre}" style="flex:1;min-width:130px" onchange="updAs(${i},'nombre',this.value)"><input type="number" value="${a.objetivo}" style="width:140px" onchange="updAs(${i},'objetivo',parseFloat(this.value)||0)"><button class="btn btn-sm" onclick="delAs(${i})" style="color:var(--g400)">✕</button></div>`;}).join('');
+}
+function updAs(i,k,v){ST.asesores[i][k]=v;save();renderEquipo();}
+function delAs(i){ST.asesores.splice(i,1);save();renderEquipo();}
+function addAsesor(){const n=document.getElementById('new-nombre').value.trim();const o=parseFloat(document.getElementById('new-obj').value)||0;if(!n)return;ST.asesores.push({nombre:n,objetivo:o});document.getElementById('new-nombre').value='';document.getElementById('new-obj').value='';save();renderEquipo();}
+
+renderChips('chips-pipe',renderPipeline);renderPipeline();renderAlertas();
+renderChips('chips-seg',renderSeg);fillAs('c-asesor');fillAs('calc-asesor');updateDots();
+</script>
+</body></html>
