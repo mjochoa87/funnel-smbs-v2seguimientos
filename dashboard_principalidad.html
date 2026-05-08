@@ -891,38 +891,67 @@ function setGasStatus(type, msg) {
 }
 
 let _fetching = false;
-async function fetchGASData() {
+function fetchGASData() {
   if (_fetching) return;
   _fetching = true;
   setGasStatus('loading','⏳ Sincronizando con Google Sheets...');
-  try {
-    const resp = await fetch(GAS_URL, {mode:'cors', cache:'no-cache', credentials:'include'});
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error);
-    const bmCount = processBaseMadreFromGAS(data.baseMadre || []);
-    processLookerv2FromGAS(data.lookerv2 || []);
-    save();
-    const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-    setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
-    renderPipeline();
-    renderSeguimiento();
-    renderAlertas();
-    renderGestion();
-    renderMedallero();
-    renderIncentivos();
-  } catch(err) {
-    console.error('GAS fetch error:', err);
-    setGasStatus('error',
-      `❌ No se pudo conectar: <b>${err.message}</b> — ` +
-      `<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a> ` +
-      `· <a href="#" onclick="document.getElementById('tab-pipeline').querySelector('input[type=file]').click();return false;" style="color:inherit">CSV manual</a>` +
-      (err.message.includes('403') || err.message.includes('401') ?
-        ' &nbsp;⚠️ <b>Tip:</b> Redeployá el Apps Script con acceso "Cualquier persona"' : '')
-    );
-  } finally {
+
+  // Limpiamos cualquier script JSONP anterior
+  const old = document.getElementById('_gasJsonpScript');
+  if (old) old.remove();
+  const CB = '__gasJsonpCB';
+
+  let _timeout = setTimeout(() => {
+    const s = document.getElementById('_gasJsonpScript');
+    if (s) s.remove();
+    delete window[CB];
     _fetching = false;
-  }
+    setGasStatus('error',
+      '⏱ Tiempo agotado (60s) — ' +
+      '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
+    );
+  }, 60000);
+
+  window[CB] = function(data) {
+    clearTimeout(_timeout);
+    const s = document.getElementById('_gasJsonpScript');
+    if (s) s.remove();
+    delete window[CB];
+    _fetching = false;
+    try {
+      if (data.error) throw new Error(data.error);
+      const bmCount = processBaseMadreFromGAS(data.baseMadre || []);
+      processLookerv2FromGAS(data.lookerv2 || []);
+      save();
+      const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+      setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
+      renderPipeline();
+      renderSeguimiento();
+      renderAlertas();
+      renderGestion();
+      renderMedallero();
+      renderIncentivos();
+    } catch(err) {
+      console.error('GAS process error:', err);
+      setGasStatus('error', `❌ Error procesando datos: <b>${err.message}</b> — <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
+    }
+  };
+
+  const script = document.createElement('script');
+  script.id = '_gasJsonpScript';
+  script.onerror = function() {
+    clearTimeout(_timeout);
+    this.remove();
+    delete window[CB];
+    _fetching = false;
+    setGasStatus('error',
+      '❌ Sin respuesta del Apps Script — asegurate de estar logueada con tu cuenta MeLi en Chrome · ' +
+      '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
+    );
+  };
+  // JSONP: script tag no tiene restricciones CORS y envía cookies de Google automáticamente
+  script.src = GAS_URL + '?callback=' + CB + '&_t=' + Date.now();
+  document.head.appendChild(script);
 }
 
 // ============================================================
