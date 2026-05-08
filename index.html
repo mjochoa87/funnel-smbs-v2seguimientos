@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -195,7 +196,7 @@ tr:hover td{background:#fafbff}
     <div class="card"><div class="card-title">📂 Base de datos M-1 (CSV)</div>
       <div id="csv-banner" class="csv-banner warn">
         <div><div class="csv-info">⚠ Sin planilla cargada — TPV M-1 y DC M-1 se completarán manualmente.</div>
-          <div style="font-size:11px;color:#92400e;margin-top:2px">CSV con columnas: cust_id, tpv_m1, dc_m1</div></div>
+          <div style="font-size:11px;color:#92400e;margin-top:2px">CSV de Base Madre con columnas: Cust_Id, Nombre_comercio, Nombre_asesor, TPV_Point, DC_Point, Rubro</div></div>
         <label class="btn btn-green btn-sm" style="cursor:pointer">📂 Cargar CSV<input type="file" accept=".csv" id="csv-input" style="display:none" onchange="loadCSV(this)"></label>
       </div>
     </div>
@@ -337,25 +338,72 @@ tr:hover td{background:#fafbff}
       <div class="gr c2">
         <div class="fg"><label>Tasa de procesamiento</label>
           <select id="calc-tasa-proc" onchange="calcSt()">
-            <option value="">Seleccionar...</option>
-            <option value="mar_abierto">Mar abierto — 2,03%</option><option value="nivel1">Nivel 1 — 2,03%</option>
-            <option value="nivel2">Nivel 2 — 1,75%</option><option value="nivel3">Nivel 3 — 1,47%</option>
-            <option value="nivel4">Nivel 4 — 1,24%</option><option value="nivel5">Nivel 5 — 0,82%</option>
-            <option value="nivel6">Nivel 6 — 0,45%</option><option value="plazos_largos">Plazos Largos — 0,30%</option>
-            <option value="promo_cuotas_t">Promo Cuotas — 0,45%</option><option value="suscripciones">Suscripciones — 0,82%</option>
+            <option value="">Seleccionar tasa proc...</option>
+            <optgroup label="── Estándar ──">
+              <option value="mar_abierto">Mar abierto — 2,03%</option>
+              <option value="nivel1">Nivel 1 — 2,03%</option><option value="nivel2">Nivel 2 — 1,75%</option>
+              <option value="nivel3">Nivel 3 — 1,47%</option><option value="nivel4">Nivel 4 — 1,24%</option>
+              <option value="nivel5">Nivel 5 — 0,82%</option><option value="nivel6">Nivel 6 — 0,45%</option>
+            </optgroup>
+            <optgroup label="── Tasas Ecosistémicas ──">
+              <option value="eco_n1">Ecosist. N1 — 2,03%</option><option value="eco_n2">Ecosist. N2 — 1,75%</option>
+              <option value="eco_n3">Ecosist. N3 — 1,47%</option><option value="eco_n4">Ecosist. N4 — 1,24%</option>
+              <option value="eco_n5">Ecosist. N5 — 0,82%</option><option value="eco_n6">Ecosist. N6 — 0,45%</option>
+            </optgroup>
+            <optgroup label="── Especiales ──">
+              <option value="plazos_largos">Plazos Largos — 0,30%</option>
+              <option value="tag_pl_n1">Tag PL-N1 — 2,03%</option><option value="tag_pl_n3">Tag PL-N3 — 1,47%</option>
+              <option value="tag_pl_n6">Tag PL-N6 — 0,45%</option>
+              <option value="promo_cuotas_t">Promo Cuotas — 0,45%</option>
+              <option value="a1">1 a 1 — 0,35%</option>
+              <option value="suscripciones">Suscripciones — 0,45%</option>
+              <option value="promo_3meses">Promo 3 meses — 0,40%</option>
+              <option value="promo_parity">Promo Parity Nave — 0,35%</option>
+            </optgroup>
           </select>
         </div>
         <div class="fg"><label>Tasa de financing (round)</label>
           <select id="calc-tasa-round" onchange="calcSt()">
-            <option value="">Seleccionar round...</option>
-            <option value="mar_abierto_fin">Mar abierto fin. — 7,04%</option>
-            <option value="r1_mar">R1 Mar abierto — 6,74%</option><option value="r1_n3">R1 Nivel 3 — 6,46%</option><option value="r1_n5">R1 Nivel 5 — 5,90%</option><option value="r1_n6">R1 Nivel 6 — 5,43%</option>
-            <option value="r2_mar">R2 Mar abierto — 6,01%</option><option value="r2_n5">R2 Nivel 5 — 5,17%</option><option value="r2_n6">R2 Nivel 6 — 4,70%</option>
-            <option value="r3_mar">R3 Mar abierto — 5,31%</option><option value="r3_n5">R3 Nivel 5 — 4,01%</option>
-            <option value="r4_mar">R4 Mar abierto — 4,71%</option><option value="r5_mar">R5 Mar abierto — 3,73%</option>
-            <option value="r5_plus">R5 Plus (Promo Cuotas) — 1,70%</option>
-            <option value="r6_n6">R6 Nivel 6 — 1,70%</option>
-            <option value="a1_mar">1 a 1 Mar abierto — 3,82%</option><option value="a1_n6">1 a 1 Nivel 6 — 2,51%</option>
+            <option value="">Seleccionar round/financing...</option>
+            <optgroup label="── Mar abierto ──">
+              <option value="mar_abierto_fin">Mar abierto — 7,04%</option>
+              <option value="r3_mar">R3 Mar abierto — 5,31%</option><option value="r4_mar">R4 Mar abierto — 4,71%</option><option value="r5_mar">R5 Mar abierto — 3,73%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 1 ──">
+              <option value="r3_n1">R3 N1 — 5,12%</option><option value="r4_n1">R4 N1 — 4,52%</option><option value="r5_n1">R5 N1 — 3,55%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 2 ──">
+              <option value="r3_n2">R3 N2 — 5,03%</option><option value="r4_n2">R4 N2 — 4,43%</option><option value="r5_n2">R5 N2 — 3,46%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 3 ──">
+              <option value="r3_n3">R3 N3 — 4,94%</option><option value="r4_n3">R4 N3 — 4,34%</option><option value="r5_n3">R5 N3 — 3,36%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 4 ──">
+              <option value="r3_n4">R3 N4 — 4,47%</option><option value="r4_n4">R4 N4 — 3,87%</option><option value="r5_n4">R5 N4 — 2,90%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 5 ──">
+              <option value="r3_n5">R3 N5 — 4,01%</option><option value="r4_n5">R4 N5 — 3,41%</option><option value="r5_n5">R5 N5 — 2,44%</option>
+            </optgroup>
+            <optgroup label="── Rounds Nivel 6 ──">
+              <option value="r3_n6">R3 N6 — 3,98%</option><option value="r4_n6">R4 N6 — 3,42%</option><option value="r5_n6">R5 N6 — 2,45%</option>
+              <option value="r5_plus">R5 Plus — Promo Cuotas — 1,70%</option>
+            </optgroup>
+            <optgroup label="── Rounds Ecosistémicas ──">
+              <option value="r3_eco_n1">R3 Eco N1 — 5,12%</option><option value="r3_eco_n2">R3 Eco N2 — 5,03%</option><option value="r3_eco_n3">R3 Eco N3 — 4,94%</option>
+              <option value="r3_eco_n4">R3 Eco N4 — 4,47%</option><option value="r3_eco_n5">R3 Eco N5 — 4,01%</option><option value="r3_eco_n6">R3 Eco N6 — 3,98%</option>
+              <option value="r4_eco_n1">R4 Eco N1 — 4,52%</option><option value="r4_eco_n2">R4 Eco N2 — 4,43%</option><option value="r4_eco_n3">R4 Eco N3 — 4,34%</option>
+              <option value="r4_eco_n4">R4 Eco N4 — 3,87%</option><option value="r4_eco_n5">R4 Eco N5 — 3,41%</option><option value="r4_eco_n6">R4 Eco N6 — 3,42%</option>
+              <option value="r5_eco_n1">R5 Eco N1 — 3,55%</option><option value="r5_eco_n2">R5 Eco N2 — 3,46%</option><option value="r5_eco_n3">R5 Eco N3 — 3,36%</option>
+              <option value="r5_eco_n4">R5 Eco N4 — 2,90%</option><option value="r5_eco_n5">R5 Eco N5 — 2,44%</option><option value="r5_eco_n6">R5 Eco N6 — 2,45%</option>
+            </optgroup>
+            <optgroup label="── Especiales ──">
+              <option value="promo_cuotas_fin">Promo Cuotas — 5,43%</option>
+              <option value="pl_mar">PL Mar abierto — 5,14%</option><option value="pl_n1">PL N1 — 6,74%</option><option value="pl_n3">PL N3 — 6,46%</option><option value="pl_n6">PL N6 — 5,43%</option>
+              <option value="a1_mar">1a1 Mar abierto — 5,14%</option><option value="a1_n1">1a1 N1 — 6,74%</option><option value="a1_n3">1a1 N3 — 6,46%</option><option value="a1_n6">1a1 N6 — 5,43%</option>
+              <option value="suscripciones_fin">Suscripciones fin. — 5,43%</option>
+              <option value="promo_3m_fin">Promo 3 meses fin. — 5,43%</option>
+              <option value="promo_parity_fin">Promo Parity fin. — 5,14%</option>
+            </optgroup>
           </select>
         </div>
       </div>
@@ -415,6 +463,17 @@ tr:hover td{background:#fafbff}
       <label class="btn btn-green btn-sm" style="cursor:pointer">📊 Cargar reporte<input type="file" accept=".csv" style="display:none" onchange="loadCSVFac(this)"></label>
     </div>
     <div style="font-size:11px;color:var(--g400)">Actualizá este reporte cada mañana. Alerta crítica a partir de <strong>3 días</strong> sin facturar 🚨, advertencia a partir de 1-2 días ⚠.</div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">📊 Datos Looker v2 — Convertidos por cohorte</div>
+    <div id="csv-looker-banner" class="csv-banner warn">
+      <div>
+        <div class="csv-info">⚠ Sin datos Looker cargados — los convertidos por cohorte no estarán disponibles.</div>
+        <div style="font-size:11px;color:#92400e;margin-top:2px">CSV de la hoja <strong>lookerv2</strong> con columnas: CUST_ID, MES, ASESOR, VALIDO (1=convertido), TPV, VC</div>
+      </div>
+      <label class="btn btn-green btn-sm" style="cursor:pointer">📊 Cargar Looker<input type="file" accept=".csv" style="display:none" onchange="loadCSVLooker(this)"></label>
+    </div>
+    <div id="looker-resumen" style="display:none"></div>
   </div>
   <div class="ar"><strong style="font-size:13px;color:var(--g600)">Asesor:</strong><div id="chips-seg"></div></div>
   <div id="seg-content"></div>
@@ -509,7 +568,7 @@ const COHORTS={
 };
 function getCohort(mes){return COHORTS[mes]||null;}
 
-const EQUIPO=[{nombre:'Julian Torres',objetivo:575000},{nombre:'Juan Cruz Rial',objetivo:1000000},{nombre:'Carol Delgado',objetivo:1000000},{nombre:'Soledad Maydana',objetivo:1000000},{nombre:'Rocio Angueira',objetivo:575000},{nombre:'Agustin Fernandez Diz',objetivo:1000000},{nombre:'Mariana Gonzalez',objetivo:1000000},{nombre:'Manuel Elizarraga',objetivo:1000000}];
+const EQUIPO=[{nombre:'Julian Torres',objetivo:575000},{nombre:'Juan Cruz Rial',objetivo:1000000},{nombre:'Carol Delgado',objetivo:1000000},{nombre:'Soledad Maydana',objetivo:1000000},{nombre:'Rocio Angueira',objetivo:575000},{nombre:'Agustin Fernandez Diz',objetivo:1000000},{nombre:'Mariana Gonzalez',objetivo:1000000},{nombre:'Manuel Elizarraga',objetivo:1000000},{nombre:'Maria Segovia',objetivo:575000},{nombre:'Matias Valenzuela',objetivo:575000},{nombre:'Mayra Marchesse',objetivo:575000}];
 const CC=[{bg:'#dbeafe',tx:'#1e40af',ac:'#2563eb'},{bg:'#fef3c7',tx:'#92400e',ac:'#d97706'},{bg:'#dcfce7',tx:'#166534',ac:'#16a34a'},{bg:'#ede9fe',tx:'#5b21b6',ac:'#7c3aed'},{bg:'#fce7f3',tx:'#9d174d',ac:'#db2777'},{bg:'#ccfbf1',tx:'#115e59',ac:'#0d9488'},{bg:'#fef9c3',tx:'#713f12',ac:'#ca8a04'},{bg:'#e0e7ff',tx:'#3730a3',ac:'#4f46e5'}];
 const ACCIONES={base:'Base',promo_cuotas:'Promo Cuotas',ri_tasa5:'RI Tasa 5',ri_tasa6:'RI Tasa 6',calentamiento:'Calentamiento'};
 
@@ -569,6 +628,8 @@ function loadCSV(input){
     const useNombre=findIdx(['nombre_comercio','nombre comercio']);
     const useTpv=findIdx(['tpv_point']);
     const useDc=findIdx(['dc_point']);
+    const useAsesor=findIdx(['nombre_asesor','asesor']);
+    const useRubro=findIdx(['rubro']);
     if(useId<0){alert('No se encontró columna Cust_Id en el CSV');return;}
     // Limpiar número formato argentino: 1.234.567,89 → 1234567.89
     function cleanNum(s){if(!s)return 0;return parseFloat(s.replace(/\./g,'').replace(',','.'))||0;}
@@ -583,7 +644,9 @@ function loadCSV(input){
       csvData[id]={
         nombre:useNombre>=0?(cols[useNombre]||'').replace(/"/g,''):'',
         tpvM1:useTpv>=0?cleanNum(cols[useTpv]):0,
-        dcM1:useDc>=0?cleanNum(cols[useDc]):0
+        dcM1:useDc>=0?cleanNum(cols[useDc]):0,
+        asesor:useAsesor>=0?(cols[useAsesor]||'').replace(/"/g,''):'',
+        rubro:useRubro>=0?(cols[useRubro]||'').replace(/"/g,''):''
       };
     }
     const n=Object.keys(csvData).length;
@@ -605,6 +668,15 @@ function onCustIdChange(){
     te.className=tpvVal>0?'auto-filled':'';de.className=dcVal>0?'auto-filled':'';
     const ne=document.getElementById('c-nombre');
     if(csvData[id].nombre&&!ne.value){ne.value=csvData[id].nombre;ne.className='auto-filled';}
+    const ae=document.getElementById('c-asesor');
+    if(csvData[id].asesor&&ae){
+      // Try to match asesor name from Base Madre to ST.asesores
+      const aName=csvData[id].asesor.trim();
+      const matchedAsesor=ST.asesores.find(a=>a.nombre.toLowerCase()===aName.toLowerCase()||aName.toLowerCase().includes(a.nombre.split(' ')[0].toLowerCase()));
+      if(matchedAsesor&&!ae.value)ae.value=matchedAsesor.nombre;
+    }
+    const re=document.getElementById('c-rubro');
+    if(csvData[id].rubro&&re&&!re.value){re.value=csvData[id].rubro;re.className='auto-filled';}
     calcDCForm();
     document.getElementById('tpvm1-src').style.display='inline';document.getElementById('dcm1-src').style.display='inline';
     calcDCForm();
@@ -641,6 +713,107 @@ function loadCSVFac(input){
     renderSeg();renderAlertas();updateDots();
   };
   reader.readAsText(file);
+}
+
+let csvLooker={};// {asesor: {mes_yyyymm: {convertidos, tpv, vc, dcM1, tpvM1, fcstTpv, fcstTpvInc}}}
+let csvLookerByCust={};// {cust_id: {fcstTpv, fcstTpvInc, tpvM1, dcM1, mes, asesor}}
+function loadCSVLooker(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const rows=parseCSVRows(e.target.result);
+    if(rows.length<2)return;
+    const headers=rows[0].map(h=>h.toLowerCase().replace(/"/g,'').trim());
+    function findIdx(keys){for(const k of keys){const i=headers.findIndex(h=>h===k||h.includes(k));if(i>=0)return i;}return -1;}
+    const idxCust=findIdx(['cust_id','custid']);
+    const idxMes=findIdx(['mes','month','fecha']);
+    const idxAsesor=findIdx(['asesor','vendedor','seller']);
+    const idxValido=findIdx(['valido','valid','convertido']);
+    const idxTpv=findIdx(['tpv']);
+    const idxVc=findIdx(['vc']);
+    // Extended columns (may not exist)
+    const idxTpvM1=findIdx(['tpv m-1','tpv_m1','tpv m1','tpv_m-1']);
+    const idxDcM1=findIdx(['dc m-1','dc_m1','dc m1','dc_m-1']);
+    const idxFcstTpv=findIdx(['fcst tpv','fcst_tpv','forecast tpv']);
+    const idxFcstInc=findIdx(['fcst tpv incr','fcst_tpv_inc','tpv incremental']);
+    if(idxMes<0||idxAsesor<0){alert('No se encontraron columnas MES y ASESOR en el CSV de Looker');return;}
+    function cleanNum(s){if(!s)return 0;return parseFloat(String(s).replace(/\./g,'').replace(',','.'))||0;}
+    csvLooker={};csvLookerByCust={};
+    for(let i=1;i<rows.length;i++){
+      const cols=rows[i];
+      const mes=String(cols[idxMes]||'').trim().replace(/"/g,'');
+      const asesor=String(cols[idxAsesor]||'').trim().replace(/"/g,'');
+      const valido=idxValido>=0?String(cols[idxValido]||'').trim():'1';
+      const esConvertido=valido==='1'||valido.toLowerCase()==='si'||valido.toLowerCase()==='true';
+      if(!mes||!asesor)continue;
+      if(!csvLooker[asesor])csvLooker[asesor]={};
+      if(!csvLooker[asesor][mes])csvLooker[asesor][mes]={convertidos:0,tpv:0,vc:0,tpvM1:0,dcM1:0,fcstTpv:0,fcstTpvInc:0};
+      if(esConvertido)csvLooker[asesor][mes].convertidos++;
+      csvLooker[asesor][mes].tpv+=idxTpv>=0?cleanNum(cols[idxTpv]):0;
+      csvLooker[asesor][mes].vc+=idxVc>=0?cleanNum(cols[idxVc]):0;
+      if(idxTpvM1>=0)csvLooker[asesor][mes].tpvM1=cleanNum(cols[idxTpvM1]);
+      if(idxDcM1>=0)csvLooker[asesor][mes].dcM1=cleanNum(cols[idxDcM1]);
+      if(idxFcstTpv>=0)csvLooker[asesor][mes].fcstTpv=cleanNum(cols[idxFcstTpv]);
+      if(idxFcstInc>=0)csvLooker[asesor][mes].fcstTpvInc=cleanNum(cols[idxFcstInc]);
+      // Also store per-CUST_ID for potenciamiento alerts
+      if(idxCust>=0){
+        const custId=String(cols[idxCust]||'').trim().replace(/"/g,'');
+        if(custId&&custId!=='0'){
+          if(!csvLookerByCust[custId]||esConvertido){
+            csvLookerByCust[custId]={
+              fcstTpv:idxFcstTpv>=0?cleanNum(cols[idxFcstTpv]):0,
+              fcstTpvInc:idxFcstInc>=0?cleanNum(cols[idxFcstInc]):0,
+              tpvM1:idxTpvM1>=0?cleanNum(cols[idxTpvM1]):0,
+              dcM1:idxDcM1>=0?cleanNum(cols[idxDcM1]):0,
+              tpv:idxTpv>=0?cleanNum(cols[idxTpv]):0,
+              vc:idxVc>=0?cleanNum(cols[idxVc]):0,
+              mes,asesor,esConvertido
+            };
+          }
+        }
+      }
+    }
+    const totalConv=Object.values(csvLooker).reduce((s,meses)=>s+Object.values(meses).reduce((s2,m)=>s2+m.convertidos,0),0);
+    const b=document.getElementById('csv-looker-banner');b.className='csv-banner';
+    b.innerHTML=`<div><div class="csv-info">✓ Looker v2 cargado — ${totalConv} convertidos en ${Object.keys(csvLooker).length} asesores</div></div><label class="btn btn-green btn-sm" style="cursor:pointer">🔄 Actualizar<input type="file" accept=".csv" style="display:none" onchange="loadCSVLooker(this)"></label>`;
+    renderLookerResumen();
+  };
+  reader.readAsText(file);
+}
+function renderLookerResumen(){
+  const div=document.getElementById('looker-resumen');
+  if(!div||!Object.keys(csvLooker).length){if(div)div.style.display='none';return;}
+  div.style.display='block';
+  // Cohorts: map YYYYMM to M0/M1/M2 tags
+  const cohortMap={};
+  Object.entries(COHORTS).forEach(([key,ch])=>{
+    const [y,m]=key.split('-');
+    const mm=y+m.padStart(2,'0');
+    cohortMap[mm]=ch;
+  });
+  // Build table: asesores as rows, cohorts as columns
+  const asesoresList=ST.asesores.map(a=>a.nombre);
+  const cohortKeys=Object.keys(COHORTS);
+  let html=`<div class="tw"><table>
+    <thead><tr><th>Asesor</th>`;
+  cohortKeys.forEach(key=>{const ch=COHORTS[key];html+=`<th style="color:${ch.text}">${ch.tag} convertidos</th><th style="color:${ch.text}">TPV ${ch.tag}</th>`;});
+  html+=`</tr></thead><tbody>`;
+  asesoresList.forEach(nombre=>{
+    // Try to match asesor name from Looker (partial match)
+    const lookerKey=Object.keys(csvLooker).find(k=>k.toLowerCase().includes(nombre.split(' ')[0].toLowerCase())||nombre.toLowerCase().includes(k.split(' ')[0].toLowerCase()));
+    const aData=lookerKey?csvLooker[lookerKey]:{};
+    html+=`<tr><td><strong>${nombre}</strong></td>`;
+    cohortKeys.forEach(key=>{
+      const [y,m]=key.split('-');
+      const mm=y+m.padStart(2,'0');
+      const d=aData[mm]||{convertidos:0,tpv:0};
+      html+=`<td style="font-family:var(--mono);text-align:center"><strong>${d.convertidos||0}</strong></td>`;
+      html+=`<td style="font-family:var(--mono);font-size:11px;color:var(--g600)">${d.tpv>0?fmt(d.tpv):'—'}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</tbody></table></div>`;
+  div.innerHTML=html;
 }
 
 function getFacAlerta(custId){
@@ -888,7 +1061,7 @@ function getAlertas(){
       lista.push({tipo:'critica',ico:'🚨',comercio:c.nombre,asesor:c.asesor,titulo:`Sin facturar hace ${f.dias} días`,desc:`Este comercio no tiene actividad de cobro hace ${f.dias} días consecutivos.`,meta:`Cust ID: ${c.custId||'—'}${f.fecha?' · Última fac: '+f.fecha:''}`});
     }
   });
-  ST.comercios.forEach(c=>{
+  ST.comercios.filter(c=>c.estado==='seguimiento').forEach(c=>{
     const dc=getDC(c),inc=getDCInc(c);
     if(!c.tasaProc)lista.push({tipo:'critica',ico:'⚠️',comercio:c.nombre,asesor:c.asesor,titulo:'Sin tasa de procesamiento',desc:'DC incompleto.',meta:''});
     if(inc<0)lista.push({tipo:'critica',ico:'📉',comercio:c.nombre,asesor:c.asesor,titulo:'DC incremental negativo',desc:'DC teórico menor que DC M-1.',meta:`Increm: ${fmt(inc)}`});
@@ -897,6 +1070,37 @@ function getAlertas(){
     if(!c.custId)lista.push({tipo:'gestion',ico:'🔍',comercio:c.nombre,asesor:c.asesor,titulo:'Sin Cust ID',desc:'Sin ID de cliente registrado.',meta:''});
     if(inc>dc*0.5&&dc>0)lista.push({tipo:'positiva',ico:'🚀',comercio:c.nombre,asesor:c.asesor,titulo:'Excelente incremento',desc:'DC incremental supera el 50% del DC teórico.',meta:`Increm: ${fmt(inc)}`});
   });
+  // Alertas de potenciamiento basadas en FCST de Looker v2
+  if(Object.keys(csvLookerByCust).length>0){
+    ST.comercios.filter(c=>c.estado==='seguimiento').forEach(c=>{
+      const l=csvLookerByCust[c.custId];
+      if(!l)return;// sin datos Looker para este comercio
+      const tpvM1=l.tpvM1||parseFloat(c.tpvM1)||0;
+      const fcstTpv=l.fcstTpv||0;
+      const fcstInc=l.fcstTpvInc||0;
+      const dcInc=getDCInc(c);
+      const supera2M=fcstInc>=2000000;
+      const supera30pct=tpvM1>0?(fcstTpv/tpvM1-1)>=0.30:false;
+      const dcPositivo=dcInc>0;
+      if(!supera2M||!supera30pct||!dcPositivo){
+        const issues=[];
+        if(!supera2M)issues.push(`FCST increm. ${fmt(fcstInc)} < $2M`);
+        if(!supera30pct)issues.push(`crecimiento ${tpvM1>0?Math.round((fcstTpv/tpvM1-1)*100):0}% < 30%`);
+        if(!dcPositivo)issues.push(`DC increm. ${fmt(dcInc)}`);
+        lista.push({tipo:'critica',ico:'⚡',comercio:c.nombre,asesor:c.asesor,
+          titulo:`No potenciado — ${c.nombre}`,
+          desc:`No cumple regla de potenciamiento: ${issues.join(' · ')}`,
+          meta:`FCST TPV: ${fmt(fcstTpv)} | TPV M-1: ${fmt(tpvM1)} | Cust ID: ${c.custId||'—'}`
+        });
+      } else {
+        lista.push({tipo:'positiva',ico:'⚡',comercio:c.nombre,asesor:c.asesor,
+          titulo:`Potenciado ✓ — ${c.nombre}`,
+          desc:'Cumple los tres criterios de potenciamiento (FCST +$2M, +30%, DC positivo).',
+          meta:`FCST TPV: ${fmt(fcstTpv)} | TPV M-1: ${fmt(tpvM1)}`
+        });
+      }
+    });
+  }
   ST.asesores.forEach(a=>{
     const dcInc=getDCIncTotal(a.nombre);
     const p=a.objetivo>0?Math.min(Math.round(dcInc/a.objetivo*100),999):0;
@@ -1060,156 +1264,231 @@ function renderSeg(){
       });
     }
   });
-  div.innerHTML=html||'<div class="card"><div class="empty">Sin convertidos en seguimiento todavía.<br><span style="font-size:12px">Cargá un comercio con estado "Seguimiento" para verlo acá.</span></div></div>';
+  div.innerHTML=html;
+  renderLookerResumen();
 }
-function updSeg(idx,mes,campo,val){
+function updSeg(idx,mi,field,val){
+  if(!ST.comercios[idx])return;
   if(!ST.comercios[idx].seguimiento)ST.comercios[idx].seguimiento=[{mes:'M0',tpvDeb:'',tpvCuotas:''},{mes:'M1',tpvDeb:'',tpvCuotas:''},{mes:'M2',tpvDeb:'',tpvCuotas:''}];
-  ST.comercios[idx].seguimiento[mes][campo]=val;save();
+  ST.comercios[idx].seguimiento[mi][field]=val;
+  save();
 }
 
 function renderGestion(){
-  const criticos=ST.asesores.filter(a=>{
-    const dc=getDCIncTotal(a.nombre);
-    return a.objetivo>0&&(dc/a.objetivo)<0.8;
-  });
+  const criticos=ST.asesores.filter(a=>a.objetivo>0&&getDCIncTotal(a.nombre)/a.objetivo<0.8);
   const div=document.getElementById('gestion-content');
-  if(!criticos.length){div.innerHTML='<div class="card"><div class="empty">🎉 Ningún asesor está por debajo del 80% del objetivo.</div></div>';return;}
-  div.innerHTML=criticos.map((a,ai)=>{
-    const dc=getDCIncTotal(a.nombre);
-    const p=Math.min(Math.round(dc/a.objetivo*100),999);
-    const key=`asesor_${a.nombre.replace(/\s/g,'_')}`;
-    const comentarios=ST.gestionComentarios[key]||[];
-    const idx_a=ST.asesores.indexOf(a);const cc=CC[idx_a%CC.length];
+  if(!criticos.length){div.innerHTML='<div class="empty">✓ Todos los asesores están por encima del 80% de su objetivo.</div>';return;}
+  div.innerHTML=criticos.map(a=>{
+    const dcInc=getDCIncTotal(a.nombre);
+    const p=Math.min(Math.round(dcInc/a.objetivo*100),999);
+    const key=a.nombre;
+    const cs=ST.gestionComentarios[key]||[];
     return`<div class="gestion-card">
       <div class="gestion-header">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(a.nombre)}</div>
-          <div>
-            <div style="font-weight:700;font-size:14px;color:var(--dark)">${a.nombre}</div>
-            <div style="font-size:12px;color:var(--g600)">DC acumulado: <strong style="font-family:var(--mono)">${fmt(dc)}</strong> / Objetivo: <strong style="font-family:var(--mono)">${fmt(a.objetivo)}</strong></div>
-          </div>
+        <div>
+          <div style="font-weight:700;font-size:14px;color:#991b1b">${a.nombre}</div>
+          <div style="font-size:12px;color:#dc2626;margin-top:2px">DC incremental: ${fmt(dcInc)} / Objetivo: ${fmt(a.objetivo)}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          ${semaforo(p)}
-          <div style="width:100px">
-            <div class="pb"><div class="pf ${semCls(p)}" style="width:${Math.min(p,100)}%"></div></div>
-          </div>
-        </div>
+        ${semaforo(p)}
       </div>
       <div class="gestion-body">
-        <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:10px">Comercios activos (${ST.comercios.filter(c=>c.asesor===a.nombre).length})</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-          ${ST.comercios.filter(c=>c.asesor===a.nombre).map(c=>`
-            <span style="background:var(--g50);border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px">
-              ${c.nombre} <span style="color:var(--purple-d);font-family:var(--mono);font-weight:600">${fmt(getDC(c))}</span>
-              ${cohortBadge(c.mesConv)}
-            </span>`).join('')}
+        <div style="height:8px;background:var(--g200);border-radius:4px;overflow:hidden;margin-bottom:12px">
+          <div class="pf ${semCls(p)}" style="width:${Math.min(p,100)}%"></div>
         </div>
-        <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:8px">📝 Planes de acción y comentarios</div>
-        <div id="comments-${key}" style="margin-bottom:10px">
-          ${comentarios.length?comentarios.map((cm,ci)=>`
-            <div class="comment-item">
-              <div class="comment-meta">${cm.autor} — ${cm.fecha}</div>
-              <div class="comment-text">${cm.texto}</div>
-              <button onclick="delComment('${key}',${ci})" style="background:none;border:none;color:var(--g400);cursor:pointer;font-size:11px;margin-top:4px">✕ eliminar</button>
-            </div>`).join(''):'<div style="font-size:12px;color:var(--g400);margin-bottom:8px">Sin comentarios aún.</div>'}
+        <div style="margin-bottom:10px">
+          ${cs.map(c=>`<div class="comment-item"><div class="comment-meta">${c.fecha} — ${c.tipo||'Comentario'}</div><div class="comment-text">${c.texto}</div></div>`).join('')}
+          ${!cs.length?'<div style="font-size:12px;color:var(--g400);margin-bottom:8px">Sin comentarios aún.</div>':''}
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <input type="text" id="comment-autor-${key}" placeholder="Tu nombre" style="width:140px;font-size:12px;padding:6px 10px">
-          <textarea id="comment-text-${key}" placeholder="Escribí el plan de acción o comentario..." style="flex:1;min-width:200px;min-height:52px;font-size:12px"></textarea>
-          <button class="btn btn-dark btn-sm" onclick="addComment('${key}')" style="align-self:flex-end">💬 Agregar</button>
+          <input type="text" id="gc-${key.replace(/\s/g,'_')}" placeholder="Plan de acción o comentario..." style="flex:1;min-width:200px">
+          <button class="btn btn-dark btn-sm" onclick="addComentario('${key}')">➕ Agregar</button>
         </div>
       </div>
     </div>`;
   }).join('');
 }
-
-function addComment(key){
-  const autor=document.getElementById('comment-autor-'+key).value.trim();
-  const texto=document.getElementById('comment-text-'+key).value.trim();
-  if(!texto){alert('Escribí un comentario');return;}
-  if(!ST.gestionComentarios[key])ST.gestionComentarios[key]=[];
-  ST.gestionComentarios[key].push({autor:autor||'Anónimo',texto,fecha:new Date().toLocaleDateString('es-AR')});
-  save();renderGestion();
-}
-function delComment(key,idx){
-  ST.gestionComentarios[key].splice(idx,1);save();renderGestion();
+function addComentario(nombre){
+  const id='gc-'+nombre.replace(/\s/g,'_');
+  const inp=document.getElementById(id);if(!inp||!inp.value.trim())return;
+  if(!ST.gestionComentarios[nombre])ST.gestionComentarios[nombre]=[];
+  ST.gestionComentarios[nombre].push({texto:inp.value.trim(),fecha:new Date().toLocaleDateString('es-AR'),tipo:'Acción'});
+  inp.value='';save();renderGestion();
 }
 
 function renderPositivas(){
-  const div=document.getElementById('positivas-content');
   const cohortKeys=Object.keys(COHORTS);
+  const div=document.getElementById('positivas-content');
   let html='';
   cohortKeys.forEach(mes=>{
     const ch=COHORTS[mes];
-    const conv=ST.comercios.filter(c=>c.mesConv===mes&&c.estado==='seguimiento');
-    // Ranking: asesores que tienen >100% y tienen convertidos en esta cohorte
     const ranking=ST.asesores.map(a=>{
-      const dcAs=ST.comercios.filter(c=>c.asesor===a.nombre).reduce((s,c)=>s+getDC(c),0);
-      const dcCohort=conv.filter(c=>c.asesor===a.nombre).reduce((s,c)=>s+getDC(c),0);
-      const p=a.objetivo>0?Math.min(Math.round(dcAs/a.objetivo*100),999):0;
-      return{nombre:a.nombre,dc:dcAs,dcCohort,objetivo:a.objetivo,pct:p};
-    }).filter(a=>a.pct>=100&&a.dcCohort>0).sort((a,b)=>b.pct-a.pct);
-
-    if(!ranking.length)return;
-    const ai_c=ST.asesores.findIndex(a=>a.nombre===ranking[0]?.nombre);
-    html+=`<div class="card" style="margin-bottom:14px">
-      <div class="card-title" style="background:${ch.color};margin:-18px -20px 14px;padding:12px 16px;border-radius:12px 12px 0 0;border-bottom:1.5px solid ${ch.border}">
-        <span style="color:${ch.text};font-size:14px;font-weight:700">${ch.label}</span>
-        <span class="badge" style="background:${ch.color};color:${ch.text};border:1px solid ${ch.border};margin-left:auto">${ranking.length} sobre objetivo</span>
-      </div>
-      ${ranking.map((r,i)=>{
-        const pos=i+1;
-        const ai=ST.asesores.findIndex(a=>a.nombre===r.nombre);const cc=CC[ai>=0?ai%CC.length:0];
-        const rankCls=pos===1?'rank-1':pos===2?'rank-2':pos===3?'rank-3':'rank-other';
-        return`<div class="ranking-item">
-          <div class="ranking-num ${rankCls}">${pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos}</div>
-          <div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(r.nombre)}</div>
+      const dcInc=getDCIncTotal(a.nombre);
+      const p=a.objetivo>0?Math.min(Math.round(dcInc/a.objetivo*100),999):0;
+      return{nombre:a.nombre,dcInc,objetivo:a.objetivo,p};
+    }).filter(a=>a.p>=100&&a.objetivo>0).sort((a,b)=>b.p-a.p);
+    html+=`<div style="background:${ch.color};border:1.5px solid ${ch.border};border-radius:10px;padding:14px 16px;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:${ch.text};margin-bottom:10px">${ch.label} — Asesores sobre el 100%</div>`;
+    if(!ranking.length){html+=`<div style="font-size:12px;color:var(--g400)">Ningún asesor superó el 100% aún.</div>`;}
+    else{
+      ranking.forEach((a,i)=>{
+        const cls=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+        html+=`<div class="ranking-item">
+          <div class="ranking-num ${cls}">${i+1}</div>
           <div style="flex:1">
-            <div style="font-weight:600;font-size:13px">${r.nombre}</div>
-            <div style="font-size:11px;color:var(--g600)">DC cohorte: <strong style="font-family:var(--mono);color:var(--purple-d)">${fmt(r.dcCohort)}</strong> · DC total: <strong style="font-family:var(--mono)">${fmt(r.dc)}</strong></div>
+            <div style="font-weight:600;font-size:13px">${a.nombre}</div>
+            <div style="font-size:11px;color:var(--g600)">DC increm: ${fmt(a.dcInc)} · Objetivo: ${fmt(a.objetivo)}</div>
           </div>
-          <div style="text-align:right">
-            ${semaforo(r.pct)}
-            <div style="font-size:11px;color:var(--g400);margin-top:3px">Obj: ${fmt(r.objetivo)}</div>
-          </div>
+          ${semaforo(a.p)}
         </div>`;
-      }).join('')}
-    </div>`;
+      });
+    }
+    html+='</div>';
   });
-  div.innerHTML=html||'<div class="card"><div class="empty">🎯 Aún no hay asesores que superaron el 100% del objetivo en ninguna cohorte.</div></div>';
+  div.innerHTML=html;
 }
 
 function renderEquipo(){
-  const dcT=ST.comercios.reduce((a,c)=>a+getDC(c),0),incT=ST.comercios.reduce((a,c)=>a+getDCInc(c),0);
-  const objT=ST.asesores.reduce((a,x)=>a+x.objetivo,0);
-  document.getElementById('eq-tot').textContent=ST.comercios.length;
-  document.getElementById('eq-dc').textContent=fmt(dcT);
-  document.getElementById('eq-inc').textContent=fmt(incT);
-  document.getElementById('eq-obj').textContent=fmt(objT);
-  document.getElementById('eq-body').innerHTML=ST.asesores.map((a,i)=>{
-    const mis=ST.comercios.filter(c=>c.asesor===a.nombre);
-    const dc=mis.reduce((s,c)=>s+getDC(c),0),inc=getDCIncTotal(a.nombre);
+  let totC=0,totDC=0,totInc=0,totObj=0;
+  ST.asesores.forEach(a=>{totObj+=a.objetivo;});
+  ST.comercios.forEach(c=>{totC++;totDC+=getDC(c);totInc+=getDCInc(c);});
+  document.getElementById('eq-tot').textContent=totC;
+  document.getElementById('eq-dc').textContent=fmt(totDC);
+  document.getElementById('eq-inc').textContent=fmt(totInc);
+  document.getElementById('eq-obj').textContent=fmt(totObj);
+  const tb=document.getElementById('eq-body');
+  tb.innerHTML=ST.asesores.map(a=>{
+    const dc=ST.comercios.filter(c=>c.asesor===a.nombre).reduce((s,c)=>s+getDC(c),0);
+    const inc=getDCIncTotal(a.nombre);
     const p=a.objetivo>0?Math.min(Math.round(inc/a.objetivo*100),999):0;
-    const faltante=Math.max(0,a.objetivo-dc);const cc=CC[i%CC.length];
+    const falt=Math.max(0,a.objetivo-inc);
+    const cnt=ST.comercios.filter(c=>c.asesor===a.nombre).length;
     return`<tr>
-      <td><div style="display:flex;align-items:center;gap:7px"><div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(a.nombre)}</div><strong style="font-size:12px">${a.nombre}</strong></div></td>
-      <td>${mis.length}</td>
-      <td style="font-weight:700;color:var(--purple-d);font-family:var(--mono)">${fmt(dc)}</td>
-      <td style="font-weight:700;font-family:var(--mono);color:${inc>=0?'#16a34a':'#dc2626'}">${fmt(inc)}</td>
-      <td style="color:var(--g600);font-family:var(--mono)">${fmt(a.objetivo)}</td>
-      <td><div style="display:flex;align-items:center;gap:6px"><div class="pb" style="width:80px"><div class="pf ${semCls(p)}" style="width:${Math.min(p,100)}%"></div></div><span style="font-size:12px;font-family:var(--mono)">${p}%</span></div></td>
+      <td><strong>${a.nombre}</strong></td>
+      <td style="font-family:var(--mono)">${cnt}</td>
+      <td style="font-family:var(--mono);color:var(--purple-d);font-weight:600">${fmt(dc)}</td>
+      <td style="font-family:var(--mono);font-weight:600;color:${inc>=0?'#16a34a':'#dc2626'}">${fmt(inc)}</td>
+      <td style="font-family:var(--mono)">${fmt(a.objetivo)}</td>
+      <td><div class="pb" style="min-width:80px"><div class="pf ${semCls(p)}" style="width:${Math.min(p,100)}%"></div></div></td>
       <td>${semaforo(p)}</td>
-      <td style="font-size:12px;font-family:var(--mono);color:${faltante>0?'#dc2626':'#16a34a'}">${faltante>0?'-'+fmt(faltante):'✓ Ok'}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--g600)">${fmt(falt)}</td>
     </tr>`;
   }).join('');
-  document.getElementById('asesores-cfg').innerHTML=ST.asesores.map((a,i)=>{const cc=CC[i%CC.length];return`<div class="rowf" style="margin-bottom:8px"><div class="avatar" style="background:${cc.bg};color:${cc.tx}">${ini(a.nombre)}</div><input type="text" value="${a.nombre}" style="flex:1;min-width:130px" onchange="updAs(${i},'nombre',this.value)"><input type="number" value="${a.objetivo}" style="width:140px" onchange="updAs(${i},'objetivo',parseFloat(this.value)||0)"><button class="btn btn-sm" onclick="delAs(${i})" style="color:var(--g400)">✕</button></div>`;}).join('');
+  const cfg=document.getElementById('asesores-cfg');
+  cfg.innerHTML=ST.asesores.map((a,i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+    <div class="avatar" style="background:${CC[i%CC.length].bg};color:${CC[i%CC.length].tx}">${ini(a.nombre)}</div>
+    <span style="flex:1;font-size:13px;font-weight:500">${a.nombre}</span>
+    <input type="number" value="${a.objetivo}" style="width:130px;font-size:12px" oninput="updObj(${i},this.value)">
+    <button class="btn btn-sm" style="color:#dc2626" onclick="delAsesor(${i})">✕</button>
+  </div>`).join('');
 }
-function updAs(i,k,v){ST.asesores[i][k]=v;save();renderEquipo();}
-function delAs(i){ST.asesores.splice(i,1);save();renderEquipo();}
-function addAsesor(){const n=document.getElementById('new-nombre').value.trim();const o=parseFloat(document.getElementById('new-obj').value)||0;if(!n)return;ST.asesores.push({nombre:n,objetivo:o});document.getElementById('new-nombre').value='';document.getElementById('new-obj').value='';save();renderEquipo();}
+function updObj(i,v){ST.asesores[i].objetivo=parseInt(v)||0;save();renderEquipo();updateDots();}
+function delAsesor(i){if(!confirm('¿Eliminar asesor?'))return;ST.asesores.splice(i,1);save();renderEquipo();updateDots();}
+function addAsesor(){
+  const n=document.getElementById('new-nombre').value.trim();
+  const o=parseInt(document.getElementById('new-obj').value)||0;
+  if(!n)return;
+  ST.asesores.push({nombre:n,objetivo:o});
+  document.getElementById('new-nombre').value='';document.getElementById('new-obj').value='';
+  save();renderEquipo();updateDots();
+}
 
-renderChips('chips-pipe',renderPipeline);renderPipeline();renderAlertas();
-renderChips('chips-seg',renderSeg);fillAs('c-asesor');fillAs('calc-asesor');updateDots();
+renderChips('chips-pipe',renderPipeline);renderPipeline();
+updateDots();
+
+// ── AUTO-FETCH DESDE GOOGLE APPS SCRIPT ──────────────────────────────────
+// Configurá tu URL de Apps Script después de desplegarlo (ver archivo gas_dashboard.js)
+const GAS_URL = 'https://script.google.com/a/macros/mercadolibre.com/s/AKfycby7qpm-q70rmLuBIda8w7NHqqd0U7kp96pry_4z3Btp3u0fGB-QX-Bkg5aalRtkdvLjqg/exec';// Apps Script Dashboard Principalidad
+function processGASData(data){
+  // Procesar Base Madre
+  if(data.baseMadre&&data.baseMadre.length>1){
+    const headers=data.baseMadre[0].map(h=>String(h).toLowerCase().trim());
+    function fi(keys){for(const k of keys){const i=headers.findIndex(h=>h===k||h.includes(k));if(i>=0)return i;}return -1;}
+    const idxId=fi(['cust_id','custid']);
+    const idxNom=fi(['nombre_comercio','nombre comercio']);
+    const idxTpv=fi(['tpv_point']);
+    const idxDc=fi(['dc_point']);
+    const idxAs=fi(['nombre_asesor','asesor']);
+    const idxRub=fi(['rubro']);
+    function cn(s){if(!s)return 0;return parseFloat(String(s).replace(/\./g,'').replace(',','.'))||0;}
+    if(idxId>=0){
+      csvData={};
+      for(let i=1;i<data.baseMadre.length;i++){
+        const r=data.baseMadre[i];
+        const id=String(r[idxId]||'').trim();
+        if(!id||id==='0')continue;
+        csvData[id]={
+          nombre:idxNom>=0?String(r[idxNom]||''):'',
+          tpvM1:idxTpv>=0?cn(r[idxTpv]):0,
+          dcM1:idxDc>=0?cn(r[idxDc]):0,
+          asesor:idxAs>=0?String(r[idxAs]||''):'',
+          rubro:idxRub>=0?String(r[idxRub]||''):''
+        };
+      }
+      const n=Object.keys(csvData).length;
+      const b=document.getElementById('csv-banner');
+      if(b)b.innerHTML=`<div><div class="csv-info">✓ Base Madre — ${n} comercios (auto-sincronizado)</div></div>`;
+      b&&(b.className='csv-banner');
+    }
+  }
+  // Procesar Looker v2
+  if(data.lookerv2&&data.lookerv2.length>1){
+    const rows=data.lookerv2;
+    const headers=rows[0].map(h=>String(h).toLowerCase().trim());
+    function fi2(keys){for(const k of keys){const i=headers.findIndex(h=>h===k||h.includes(k));if(i>=0)return i;}return -1;}
+    const idxCust=fi2(['cust_id','custid']);
+    const idxMes=fi2(['mes','month']);
+    const idxAsesor=fi2(['asesor','vendedor']);
+    const idxValido=fi2(['valido','valid']);
+    const idxTpv=fi2(['tpv']);
+    const idxVc=fi2(['vc']);
+    const idxTpvM1=fi2(['tpv m-1','tpv_m1','tpv m1']);
+    const idxDcM1=fi2(['dc m-1','dc_m1','dc m1']);
+    const idxFcstTpv=fi2(['fcst tpv','fcst_tpv','forecast tpv']);
+    const idxFcstInc=fi2(['fcst tpv incr','fcst_tpv_inc','tpv incremental']);
+    function cn2(s){if(!s)return 0;return parseFloat(String(s).replace(/\./g,'').replace(',','.'))||0;}
+    if(idxMes>=0&&idxAsesor>=0){
+      csvLooker={};csvLookerByCust={};
+      for(let i=1;i<rows.length;i++){
+        const r=rows[i];
+        const mes=String(r[idxMes]||'').trim();
+        const asesor=String(r[idxAsesor]||'').trim();
+        const valido=idxValido>=0?String(r[idxValido]||'').trim():'1';
+        const esConv=valido==='1'||valido.toLowerCase()==='si'||valido.toLowerCase()==='true';
+        if(!mes||!asesor)continue;
+        if(!csvLooker[asesor])csvLooker[asesor]={};
+        if(!csvLooker[asesor][mes])csvLooker[asesor][mes]={convertidos:0,tpv:0,vc:0,tpvM1:0,dcM1:0,fcstTpv:0,fcstTpvInc:0};
+        if(esConv)csvLooker[asesor][mes].convertidos++;
+        csvLooker[asesor][mes].tpv+=idxTpv>=0?cn2(r[idxTpv]):0;
+        if(idxCust>=0){
+          const custId=String(r[idxCust]||'').trim();
+          if(custId&&custId!=='0'){
+            if(!csvLookerByCust[custId]||esConv){
+              csvLookerByCust[custId]={fcstTpv:idxFcstTpv>=0?cn2(r[idxFcstTpv]):0,fcstTpvInc:idxFcstInc>=0?cn2(r[idxFcstInc]):0,tpvM1:idxTpvM1>=0?cn2(r[idxTpvM1]):0,dcM1:idxDcM1>=0?cn2(r[idxDcM1]):0,tpv:idxTpv>=0?cn2(r[idxTpv]):0,mes,asesor,esConvertido:esConv};
+            }
+          }
+        }
+      }
+      const tot=Object.values(csvLooker).reduce((s,m)=>s+Object.values(m).reduce((s2,d)=>s2+d.convertidos,0),0);
+      const lb=document.getElementById('csv-looker-banner');
+      if(lb){lb.className='csv-banner';lb.innerHTML=`<div><div class="csv-info">✓ Looker v2 — ${tot} convertidos (auto-sincronizado)</div></div>`;}
+      renderSeg();renderAlertas();updateDots();renderLookerResumen&&renderLookerResumen();
+    }
+  }
+}
+async function fetchGASData(){
+  if(!GAS_URL)return;// No configurado todavía
+  try{
+    const res=await fetch(GAS_URL+'?t='+Date.now());// t= para evitar cache
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    processGASData(data);
+    console.log('[GAS] Datos actualizados:',new Date().toLocaleTimeString('es-AR'));
+  }catch(e){console.warn('[GAS] Error al fetchear datos:',e.message);}
+}
+// Fetch al cargar la página
+fetchGASData();
+// Auto-refresh cada 60 minutos mientras la página esté abierta
+setInterval(fetchGASData,60*60*1000);
 </script>
-</body></html>
+</body>
+</html>
