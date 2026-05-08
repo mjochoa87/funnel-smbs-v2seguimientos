@@ -731,7 +731,7 @@ function loadLookerv2(input) {
         tpvM2: iTpvM2 >= 0 ? parseFloat((row[iTpvM2]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         vcM2: iVcM2 >= 0 ? parseFloat((row[iVcM2]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         fcstTpv: iFcstTpv >= 0 ? parseFloat((row[iFcstTpv]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
-        fcstTpvInc: iFcstInc >= 0 ? parseFloat((row[iFcstInc]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        fcstVc: iFcstInc >= 0 ? parseFloat((row[iFcstInc]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         m2completo: iM2Comp >= 0 ? row[iM2Comp] : '',
         isInactivo,
       });
@@ -814,7 +814,7 @@ function processLookerv2FromGAS(rows) {
   const iCustId = headersL.findIndex(h => h.includes('cust_id') || h.includes('custid'));
   const iMes = headersL.findIndex(h => h === 'mes' || h.includes('mes'));
   const iAsesor = headersL.findIndex(h => h === 'asesor');
-  const iValido = headersL.findIndex(h => h === 'valido' || h.includes('valid'));
+  const iValido = headersL.findIndex(h => h === 'valido' || h === 'válido' || h.includes('valid') || h.includes('válid'));
   const iTpv = headersL.findIndex(h => h === 'tpv');
   const iVc = headersL.findIndex(h => h === 'vc');
 
@@ -864,7 +864,7 @@ function processLookerv2FromGAS(rows) {
       tpvM2: iTpvM2 >= 0 ? gasNum(row[iTpvM2]) : 0,
       vcM2:  iVcM2  >= 0 ? gasNum(row[iVcM2])  : 0,
       fcstTpv:    iFcstTpv >= 0 ? gasNum(row[iFcstTpv]) : 0,
-      fcstTpvInc: iFcstInc >= 0 ? gasNum(row[iFcstInc]) : 0,
+      fcstVc: iFcstInc >= 0 ? gasNum(row[iFcstInc]) : 0,
       m2completo: iM2Comp >= 0 ? String(row[iM2Comp]||'') : '',
       isInactivo,
     });
@@ -1277,10 +1277,10 @@ function renderSegCohorte() {
         const tpvActual = row.tpvM0 || row.tpv || 0;
 
         // Potenciado criteria
-        const fcstTpvIncr = row.fcstTpvInc || 0;
+        const fcstVcr = row.fcstVc || 0;
         const fcstTpv = row.fcstTpv || 0;
         const tpvGrowth = tpvM1 > 0 ? (fcstTpv/tpvM1 - 1) : 0;
-        const crit1 = fcstTpvIncr >= 2000000;
+        const crit1 = fcstVcr >= 2000000;
         const crit2 = tpvGrowth >= 0.30;
         const crit3 = dcActual > dcM1;
         const isPotenciado = crit1 && crit2 && crit3;
