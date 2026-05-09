@@ -847,6 +847,8 @@ function processLookerv2FromGAS(rows) {
   const iFcstTpv1= headers.findIndex(h => /fcst\s*tpv\s*m1\b/i.test(h));
   const iFcstVc1 = headers.findIndex(h => /fcst\s*vc\s*m1\b/i.test(h));
   const iFcstTpv2= headers.findIndex(h => /fcst\s*tpv\s*m2\b/i.test(h));
+      const iFcstTpv = iFcstTpv0 >= 0 ? iFcstTpv0 : headers.findIndex(h => /fcst.*tpv/i.test(h));
+      const iFcstInc = headers.findIndex(h => /fcst.*inc/i.test(h) || /inc.*fcst/i.test(h));
   const iFcstVc2 = headers.findIndex(h => /fcst\s*vc\s*m2\b/i.test(h));
   const iM0Comp  = headers.findIndex(h => /m0\s*completo/i.test(h));
   const iM1Comp  = headers.findIndex(h => /m1\s*completo/i.test(h));
