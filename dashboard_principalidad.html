@@ -635,8 +635,7 @@ function loadBaseMadre(input) {
     const headers = rows[0].map(h => h.toLowerCase());
     const iId = findColIdx(headers,'cust_id','custid','cust id','id');
     const iNombre = findColIdx(headers,'nombre_comercio','nombrecomercio','nombre comercio','nombre');
-    const iTpv = findColIdx(headers,'tpv_point','tpvpoint','tpv point','tpv');
-    const iDc = findColIdx(headers,'dc_point','dcpoint','dc point','dc');
+        const iDc = findColIdx(headers,'dc_point','dcpoint','dc point','dc');
     const iAsesor = findColIdx(headers,'nombre_asesor','nombreasesor','asesor');
     const iRubro = findColIdx(headers,'rubro');
     let count = 0;
@@ -678,9 +677,7 @@ function loadLookerv2(input) {
     const iMes = findColIdx(headersL,'mes');
     const iAsesor = findColIdx(headersL,'asesor');
     const iValido = findColIdx(headersL,'valido');
-    const iTpv = findColIdx(headersL,'tpv');
-    const iVc = findColIdx(headersL,'vc');
-
+    
     // Find M-1, M0, M1, M2 columns
     const iTpvM1 = headers.findIndex(h => /tpv\s*m-?1/i.test(h) || /tpv\s*m1/i.test(h));
     const iVcM1 = headers.findIndex(h => /vc\s*m-?1/i.test(h) || /vc\s*m1\b/i.test(h) || /dc\s*m-?1/i.test(h));
@@ -785,8 +782,7 @@ function processBaseMadreFromGAS(rows) {
   // fallback: col D (index 3)
   const custIdx = iId >= 0 ? iId : 3;
   const iNombre = headers.findIndex(h => h.includes('nombrecomercio') || h.includes('nombre')) || 5;
-  const iTpv = headers.findIndex(h => h.includes('tpvpoint') || (h.includes('tpv') && !h.includes('dc')));
-  const iDc = headers.findIndex(h => h.includes('dcpoint') || (h.includes('dc') && !h.includes('tpv')));
+    const iDc = headers.findIndex(h => h.includes('dcpoint') || (h.includes('dc') && !h.includes('tpv')));
   const iAsesor = headers.findIndex(h => h.includes('nombreasesor') || h.includes('asesor'));
   const iRubro = headers.findIndex(h => h.includes('rubro'));
   let count = 0;
