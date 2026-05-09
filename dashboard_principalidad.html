@@ -700,7 +700,9 @@ function loadLookerv2(input) {
     const threeDaysAgo = new Date(hoy); threeDaysAgo.setDate(threeDaysAgo.getDate()-3);
     const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
 
-    const parsed = [];
+    const iTpv = iTpvM0 >= 0 ? iTpvM0 : headers.findIndex(h => /tpv/i.test(h));
+      const iVc  = iVcM0  >= 0 ? iVcM0  : headers.findIndex(h => /\bvc\b|\bdc\b/i.test(h));
+      const parsed = [];
     let convertidos = 0;
     for (let r = 1; r < rows.length; r++) {
       const row = rows[r];
