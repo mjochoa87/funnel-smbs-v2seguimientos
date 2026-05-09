@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Principalidad — MercadoPago SMB<h/title>
+<title>Dashboard Principalidad — MercadoPago SMB</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
@@ -806,36 +806,55 @@ function processBaseMadreFromGAS(rows) {
   return count;
 }
 
+function normHeader(s) {
+  // Normaliza: minusculas + quita tildes para comparacion robusta
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
 function processLookerv2FromGAS(rows) {
   if (!rows || rows.length < 2) return 0;
   const headers = rows[0].map(h => String(h||'').trim());
   const headersL = headers.map(h => h.toLowerCase());
+  const headersN = headers.map(normHeader); // sin tildes
 
-  const iCustId = headersL.findIndex(h => h.includes('cust_id') || h.includes('custid'));
-  const iMes = headersL.findIndex(h => h === 'mes' || h.includes('mes'));
-  const iAsesor = headersL.findIndex(h => h === 'asesor');
-  const iValido = headersL.findIndex(h => h === 'valido' || h === 'válido' || h.includes('valid') || h.includes('válid'));
-  const iTpv = headersL.findIndex(h => h === 'tpv');
-  const iVc = headersL.findIndex(h => h === 'vc');
+  // Indices de columnas (con normalizacion de tildes)
+  const iCustId  = headersN.findIndex(h => h.includes('cust id') || h.includes('cust_id') || h.includes('custid'));
+  const iMes     = headersN.findIndex(h => h === 'mes');
+  const iAsesor  = headersN.findIndex(h => h === 'asesor');
+  const iValido  = headersN.findIndex(h => h === 'valido');
+  const iTeam    = headersN.findIndex(h => h.includes('team') || h.includes('lider'));
+  const iPotenc  = headersN.findIndex(h => h.includes('potenc'));
 
-  const iTpvM1 = headers.findIndex(h => /tpv\s*m-?1/i.test(h));
-  const iVcM1  = headers.findIndex(h => /vc\s*m-?1/i.test(h) || /dc\s*m-?1/i.test(h));
-  const iTpvM0 = headers.findIndex(h => /tpv\s*m0/i.test(h));
-  const iVcM0  = headers.findIndex(h => /vc\s*m0/i.test(h) || /dc\s*m0/i.test(h));
-  // M1 real (forward cohort) — different from M-1
-  const iTpvM1r = headers.findIndex((h,i) => /tpv\s*m1\b/i.test(h) && i !== iTpvM1);
-  const iVcM1r  = headers.findIndex((h,i) => /vc\s*m1\b/i.test(h)  && i !== iVcM1);
-  const iTpvM2 = headers.findIndex(h => /tpv\s*m2/i.test(h));
-  const iVcM2  = headers.findIndex(h => /vc\s*m2/i.test(h) || /dc\s*m2/i.test(h));
-  const iFcstTpv = headers.findIndex(h => /fcst/i.test(h) && /tpv/i.test(h) && !/inc/i.test(h));
-  const iFcstInc = headers.findIndex(h => /fcst/i.test(h) && /inc/i.test(h));
-  const iM2Comp  = headers.findIndex(h => /m2.*completo/i.test(h) || /completo/i.test(h));
+  // Columnas TPV/VC por mes
+  const iTpvM1   = headers.findIndex(h => /tpv\s*m-?1\b/i.test(h));
+  const iVcM1    = headers.findIndex(h => /vc\s*m-?1\b/i.test(h) || /dc\s*m-?1\b/i.test(h));
+  const iTpvM0   = headers.findIndex(h => /tpv\s*m0\b/i.test(h));
+  const iVcM0    = headers.findIndex(h => /vc\s*m0\b/i.test(h) || /dc\s*m0\b/i.test(h));
+  const iTpvM1r  = headers.findIndex((h,i) => /tpv\s*m1\b/i.test(h) && i !== iTpvM1);
+  const iVcM1r   = headers.findIndex((h,i) => /vc\s*m1\b/i.test(h) && i !== iVcM1);
+  const iTpvM2   = headers.findIndex(h => /tpv\s*m2\b/i.test(h));
+  const iVcM2    = headers.findIndex(h => /vc\s*m2\b/i.test(h) || /dc\s*m2\b/i.test(h));
+  const iTpvIncM0= headers.findIndex(h => /tpv\s*inc\s*m0/i.test(h));
+  const iVcIncM0 = headers.findIndex(h => /vc\s*inc\s*m0/i.test(h));
+  const iTpvIncM1= headers.findIndex(h => /tpv\s*inc\s*m1\b/i.test(h));
+  const iVcIncM1 = headers.findIndex(h => /vc\s*inc\s*m1\b/i.test(h));
+  const iTpvIncM2= headers.findIndex(h => /tpv\s*inc\s*m2\b/i.test(h));
+  const iVcIncM2 = headers.findIndex(h => /vc\s*inc\s*m2\b/i.test(h));
+  const iFcstTpv0= headers.findIndex(h => /fcst\s*tpv\s*m0\b/i.test(h));
+  const iFcstVc0 = headers.findIndex(h => /fcst\s*vc\s*m0\b/i.test(h));
+  const iFcstTpv1= headers.findIndex(h => /fcst\s*tpv\s*m1\b/i.test(h));
+  const iFcstVc1 = headers.findIndex(h => /fcst\s*vc\s*m1\b/i.test(h));
+  const iFcstTpv2= headers.findIndex(h => /fcst\s*tpv\s*m2\b/i.test(h));
+  const iFcstVc2 = headers.findIndex(h => /fcst\s*vc\s*m2\b/i.test(h));
+  const iM0Comp  = headers.findIndex(h => /m0\s*completo/i.test(h));
+  const iM1Comp  = headers.findIndex(h => /m1\s*completo/i.test(h));
+  const iM2Comp  = headers.findIndex(h => /m2\s*completo/i.test(h));
 
   const todayStr = hoy.toISOString().split('T')[0];
   const threeDaysAgo = new Date(hoy); threeDaysAgo.setDate(threeDaysAgo.getDate()-3);
   const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
 
-  const parsed = [];
+const parsed = [];
   let convertidos = 0;
   for (let r = 1; r < rows.length; r++) {
     const row = rows[r];
@@ -1283,7 +1302,10 @@ function renderSegCohorte() {
         const crit1 = fcstVcr >= 2000000;
         const crit2 = tpvGrowth >= 0.30;
         const crit3 = dcActual > dcM1;
-        const isPotenciado = crit1 && crit2 && crit3;
+        const isPotenciado = row.potenciado === '1' || row.potenciado === 1 ||
+          String(row.potenciado||'').toLowerCase() === 'si' ||
+          String(row.potenciado||'').toLowerCase() === 'sí' ||
+          String(row.potenciado||'').toLowerCase() === 'true'
 
         // Progress asesor vs objetivo cohort
         const objAsesor = getObjetivo(row.asesor, cohortKey);
