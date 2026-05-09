@@ -636,6 +636,7 @@ function loadBaseMadre(input) {
     const iId = findColIdx(headers,'cust_id','custid','cust id','id');
     const iNombre = findColIdx(headers,'nombre_comercio','nombrecomercio','nombre comercio','nombre');
         const iDc = findColIdx(headers,'dc_point','dcpoint','dc point','dc');
+      const iTpv = headers.findIndex(h => /tpv/i.test(h));
     const iAsesor = findColIdx(headers,'nombre_asesor','nombreasesor','asesor');
     const iRubro = findColIdx(headers,'rubro');
     let count = 0;
@@ -783,6 +784,7 @@ function processBaseMadreFromGAS(rows) {
   const custIdx = iId >= 0 ? iId : 3;
   const iNombre = headers.findIndex(h => h.includes('nombrecomercio') || h.includes('nombre')) || 5;
     const iDc = headers.findIndex(h => h.includes('dcpoint') || (h.includes('dc') && !h.includes('tpv')));
+      const iTpv = headers.findIndex(h => /tpv/i.test(h));
   const iAsesor = headers.findIndex(h => h.includes('nombreasesor') || h.includes('asesor'));
   const iRubro = headers.findIndex(h => h.includes('rubro'));
   let count = 0;
