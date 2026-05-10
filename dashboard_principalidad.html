@@ -1312,7 +1312,7 @@ function renderSegCohorte() {
         const nombreComercio = bm.nombre || row.custId;
         const dcM1 = row.vcM1 || bm.dcM1 || 0;
         const dcActual = cohortKey==202603?(row.rawCols&&row.rawCols['VC INC M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['VC INC M1']||0):(row.rawCols&&row.rawCols['VC INC M0']||row.vcM0||row.vc||0);
-        const dcIncr = dcActual - dcM1;
+        const dcIncr = dcActual;
         const tpvM1 = row.tpvM1 || bm.tpvM1 || 0;
         const tpvActual = cohortKey==202603?(row.rawCols&&row.rawCols['TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['TPV M1']||0):(row.tpvM0||row.tpv||0);
 
