@@ -1313,8 +1313,8 @@ function renderSegCohorte() {
         const dcM1 = row.vcM1 || bm.dcM1 || 0;
         const dcActual = cohortKey==202603?(row.rawCols&&row.rawCols['VC INC M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['VC INC M1']||0):(row.rawCols&&row.rawCols['VC INC M0']||row.vcM0||row.vc||0);
         const dcIncr = dcActual;
-        const tpvM1 = tpvCurrentM1 || bm.tpvM1 || 0;
-        const tpvActual = cohortKey==202603?(row.rawCols&&row.rawCols['TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['TPV M1']||0):(tpvCurrentM0||tpvCurrent||0);
+        const tpvM1 = row.tpvM1 || bm.tpvM1 || 0;
+        const tpvActual = cohortKey==202603?(row.rawCols&&row.rawCols['TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['TPV M1']||0):(row.tpvM0||tpvCurrent||0);
 
         // Potenciado criteria
         const fcstVcr = row.fcstVc || 0;
@@ -1357,7 +1357,7 @@ function renderSegCohorte() {
           </div>
           ${!isPotenciado ? `<div class="no-potenciado-reasons">Criterios no cumplidos: ${!crit1?'• FCST Inc < $2.000.000 ':''}${!crit2?'• FCST TPV crecimiento < 30% ':''}${!crit3?'• DC actual no supera DC M-1':''}</div>` : ''}
           <div class="kv-grid">
-                                <div class="kv-item"><div class="kv-label">TPV M-1</div><div class="kv-value">${fmt(tpvCurrentM1)}</div></div>
+                                <div class="kv-item"><div class="kv-label">TPV M-1</div><div class="kv-value">${fmt(row.tpvM1)}</div></div>
                                                     <div class="kv-item"><div class="kv-label">VC M-1</div><div class="kv-value">${fmt(row.vcM1)}</div></div>
                                                                         <div class="kv-item"><div class="kv-label">${cohortKey===202603?'TPV M2':cohortKey===202604?'TPV M1':'TPV M0'}</div><div class="kv-value">${fmt(row.tpv)}</div></div>
                                                                                             <div class="kv-item"><div class="kv-label">${cohortKey===202603?'VC M2':cohortKey===202604?'VC M1':'VC M0'}</div><div class="kv-value">${fmt(row.vc)}</div></div>
