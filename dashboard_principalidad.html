@@ -888,7 +888,7 @@ const parsed = [];
       vcM2:  iVcM2  >= 0 ? gasNum(row[iVcM2])  : 0,
       fcstTpv:    iFcstTpv >= 0 ? gasNum(row[iFcstTpv]) : 0,
       fcstVc: iFcstInc >= 0 ? gasNum(row[iFcstInc]) : 0,
-      m2completo: iM2Comp >= 0 ? String(row[iM2Comp]||'') : '',
+      m2completo: iM2Comp >= 0 ? String(row[iM2Comp]||'') : '',      rawCols: (() => { const rc = {}; for (let ci = 8; ci <= 45 && ci < headers.length; ci++) { const h = headers[ci]; if (h) rc[h] = gasNum(row[ci]); } return rc; })(),
       isInactivo,
     });
   }
