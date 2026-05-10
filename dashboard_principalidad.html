@@ -1311,7 +1311,7 @@ function renderSegCohorte() {
         const bm = ST.baseMadreData[row.custId] || {};
         const nombreComercio = bm.nombre || row.custId;
         const dcM1 = row.vcM1 || bm.dcM1 || 0;
-        const dcActual = row.vcM0 || row.vc || 0;
+        const dcActual = cohortKey==202603?(row.rawCols&&row.rawCols['VC INC M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['VC INC M1']||0):(row.rawCols&&row.rawCols['VC INC M0']||row.vcM0||row.vc||0);
         const dcIncr = dcActual - dcM1;
         const tpvM1 = row.tpvM1 || bm.tpvM1 || 0;
         const tpvActual = cohortKey==202603?(row.rawCols&&row.rawCols['TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['TPV M1']||0):(row.tpvM0||row.tpv||0);
@@ -1322,7 +1322,7 @@ function renderSegCohorte() {
         const tpvGrowth = tpvM1 > 0 ? (fcstTpv/tpvM1 - 1) : 0;
         const crit1 = (fcstTpv - tpvM1) >= 2000000;
         const crit2 = tpvGrowth >= 0.30;
-        const crit3 = dcActual > dcM1;
+        const crit3 = dcActual > 0;
         const isPotenciado = crit1 && crit3;
 
         // Progress asesor vs objetivo cohort
@@ -1348,7 +1348,7 @@ function renderSegCohorte() {
             <div class="kv-item"><div class="kv-label">TPV M-1</div><div class="kv-val">${fmt(tpvM1)}</div></div>
             <div class="kv-item"><div class="kv-label">DC M-1</div><div class="kv-val">${fmt(dcM1)}</div></div>
             <div class="kv-item"><div class="kv-label">TPV Actual</div><div class="kv-val">${fmt(tpvActual)}</div></div>
-            <div class="kv-item"><div class="kv-label">DC Actual</div><div class="kv-val">${fmt(dcActual)}</div></div>
+            <div class="kv-item"><div class="kv-label">VC Incremental</div><div class="kv-val">${fmt(dcActual)}</div></div>
             <div class="kv-item"><div class="kv-label">FCST TPV</div><div class="kv-val">${fmt(fcstTpv)}</div></div>
             <div class="kv-item"><div class="kv-label">DC Incremental</div><div class="kv-val" style="${dcIncr>=0?'color:var(--green-d)':'color:var(--red-d)'};font-weight:700">${fmt(dcIncr)}</div></div>
           </div>
