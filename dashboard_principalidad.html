@@ -1083,7 +1083,7 @@ function populateSelects() {
 }
 
 function autofillFromBase(custId) {
-  const data = ST.baseMadreData[custId];
+  const data = ST.baseMadreData[custId] || ST.baseMadreData[String(custId)] || ST.baseMadreData[+custId] || null;
   if (!data) return;
   const n = document.getElementById('f_nombre');
   const a = document.getElementById('f_asesor');
