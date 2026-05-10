@@ -853,6 +853,7 @@ function processLookerv2FromGAS(rows) {
   const iM0Comp  = headers.findIndex(h => /m0\s*completo/i.test(h));
   const iM1Comp  = headers.findIndex(h => /m1\s*completo/i.test(h));
   const iM2Comp  = headers.findIndex(h => /m2\s*completo/i.test(h));
+      const iPotenciado = headers.findIndex(h => /^POTENCIADO$/i.test(h.trim()));
 
   const todayStr = hoy.toISOString().split('T')[0];
   const threeDaysAgo = new Date(hoy); threeDaysAgo.setDate(threeDaysAgo.getDate()-3);
@@ -889,7 +890,7 @@ const parsed = [];
       fcstTpv:    iFcstTpv >= 0 ? gasNum(row[iFcstTpv]) : 0,
       fcstVc: iFcstInc >= 0 ? gasNum(row[iFcstInc]) : 0,
       m2completo: iM2Comp >= 0 ? String(row[iM2Comp]||'') : '',      rawCols: (() => { const rc = {}; for (let ci = 8; ci <= 45 && ci < headers.length; ci++) { const h = headers[ci]; if (h) rc[h] = gasNum(row[ci]); } return rc; })(),
-      isInactivo,
+      isInactivo,        potenciado: iPotenciado >= 0 ? String(row[iPotenciado]||'') : '',
     });
   }
   ST.lookerData = parsed;
@@ -1285,7 +1286,7 @@ function renderSegCohorte() {
     if (!cohort) continue;
     const rows = ST.lookerData.filter(r => r.mes == cohortKey);
     const equipoRows = rows.filter(r => esAsesorEquipo(r.asesor));
-    const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => r.asesor === segCohorteFilter);
+    const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => { const la=(r.asesor||'').trim().toLowerCase(),laToks=la.split(' '),laLast=laToks[laToks.length-1],laFirst0=laToks[0]?.[0]||'',eq=EQUIPO.find(e=>e.nombre===segCohorteFilter); if(!eq)return la===segCohorteFilter.toLowerCase(); const ea=eq.nombre.trim().toLowerCase(),eaToks=ea.split(' '),eaLast=eaToks[eaToks.length-1],eaFirst0=eaToks[0]?.[0]||''; return la===ea||(laLast===eaLast&&laFirst0===eaFirst0); });
     const totalDcIncr = filtered.reduce((s,r) => s + (r.vcM0 - r.vcM1), 0);
     const objCohort = ST.asesores.reduce((s,a) => s + getObjetivo(a.nombre, cohortKey), 0);
     const pctCohort = objCohort > 0 ? (totalDcIncr/objCohort*100) : 0;
@@ -1329,7 +1330,7 @@ function renderSegCohorte() {
 
         // Progress asesor vs objetivo cohort
         const objAsesor = getObjetivo(row.asesor, cohortKey);
-        const asesorRows = ST.lookerData.filter(r2 => r2.mes == cohortKey && r2.valido === 1 && r2.asesor === row.asesor);
+        const asesorRows = ST.lookerData.filter(r2 => r2.mes == cohortKey && r2.asesor === row.asesor);
         const asesorDcIncr = asesorRows.reduce((s,r2) => s + ((r2.vcM0||r2.vc||0) - (r2.vcM1||0)), 0);
         const pctAsesor = objAsesor > 0 ? (asesorDcIncr/objAsesor*100) : 0;
         const barColor = semColor(pctAsesor);
