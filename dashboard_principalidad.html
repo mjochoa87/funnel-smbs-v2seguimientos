@@ -1314,19 +1314,16 @@ function renderSegCohorte() {
         const dcActual = row.vcM0 || row.vc || 0;
         const dcIncr = dcActual - dcM1;
         const tpvM1 = row.tpvM1 || bm.tpvM1 || 0;
-        const tpvActual = row.tpvM0 || row.tpv || 0;
+        const tpvActual = cohortKey==202603?(row.rawCols&&row.rawCols['TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['TPV M1']||0):(row.tpvM0||row.tpv||0);
 
         // Potenciado criteria
         const fcstVcr = row.fcstVc || 0;
-        const fcstTpv = row.fcstTpv || 0;
+        const fcstTpv = cohortKey==202603?(row.rawCols&&row.rawCols['FCST TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['FCST TPV M1']||0):(row.rawCols&&row.rawCols['FCST TPV M0']||row.fcstTpv||0);
         const tpvGrowth = tpvM1 > 0 ? (fcstTpv/tpvM1 - 1) : 0;
-        const crit1 = fcstVcr >= 2000000;
+        const crit1 = (fcstTpv - tpvM1) >= 2000000;
         const crit2 = tpvGrowth >= 0.30;
         const crit3 = dcActual > dcM1;
-        const isPotenciado = row.potenciado === '1' || row.potenciado === 1 ||
-          String(row.potenciado||'').toLowerCase() === 'si' ||
-          String(row.potenciado||'').toLowerCase() === 'sí' ||
-          String(row.potenciado||'').toLowerCase() === 'true'
+        const isPotenciado = crit1 && crit3;
 
         // Progress asesor vs objetivo cohort
         const objAsesor = getObjetivo(row.asesor, cohortKey);
