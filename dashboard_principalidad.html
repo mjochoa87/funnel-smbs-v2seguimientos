@@ -1283,7 +1283,7 @@ function renderSegCohorte() {
   for (const cohortKey of [M2_KEY, M1_KEY, M0_KEY]) {
     const cohort = COHORTS[cohortKey];
     if (!cohort) continue;
-    const rows = ST.lookerData.filter(r => r.mes == cohortKey && r.valido === 1);
+    const rows = ST.lookerData.filter(r => r.mes == cohortKey);
     const equipoRows = rows.filter(r => esAsesorEquipo(r.asesor));
     const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => r.asesor === segCohorteFilter);
     const totalDcIncr = filtered.reduce((s,r) => s + (r.vcM0 - r.vcM1), 0);
