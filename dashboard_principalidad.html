@@ -706,7 +706,7 @@ function loadLookerv2(input) {
       const row = rows[r];
       if (!row[iCustId]) continue;
       const custId = row[iCustId];
-      const tpvCurrent = parseFloat((row[iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
+      const tpvCurrent = parseFloat((row[(parseInt(row[iMes])||0)===202603&&iTpvM2>=0?iTpvM2:(parseInt(row[iMes])||0)===202604&&iTpvM1real>=0?iTpvM1real:iTpvM0>=0?iTpvM0:iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
       // Track inactivity
       ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
       const oldTpv = ST.historialTPV[custId+'_'+threeDaysAgoStr];
@@ -721,7 +721,7 @@ function loadLookerv2(input) {
         asesor: iAsesor >= 0 ? row[iAsesor] : '',
         valido,
         tpv: tpvCurrent,
-        vc: parseFloat((row[iVc]||'0').replace(/[^0-9.-]/g,''))||0,
+        vc: parseFloat((row[(parseInt(row[iMes])||0)===202603&&iVcM2>=0?iVcM2:(parseInt(row[iMes])||0)===202604&&iVcM1real>=0?iVcM1real:iVcM0>=0?iVcM0:iVc]||'0').replace(/[^0-9.-]/g,''))||0,
         tpvM1: iTpvM1 >= 0 ? parseFloat((row[iTpvM1]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         vcM1: iVcM1 >= 0 ? parseFloat((row[iVcM1]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         tpvM0: iTpvM0 >= 0 ? parseFloat((row[iTpvM0]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
