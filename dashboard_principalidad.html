@@ -1248,6 +1248,21 @@ function renderSeguimiento() {
   renderSegAsesor();
 }
 
+function esAsesorEquipo(nombre) {
+  if (!nombre) return false;
+  const la = nombre.trim().toLowerCase();
+  const laToks = la.split(' ');
+  const laLast = laToks[laToks.length - 1];
+  const laFirst0 = laToks[0][0];
+  return EQUIPO.some(e => {
+    const ea = e.nombre.trim().toLowerCase();
+    const eaToks = ea.split(' ');
+    const eaLast = eaToks[eaToks.length - 1];
+    const eaFirst0 = eaToks[0][0];
+    return la === ea || (laLast === eaLast && laFirst0 === eaFirst0);
+  });
+}
+
 function renderSegCohorte() {
   const chips = document.getElementById('segCohorteChips');
   if (!chips) return;
@@ -1269,7 +1284,8 @@ function renderSegCohorte() {
     const cohort = COHORTS[cohortKey];
     if (!cohort) continue;
     const rows = ST.lookerData.filter(r => r.mes == cohortKey && r.valido === 1);
-    const filtered = segCohorteFilter === 'Todos' ? rows : rows.filter(r => r.asesor === segCohorteFilter);
+    const equipoRows = rows.filter(r => esAsesorEquipo(r.asesor));
+    const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => r.asesor === segCohorteFilter);
     const totalDcIncr = filtered.reduce((s,r) => s + (r.vcM0 - r.vcM1), 0);
     const objCohort = ST.asesores.reduce((s,a) => s + getObjetivo(a.nombre, cohortKey), 0);
     const pctCohort = objCohort > 0 ? (totalDcIncr/objCohort*100) : 0;
