@@ -1792,8 +1792,8 @@ function renderIncentivos() {
 
   const cards = ST.asesores.map(asesor => {
     // Get M2 achievement
-    const rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.valido === 1 && r.asesor === asesor.nombre);
-    const dcIncr = rows.reduce((s,r) => s + ((r.vcM0||r.vc||0) - (r.vcM1||0)), 0);
+    const rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.valido === 1 && r.asesor === asesor.nombre && (r.rawCols&&r.rawCols['FCST TPV M2']||0)-(r.tpvM1||0)>=2000000 && (r.rawCols&&r.rawCols['VC INC M2']||0)>0);
+    const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols['VC INC M2']||0), 0);
     const obj = getObjetivo(asesor.nombre, M2_KEY);
     const pct = obj > 0 ? (dcIncr/obj*100) : 0;
     const tier = asesor.tier || 'bronce';
