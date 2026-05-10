@@ -706,11 +706,11 @@ function loadLookerv2(input) {
       const row = rows[r];
       if (!row[iCustId]) continue;
       const custId = row[iCustId];
-      const tpvCurrent = parseFloat((row[(parseInt(row[iMes])||0)===202603&&iTpvM2>=0?iTpvM2:(parseInt(row[iMes])||0)===202604&&iTpvM1real>=0?iTpvM1real:iTpvM0>=0?iTpvM0:iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
+      const row.tpv = parseFloat((row[(parseInt(row[iMes])||0)===202603&&iTpvM2>=0?iTpvM2:(parseInt(row[iMes])||0)===202604&&iTpvM1real>=0?iTpvM1real:iTpvM0>=0?iTpvM0:iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
       // Track inactivity
-      ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
+      ST.historialTPV[custId+'_'+todayStr] = row.tpv;
       const oldTpv = ST.historialTPV[custId+'_'+threeDaysAgoStr];
-      const isInactivo = oldTpv !== undefined && oldTpv === tpvCurrent && tpvCurrent > 0;
+      const isInactivo = oldTpv !== undefined && oldTpv === row.tpv && row.tpv > 0;
 
       const valido = parseInt(row[iValido]||'0')||0;
       if (valido === 1) convertidos++;
@@ -720,7 +720,7 @@ function loadLookerv2(input) {
         mes: row[iMes]||'',
         asesor: iAsesor >= 0 ? row[iAsesor] : '',
         valido,
-        tpv: tpvCurrent,
+        tpv: row.tpv,
         vc: parseFloat((row[(parseInt(row[iMes])||0)===202603&&iVcM2>=0?iVcM2:(parseInt(row[iMes])||0)===202604&&iVcM1real>=0?iVcM1real:iVcM0>=0?iVcM0:iVc]||'0').replace(/[^0-9.-]/g,''))||0,
         tpvM1: iTpvM1 >= 0 ? parseFloat((row[iTpvM1]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         vcM1: iVcM1 >= 0 ? parseFloat((row[iVcM1]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
@@ -866,10 +866,10 @@ const parsed = [];
     if (!row || row.length === 0) continue;
     const custId = String(row[iCustId >= 0 ? iCustId : 0]||'').trim();
     if (!custId) continue;
-    const tpvCurrent = iTpv >= 0 ? gasNum(row[iTpv]) : 0;
-    ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
+    const row.tpv = iTpv >= 0 ? gasNum(row[iTpv]) : 0;
+    ST.historialTPV[custId+'_'+todayStr] = row.tpv;
     const oldTpv = ST.historialTPV[custId+'_'+threeDaysAgoStr];
-    const isInactivo = oldTpv !== undefined && oldTpv === tpvCurrent && tpvCurrent > 0;
+    const isInactivo = oldTpv !== undefined && oldTpv === row.tpv && row.tpv > 0;
     const valido = iValido >= 0 ? Math.round(gasNum(row[iValido])) : 0;
     if (valido === 1) convertidos++;
     parsed.push({
@@ -877,7 +877,7 @@ const parsed = [];
       mes: iMes >= 0 ? gasMes(row[iMes]) : '',
       asesor: iAsesor >= 0 ? String(row[iAsesor]||'').trim() : '',
       valido,
-      tpv: tpvCurrent,
+      tpv: row.tpv,
       vc: iVc >= 0 ? gasNum(row[iVc]) : 0,
       tpvM1: iTpvM1 >= 0 ? gasNum(row[iTpvM1]) : 0,
       vcM1:  iVcM1  >= 0 ? gasNum(row[iVcM1])  : 0,
@@ -1359,7 +1359,7 @@ function renderSegCohorte() {
           <div class="kv-grid">
                                 <div class="kv-item"><div class="kv-label">TPV M-1</div><div class="kv-value">${fmt(row.tpvM1)}</div></div>
                                                     <div class="kv-item"><div class="kv-label">VC M-1</div><div class="kv-value">${fmt(row.vcM1)}</div></div>
-                                                                        <div class="kv-item"><div class="kv-label">${cohortKey===202603?'TPV M2':cohortKey===202604?'TPV M1':'TPV M0'}</div><div class="kv-value">${fmt(tpvCurrent)}</div></div>
+                                                                        <div class="kv-item"><div class="kv-label">${cohortKey===202603?'TPV M2':cohortKey===202604?'TPV M1':'TPV M0'}</div><div class="kv-value">${fmt(row.tpv)}</div></div>
                                                                                             <div class="kv-item"><div class="kv-label">${cohortKey===202603?'VC M2':cohortKey===202604?'VC M1':'VC M0'}</div><div class="kv-value">${fmt(row.vc)}</div></div>
                                                                                                                 <div class="kv-item"><div class="kv-label">${cohortKey===202603?'FCST TPV M2':cohortKey===202604?'FCST TPV M1':'FCST TPV M0'}</div><div class="kv-value">${fmt(cohortKey===202603?rc('FCST TPV M2'):cohortKey===202604?rc('FCST TPV M1'):rc('FCST TPV M0'))}</div></div>
                                                                                                                                     <div class="kv-item"><div class="kv-label">${cohortKey===202603?'FCST TPV M2 - 1X':cohortKey===202604?'FCST M1 - 1x':'FCST TPV M0-1X'}</div><div class="kv-value">${fmt(fcstTpv1x)}</div></div>
