@@ -1287,7 +1287,7 @@ function renderSegCohorte() {
     const rows = ST.lookerData.filter(r => r.mes == cohortKey);
     const equipoRows = rows.filter(r => esAsesorEquipo(r.asesor));
     const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => { const la=(r.asesor||'').trim().toLowerCase(),laToks=la.split(' '),laLast=laToks[laToks.length-1],laFirst0=laToks[0]?.[0]||'',eq=EQUIPO.find(e=>e.nombre===segCohorteFilter); if(!eq)return la===segCohorteFilter.toLowerCase(); const ea=eq.nombre.trim().toLowerCase(),eaToks=ea.split(' '),eaLast=eaToks[eaToks.length-1],eaFirst0=eaToks[0]?.[0]||''; return la===ea||(laLast===eaLast&&laFirst0===eaFirst0); });
-    const totalDcIncr = filtered.reduce((s,r) => { const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0); const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0); return s+((ft-(r.tpvM1||0))>=2000000&&vi>0?vi:0);})
+    const totalDcIncr = filtered.reduce((s,r) => { const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0); const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0); return s+((ft-(r.tpvM1||0))>=2000000&&vi>0?vi:0);}, 0)
     const objCohort = ST.asesores.reduce((s,a) => s + getObjetivo(a.nombre, cohortKey), 0);
     const pctCohort = objCohort > 0 ? (totalDcIncr/objCohort*100) : 0;
 
