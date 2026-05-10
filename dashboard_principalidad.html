@@ -1287,7 +1287,7 @@ function renderSegCohorte() {
     const rows = ST.lookerData.filter(r => r.mes == cohortKey);
     const equipoRows = rows.filter(r => esAsesorEquipo(r.asesor));
     const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => { const la=(r.asesor||'').trim().toLowerCase(),laToks=la.split(' '),laLast=laToks[laToks.length-1],laFirst0=laToks[0]?.[0]||'',eq=EQUIPO.find(e=>e.nombre===segCohorteFilter); if(!eq)return la===segCohorteFilter.toLowerCase(); const ea=eq.nombre.trim().toLowerCase(),eaToks=ea.split(' '),eaLast=eaToks[eaToks.length-1],eaFirst0=eaToks[0]?.[0]||''; return la===ea||(laLast===eaLast&&laFirst0===eaFirst0); });
-    const totalDcIncr = filtered.reduce((s,r) => s + (r.vcM0 - r.vcM1), 0);
+    const totalDcIncr = filtered.reduce((s,r) => { const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0); const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0); return s+((ft-(r.tpvM1||0))>=2000000&&vi>0?vi:0);})
     const objCohort = ST.asesores.reduce((s,a) => s + getObjetivo(a.nombre, cohortKey), 0);
     const pctCohort = objCohort > 0 ? (totalDcIncr/objCohort*100) : 0;
 
@@ -1298,7 +1298,7 @@ function renderSegCohorte() {
           <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:13px">DC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
+          <span style="font-size:13px">VC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
           ${semaforo(pctCohort)}
         </div>
       </div>
@@ -1328,7 +1328,7 @@ function renderSegCohorte() {
         // Progress asesor vs objetivo cohort
         const objAsesor = getObjetivo(row.asesor, cohortKey);
         const asesorRows = ST.lookerData.filter(r2 => r2.mes == cohortKey && r2.asesor === row.asesor);
-        const asesorDcIncr = asesorRows.reduce((s,r2) => s + ((r2.vcM0||r2.vc||0) - (r2.vcM1||0)), 0);
+        const asesorDcIncr = asesorRows.reduce((s,r2) => s + (cohortKey==202603?(r2.rawCols&&r2.rawCols['VC INC M2']||0):cohortKey==202604?(r2.rawCols&&r2.rawCols['VC INC M1']||0):(r2.rawCols&&r2.rawCols['VC INC M0']||0)), 0);
         const pctAsesor = objAsesor > 0 ? (asesorDcIncr/objAsesor*100) : 0;
         const barColor = semColor(pctAsesor);
 
@@ -1354,7 +1354,7 @@ function renderSegCohorte() {
           </div>
           <div style="margin-top:10px">
             <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:4px">
-              <span>${row.asesor} — DC Incr. acum: ${fmt(asesorDcIncr)} / Obj: ${fmt(objAsesor)}</span>
+              <span>${row.asesor} — VC Incr. acum: ${fmt(asesorDcIncr)} / Obj: ${fmt(objAsesor)}</span>
               ${semaforo(pctAsesor)}
             </div>
             <div class="progress-bar"><div class="progress-fill ${barColor}" style="width:${Math.min(pctAsesor,100)}%"></div></div>
