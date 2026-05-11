@@ -1407,7 +1407,7 @@ function renderSegAsesor() {
   for (const asesor of ST.asesores) {
     const cohortData = [M0_KEY, M1_KEY, M2_KEY].map(k => {
       const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
-      const dcIncr = rows.reduce((s,r) => s + ((r.vcM0||r.vc||0) - (r.vcM1||0)), 0);
+      const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
       const obj = getObjetivo(asesor.nombre, k);
       const pct = obj > 0 ? (dcIncr/obj*100) : 0;
       return {key:k, label:COHORTS[k]?.tag||k, dcIncr, obj, pct, count:rows.length};
@@ -1459,7 +1459,7 @@ function renderSegAsesor() {
       if (!canvas) continue;
       const cohortData = [M0_KEY, M1_KEY, M2_KEY].map(k => {
         const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
-        const dcIncr = rows.reduce((s,r) => s + ((r.vcM0||r.vc||0) - (r.vcM1||0)), 0);
+        const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
         const obj = getObjetivo(asesor.nombre, k);
         return {key:k, label:COHORTS[k]?.tag||k, dcIncr, obj};
       });
@@ -1614,7 +1614,7 @@ function renderGestion() {
     const cohorts = [M0_KEY, M1_KEY, M2_KEY];
     const pcts = cohorts.map(k => {
       const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
-      const dcIncr = rows.reduce((s,r) => s + ((r.vcM0||r.vc||0) - (r.vcM1||0)), 0);
+      const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
       const obj = getObjetivo(asesor.nombre, k);
       return obj > 0 ? (dcIncr/obj*100) : 0;
     });
@@ -1682,7 +1682,7 @@ function renderMedallero() {
   const asesorStats = ST.asesores.map(asesor => {
     const computeForCohort = (k) => {
       const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
-      const dcIncr = rows.reduce((s,r) => s + ((r.vcM0||r.vc||0) - (r.vcM1||0)), 0);
+      const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
       const obj = getObjetivo(asesor.nombre, k);
       const pct = obj > 0 ? (dcIncr/obj*100) : 0;
       return {dcIncr, obj, pct};
@@ -1872,7 +1872,7 @@ function renderEscalaTable(tier) {
   for (const asesor of ST.asesores) {
     if ((asesor.tier||'bronce') !== tier) continue;
     const rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
-    const dcIncr = rows.reduce((s,r) => s + ((r.vcM0||r.vc||0) - (r.vcM1||0)), 0);
+    const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
     const obj = getObjetivo(asesor.nombre, M2_KEY);
     asesorPcts[asesor.nombre] = obj > 0 ? (dcIncr/obj*100) : 0;
   }
