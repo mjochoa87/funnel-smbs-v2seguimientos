@@ -717,7 +717,7 @@ function loadLookerv2(input) {
 
       parsed.push({
         custId,
-        mes: row[iMes]||'',
+        mes: (row[iMes]||'').trim(),
         asesor: iAsesor >= 0 ? row[iAsesor] : '',
         valido,
         tpv: tpvCurrent,
@@ -1264,7 +1264,7 @@ function esAsesorEquipo(nombre) {
   });
 }
 
-function matchAsesor(n,e){const la=(n||'').trim().toLowerCase(),ea=(e||'').trim().toLowerCase(),lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';return la===ea||(ll===el&&lf===ef);}
+function matchAsesor(n,e){const la=(n||'').trim().toLowerCase(),ea=(e||'').trim().toLowerCase(),lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
 
 function renderSegCohorte() {
   const chips = document.getElementById('segCohorteChips');
