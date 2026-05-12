@@ -717,7 +717,7 @@ function loadLookerv2(input) {
 
       parsed.push({
         custId,
-        mes: (row[iMes]||'').trim(),
+        mes: (parseInt(row[iMes])||0) > 0 ? String(parseInt(row[iMes])) : '',
         asesor: iAsesor >= 0 ? row[iAsesor] : '',
         valido,
         tpv: tpvCurrent,
