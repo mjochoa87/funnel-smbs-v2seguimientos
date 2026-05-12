@@ -1288,7 +1288,7 @@ function renderSegCohorte() {
     if (!cohort) continue;
     const rows = ST.lookerData.filter(r => r.mes == cohortKey && r.valido === 1);
     const equipoRows = rows;
-    const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => { const la=(r.asesor||'').trim().toLowerCase(),laToks=la.split(' '),laLast=laToks[laToks.length-1],laFirst0=laToks[0]?.[0]||'',eq=EQUIPO.find(e=>e.nombre===segCohorteFilter); if(!eq)return la===segCohorteFilter.toLowerCase(); const ea=eq.nombre.trim().toLowerCase(),eaToks=ea.split(' '),eaLast=eaToks[eaToks.length-1],eaFirst0=eaToks[0]?.[0]||''; return la===ea||(laLast===eaLast&&laFirst0===eaFirst0); });
+    const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => matchAsesor(r.asesor, segCohorteFilter));
     const _pf=filtered.filter(r=>{const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0);const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0);return (ft-(r.tpvM1||0))>=2000000&&vi>0;});const totalDcIncr=_pf.reduce((s,r)=>{const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0);return s+vi;},0);
     const objCohort=[...new Set(_pf.map(r=>r.asesor))].reduce((s,n)=>s+getObjetivo(n,cohortKey),0);
     const pctCohort = objCohort > 0 ? (totalDcIncr/objCohort*100) : 0;
@@ -1297,7 +1297,7 @@ function renderSegCohorte() {
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <div>
           <span style="font-weight:700;font-size:16px">${cohort.label}</span>
-          <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
+FixBug4:reemplazarfiltroinlinedeasesorenrenderSegCohorteconmatchAsesor(agregaword-subsetmatching)          <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:13px">VC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
