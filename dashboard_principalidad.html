@@ -1298,7 +1298,8 @@ function renderSegCohorte() {
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
         <div>
           <span style="font-weight:700;font-size:16px">${cohort.label}</span>
-        </div>
+          <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
+                  </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:13px">VC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
           ${semaforo(pctCohort)}
