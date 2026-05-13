@@ -381,13 +381,13 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 const EQUIPO = [
   {nombre:'Juan Cruz Rial', objetivos:{default:1000000}, tier:'bronce'},
   {nombre:'Agustin Fernandez Diz', objetivos:{default:1000000}, tier:'bronce'},
-  {nombre:'Carol Delgado', objetivos:{default:1000000}, tier:'bronce'},
+  {nombre:'Carolina Delgado', objetivos:{default:1000000}, tier:'bronce'},
   {nombre:'Mariana Gonzalez', objetivos:{default:1000000}, tier:'bronce'},
   {nombre:'Manuel Elizarraga', objetivos:{default:1000000}, tier:'bronce'},
   {nombre:'Soledad Maydana', objetivos:{default:1000000}, tier:'bronce'},
   {nombre:'Julian Torres', objetivos:{'202604':350000,'202605':575000}, tier:'bronce'},
-  {nombre:'Rocio Angueira', objetivos:{'202604':350000,'202605':575000}, tier:'bronce'},
-  {nombre:'Mayra Marchesse', objetivos:{'202605':220000}, tier:'bronce'},
+  {nombre:'Rocio Angueria', objetivos:{'202604':350000,'202605':575000}, tier:'bronce'},
+  {nombre:'Mayra Marchese', objetivos:{'202605':220000}, tier:'bronce'},
   {nombre:'Maria Segovia', objetivos:{'202605':220000}, tier:'bronce'},
   {nombre:'Matias Valenzuela', objetivos:{'202605':220000}, tier:'bronce'},
 ];
@@ -717,7 +717,7 @@ function loadLookerv2(input) {
 
       parsed.push({
         custId,
-        mes: (parseInt(row[iMes])||0) > 0 ? String(parseInt(row[iMes])) : '',
+        mes: (parseInt(row[iMes])||0) > 0 ? String(parseInt(row[iMes])) : (gasMes(row[iMes])||''),
         asesor: iAsesor >= 0 ? row[iAsesor] : '',
         valido,
         tpv: tpvCurrent,
@@ -773,7 +773,8 @@ function gasMes(val) {
   const s = String(val).trim();
   // ISO date string → YYYYMM
   if (s.match(/^\d{4}-\d{2}-\d{2}/)) return s.slice(0,4) + s.slice(5,7);
-  return s;
+  if (s.match(/^\d{6}(\.\d+)?$/)) return String(parseInt(s));
+    return s;
 }
 
 function processBaseMadreFromGAS(rows) {
@@ -1264,7 +1265,7 @@ function esAsesorEquipo(nombre) {
   });
 }
 
-function matchAsesor(n,e){const la=(n||'').trim().toLowerCase(),ea=(e||'').trim().toLowerCase(),lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
+function matchAsesor(n,e){function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}const la=norm(n),ea=norm(e);if(!la||!ea)return false;if(la===ea)return true;const lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
 
 function renderSegCohorte() {
   const chips = document.getElementById('segCohorteChips');
