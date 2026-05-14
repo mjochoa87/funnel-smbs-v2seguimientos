@@ -602,7 +602,7 @@ function loadState() {
       if (saved.asesores) {
         for (const sa of saved.asesores) {
           const idx = ST.asesores.findIndex(a => a.nombre === sa.nombre || matchAsesor(sa.nombre, a.nombre));
-          if (idx >= 0) { ST.asesores[idx] = {...ST.asesores[idx], ...sa}; }
+          if (idx >= 0) { ST.asesores[idx] = {...ST.asesores[idx], ...sa, nombre: ST.asesores[idx].nombre}; }
           else { ST.asesores.push(sa); }
         }
       }
@@ -1317,7 +1317,7 @@ function esAsesorEquipo(nombre) {
   });
 }
 
-function matchAsesor(n,e){function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}const la=norm(n),ea=norm(e);if(!la||!ea)return false;if(la===ea)return true;const lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
+function matchAsesor(n,e){function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}const la=norm(n),ea=norm(e);if(!la||!ea)return false;if(la===ea)return true;const lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lf===ef&&Math.abs(ll.length-el.length)<=2&&(ll.startsWith(el)||el.startsWith(ll)))return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
 
 function renderSegCohorte() {
   const chips = document.getElementById('segCohorteChips');
