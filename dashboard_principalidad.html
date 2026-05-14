@@ -467,7 +467,7 @@ let ST = {
   lookerData: [],
   baseMadreData: {},
   historialTPV: {},
-  lastLoadDate: null,
+  lastLoadDate: null, targetObjetivos: {},
 };
 
 // ============================================================
@@ -522,7 +522,7 @@ function semColor(pct) {
   return 'red';
 }
 
-function getObjetivo(nombre, cohortYYYYMM) {
+function normalizarNombre(n) { return (n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); } function getObjetivo(nombre, cohortYYYYMM) { const key=normalizarNombre(nombre); if(ST.targetObjetivos[key]){const v=ST.targetObjetivos[key][String(cohortYYYYMM)];if(v!==undefined&&v!==null&&v!=='')return parseFloat(v)||0;return 0;} const a=ST.asesores.find(x=>x.nombre===nombre); if(!a)return 0; if(a.objetivos[cohortYYYYMM]!==undefined)return a.objetivos[cohortYYYYMM]; if(a.objetivos.default!==undefined)return a.objetivos.default; return 0; } function _dummy_replaced() {
   const a = ST.asesores.find(x => x.nombre === nombre);
   if (!a) return 0;
   if (a.objetivos[cohortYYYYMM] !== undefined) return a.objetivos[cohortYYYYMM];
@@ -568,7 +568,7 @@ function loadState() {
       ST.lookerData = saved.lookerData || [];
       ST.baseMadreData = saved.baseMadreData || {};
       ST.historialTPV = saved.historialTPV || {};
-      ST.lastLoadDate = saved.lastLoadDate || null;
+      ST.lastLoadDate = saved.lastLoadDate || null; ST.targetObjetivos = saved.targetObjetivos || {};
       // Merge EQUIPO with saved asesores
       ST.asesores = JSON.parse(JSON.stringify(EQUIPO));
       if (saved.asesores) {
@@ -916,6 +916,24 @@ function setGasStatus(type, msg) {
 }
 
 let _fetching = false;
+function processTargetPorAsesorFromGAS(rows) {
+    ST.targetObjetivos = {};
+      if (!rows || rows.length === 0) return 0;
+        let count = 0;
+          for (const row of rows) {
+              const asesor = String(row[0] || '').trim();
+                  const cohort = String(row[1] || '').trim();
+                      const objetivo = row[2];
+                          if (!asesor || !cohort || objetivo === '' || objetivo === null || objetivo === undefined) continue;
+                              const key = normalizarNombre(asesor);
+                                  if (!ST.targetObjetivos[key]) ST.targetObjetivos[key] = {};
+                                      ST.targetObjetivos[key][cohort] = parseFloat(objetivo) || 0;
+                                          count++;
+                                            }
+                                              console.log('Target por asesor procesado:', count, 'entradas,', Object.keys(ST.targetObjetivos).length, 'asesores');
+                                                return count;
+                                                }
+
 function fetchGASData() {
   if (_fetching) return;
   _fetching = true;
@@ -946,7 +964,7 @@ function fetchGASData() {
     try {
       if (data.error) throw new Error(data.error);
       const bmCount = processBaseMadreFromGAS(data.baseMadre || []);
-      processLookerv2FromGAS(data.lookerv2 || []);
+      processLookerv2FromGAS(data.lookerv2 || []); processTargetPorAsesorFromGAS(data.targetPorAsesor || []);
       save();
       const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
       setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
