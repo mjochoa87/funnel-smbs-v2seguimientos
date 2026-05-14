@@ -171,7 +171,6 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 <nav id="mainNav">
   <button class="active" onclick="switchTab('pipeline',this)">📋 Pipeline</button>
   <button onclick="switchTab('seguimiento',this)">📅 Seguimiento</button>
-  <button onclick="switchTab('alertas',this)">🔔 Alertas M0</button>
   <button onclick="switchTab('gestion',this)">⚠️ Gestión</button>
   <button onclick="switchTab('medallero',this)">🏆 Medallero</button>
   <button onclick="switchTab('incentivos',this)">💰 Incentivos</button>
@@ -333,7 +332,7 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 </div>
 
 <!-- ===== TAB 3: ALERTAS M0 ===== -->
-<div id="tab-alertas" class="tab-content">
+<div id="tab-alertas" class="tab-content" style="display:none">
   <div class="section-title">🔔 Alertas — Escenario M0 (mes actual)</div>
   <div class="section-sub">Proyección: si todos los comercios convertidos este mes cumplen su TPV declarado, ¿llegás al objetivo?</div>
   <div id="alertasChips" class="chips"></div>
@@ -598,15 +597,22 @@ function loadState() {
       ST.baseMadreData = saved.baseMadreData || {};
       ST.historialTPV = saved.historialTPV || {};
       ST.lastLoadDate = saved.lastLoadDate || null; ST.targetObjetivos = saved.targetObjetivos || {};
-      // Merge EQUIPO with saved asesores
+      // Merge EQUIPO with saved asesores (fuzzy match to avoid duplicates like "Carol Delgado" vs "Carolina Delgado")
       ST.asesores = JSON.parse(JSON.stringify(EQUIPO));
       if (saved.asesores) {
         for (const sa of saved.asesores) {
-          const idx = ST.asesores.findIndex(a => a.nombre === sa.nombre);
+          const idx = ST.asesores.findIndex(a => a.nombre === sa.nombre || matchAsesor(sa.nombre, a.nombre));
           if (idx >= 0) { ST.asesores[idx] = {...ST.asesores[idx], ...sa}; }
           else { ST.asesores.push(sa); }
         }
       }
+      // Dedup: remove any entry not in EQUIPO that fuzzy-matches an EQUIPO member
+      const equipoNames = EQUIPO.map(e => e.nombre);
+      ST.asesores = ST.asesores.filter(a => {
+        if (equipoNames.includes(a.nombre)) return true;
+        const matchesEquipo = equipoNames.some(en => matchAsesor(a.nombre, en));
+        return !matchesEquipo;
+      });
     }
   } catch(e) {}
 }
@@ -1683,58 +1689,102 @@ function renderGestion() {
   const content = document.getElementById('gestionContent');
   if (!content) return;
 
-  // Find asesores with < 80% for all 3 recent cohorts
-  const bajoTarget = [];
-  for (const asesor of ST.asesores) {
-    const cohorts = [M0_KEY, M1_KEY, M2_KEY];
+  const cohorts = [M2_KEY, M1_KEY, M0_KEY];
+  const cohortLabels = {[M2_KEY]:'M2 Mar', [M1_KEY]:'M1 Abr', [M0_KEY]:'M0 May'};
+
+  // Calcular % por asesor y cohorte
+  const asesorStats = ST.asesores.map(asesor => {
     const pcts = cohorts.map(k => {
       const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
-      const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
+      const dcIncr = rows.reduce((s,r) => {
+        const vi = r.mes==M2_KEY?(r.rawCols&&r.rawCols['VC INC M2']||r.vcM2||0):r.mes==M1_KEY?(r.rawCols&&r.rawCols['VC INC M1']||r.vcM1real||0):(r.rawCols&&r.rawCols['VC INC M0']||r.vcM0||r.vc||0);
+        return s + vi;
+      }, 0);
       const obj = getObjetivo(asesor.nombre, k);
-      return obj > 0 ? (dcIncr/obj*100) : 0;
+      const hasData = rows.length > 0;
+      return {pct: obj > 0 ? (dcIncr/obj*100) : 0, dcIncr, obj, hasData};
     });
-    // Only flag if all 3 have data AND all < 80%
-    const allBelow = pcts.every(p => p < 80);
-    const hasAnyData = ST.lookerData.some(r => matchAsesor(r.asesor, asesor.nombre));
-    if (hasAnyData && allBelow) {
-      bajoTarget.push({asesor, pcts, cohorts});
-    }
-  }
+    const tresRojo = pcts.every(p => p.hasData && p.pct < 80);
+    const hayDatos = pcts.some(p => p.hasData);
+    return {asesor, pcts, tresRojo, hayDatos};
+  }).filter(s => s.hayDatos);
 
-  if (bajoTarget.length === 0) {
-    content.innerHTML = `<div class="card"><div class="empty-state" style="padding:32px">
-      <div class="icon">✅</div>
-      <p style="color:var(--green-d);font-weight:600;font-size:16px">Sin asesores en situación crítica</p>
-      <p style="margin-top:8px">Todos los asesores han tenido al menos una cohorte por encima del 80%.</p>
-    </div></div>`;
-    return;
-  }
-
-  let html = '';
-  for (const {asesor, pcts, cohorts} of bajoTarget) {
-    const planKey = 'plan_'+asesor.nombre;
-    const existingPlan = ST.comentarios[planKey] || '';
-    html += `<div class="alert-card critical">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-        <span style="font-size:20px">⚠️</span>
-        <span style="font-size:16px;font-weight:700;color:var(--red-d)">${asesor.nombre}</span>
-        <span class="badge badge-red">3 cohortes bajo 80%</span>
-      </div>
-      <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
-        ${cohorts.map((k,i) => `
-          <div style="text-align:center;background:rgba(255,255,255,.6);border-radius:8px;padding:10px 16px">
-            <div style="font-size:11px;color:var(--g600);margin-bottom:4px">${COHORTS[k]?.tag||k}</div>
-            ${semaforo(pcts[i])}
-          </div>
-        `).join('')}
-      </div>
-      <div style="margin-top:12px">
-        <label style="font-size:13px;font-weight:600;color:var(--g800);margin-bottom:6px;display:block">📝 Plan de acción:</label>
-        <textarea class="comment" style="min-height:80px;background:rgba(255,255,255,.8)" placeholder="Describí el plan de acción para ${asesor.nombre}..." onblur="saveComment('${planKey}',this.value)">${existingPlan}</textarea>
-        ${existingPlan ? `<div class="comment-hist" style="margin-top:6px">💬 Último plan guardado: ${existingPlan}</div>` : ''}
+  // ---- Seccion: TPV sin actividad ----
+  const inactivosAll = ST.lookerData.filter(r => r.isInactivo);
+  let htmlInactivos = '';
+  if (inactivosAll.length > 0) {
+    const byAsesor = {};
+    inactivosAll.forEach(r => { const a=r.asesor||'Sin asesor'; if(!byAsesor[a])byAsesor[a]=[]; byAsesor[a].push(r); });
+    htmlInactivos = `<div style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;font-size:14px;color:#991b1b;margin-bottom:10px">Llamar sin movimiento TPV (${inactivosAll.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${inactivosAll.sort((a,b)=>b.inactivoDias-a.inactivoDias).map(r => {
+          const bm = ST.baseMadreData[r.custId]||{};
+          const nombre = bm.nombre || r.custId;
+          const cohortLabel = r.mes=='202603'?'M2':r.mes=='202604'?'M1':'M0';
+          return `<div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:#fff;border:1px solid #fecaca;border-radius:8px;font-size:12px">
+            <span style="font-weight:700;color:#991b1b">${r.inactivoDias}d</span>
+            <span style="font-weight:600">${nombre}</span>
+            <span style="color:#9ca3af;font-size:11px">${r.asesor?.split(' ')[0]||''} ${cohortLabel}</span>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
   }
+
+  // ---- Tabla principal por asesor ----
+  const rojos3 = asesorStats.filter(s => s.tresRojo);
+  const resto = asesorStats.filter(s => !s.tresRojo);
+
+  function pctCell(p) {
+    const color = p.pct >= 100 ? '#15803d' : p.pct >= 80 ? '#92400e' : '#991b1b';
+    const bg = p.pct >= 100 ? '#f0fdf4' : p.pct >= 80 ? '#fffbeb' : '#fff5f5';
+    const bar = Math.min(p.pct, 100);
+    if (!p.hasData) return `<td style="text-align:center;color:#9ca3af;font-size:12px">-</td>`;
+    return `<td style="text-align:center">
+      <div style="font-weight:700;color:${color};font-size:13px">${Math.round(p.pct)}%</div>
+      <div style="height:4px;background:#e5e7eb;border-radius:2px;margin:3px 4px 0">
+        <div style="height:4px;background:${color};border-radius:2px;width:${bar}%"></div>
+      </div>
+      <div style="font-size:10px;color:#6b7280;margin-top:2px">${fmt(p.dcIncr)} / ${fmt(p.obj)}</div>
+    </td>`;
+  }
+
+  function asesorRow(s, highlight) {
+    const planKey = 'plan_'+s.asesor.nombre;
+    const existingPlan = ST.comentarios[planKey] || '';
+    const rowStyle = highlight ? 'background:#fff5f5;' : '';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:600;font-size:13px">
+        ${highlight ? '<span style="color:#dc2626;margin-right:4px">rojo</span>' : ''}
+        ${s.asesor.nombre}
+        ${highlight ? '<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700">3 meses rojo</span>' : ''}
+      </td>
+      ${s.pcts.map(p => pctCell(p)).join('')}
+      <td style="min-width:180px">
+        <textarea class="comment" style="min-height:48px;font-size:12px;padding:6px 8px;background:${highlight?'rgba(255,255,255,.8)':'var(--g50)'}"
+          placeholder="Plan de accion..."
+          onblur="saveComment('${planKey}',this.value)">${existingPlan}</textarea>
+      </td>
+    </tr>`;
+  }
+
+  let html = htmlInactivos + `
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th style="min-width:160px">Asesor</th>
+      ${cohorts.map(k => `<th style="text-align:center;min-width:120px">${cohortLabels[k]}</th>`).join('')}
+      <th style="min-width:180px">Plan de accion</th>
+    </tr></thead>
+    <tbody>
+      ${rojos3.map(s => asesorRow(s, true)).join('')}
+      ${rojos3.length > 0 && resto.length > 0 ? `<tr><td colspan="5" style="padding:4px 0;background:transparent"><hr style="border:none;border-top:1px solid var(--g200);margin:4px 0"></td></tr>` : ''}
+      ${resto.map(s => asesorRow(s, false)).join('')}
+    </tbody>
+  </table>
+  </div>`;
+
   content.innerHTML = html;
 }
 
