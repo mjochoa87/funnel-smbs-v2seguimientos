@@ -559,6 +559,35 @@ function save() {
   try { localStorage.setItem('dash_principalidad_v1', JSON.stringify(ST)); } catch(e) {}
 }
 
+// Cuenta cuántos días consecutivos (hacia atrás desde hoy) el TPV se mantuvo igual
+function contarDiasInactivo(custId, tpvCurrent, todayStr) {
+  if (tpvCurrent <= 0) return 0;
+  let dias = 1;
+  const d = new Date(todayStr + 'T12:00:00');
+  for (let i = 1; i <= 14; i++) {
+    d.setDate(d.getDate() - 1);
+    const ds = d.toISOString().split('T')[0];
+    const v = ST.historialTPV[custId + '_' + ds];
+    if (v === undefined || v === null) break;
+    if (Number(v) !== Number(tpvCurrent)) break;
+    dias++;
+  }
+  return dias;
+}
+
+// Elimina entradas de historialTPV más viejas que maxDias días
+function purgarHistorialTPV(maxDias) {
+  try {
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - maxDias);
+    const cutoffStr = cutoff.toISOString().split('T')[0];
+    Object.keys(ST.historialTPV).forEach(k => {
+      const parts = k.split('_');
+      const dateStr = parts[parts.length - 1];
+      if (dateStr < cutoffStr) delete ST.historialTPV[k];
+    });
+  } catch(e) {}
+}
+
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem('dash_principalidad_v1')||'null');
@@ -695,8 +724,6 @@ function loadLookerv2(input) {
     const iM2Comp = headers.findIndex(h => /m2.*completo/i.test(h) || /completo/i.test(h));
 
     const todayStr = hoy.toISOString().split('T')[0];
-    const threeDaysAgo = new Date(hoy); threeDaysAgo.setDate(threeDaysAgo.getDate()-3);
-    const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
 
     const iTpv = iTpvM0 >= 0 ? iTpvM0 : headers.findIndex(h => /tpv/i.test(h));
       const iVc  = iVcM0  >= 0 ? iVcM0  : headers.findIndex(h => /\bvc\b|\bdc\b/i.test(h));
@@ -707,10 +734,10 @@ function loadLookerv2(input) {
       if (!row[iCustId]) continue;
       const custId = row[iCustId];
       const tpvCurrent = parseFloat((row[(parseInt(row[iMes])||0)===202603&&iTpvM2>=0?iTpvM2:(parseInt(row[iMes])||0)===202604&&iTpvM1real>=0?iTpvM1real:iTpvM0>=0?iTpvM0:iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
-      // Track inactivity
+      // Registrar TPV de hoy y contar días consecutivos sin cambio
       ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
-      const oldTpv = ST.historialTPV[custId+'_'+threeDaysAgoStr];
-      const isInactivo = oldTpv !== undefined && oldTpv === tpvCurrent && tpvCurrent > 0;
+      const inactivoDias = contarDiasInactivo(custId, tpvCurrent, todayStr);
+      const isInactivo = inactivoDias >= 3;
 
       const valido = parseInt(row[iValido]||'0')||0;
       if (valido === 1) convertidos++;
@@ -734,10 +761,12 @@ function loadLookerv2(input) {
         fcstVc: iFcstInc >= 0 ? parseFloat((row[iFcstInc]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
         m2completo: iM2Comp >= 0 ? row[iM2Comp] : '',
         isInactivo,
+        inactivoDias,
       });
     }
     ST.lookerData = parsed;
     ST.lastLoadDate = todayStr;
+    purgarHistorialTPV(15);
     save();
     const msg = `✅ ${parsed.length} filas cargadas — ${convertidos} convertidos`;
     showBanner('lookerBannerStatus','success',msg);
@@ -857,8 +886,6 @@ function processLookerv2FromGAS(rows) {
       const iPotenciado = headers.findIndex(h => /^POTENCIADO$/i.test(h.trim()));
 
   const todayStr = hoy.toISOString().split('T')[0];
-  const threeDaysAgo = new Date(hoy); threeDaysAgo.setDate(threeDaysAgo.getDate()-3);
-  const threeDaysAgoStr = threeDaysAgo.toISOString().split('T')[0];
 
 const parsed = [];
   let convertidos = 0;
@@ -869,8 +896,8 @@ const parsed = [];
     if (!custId) continue;
     const tpvCurrent = iTpv >= 0 ? gasNum(row[iTpv]) : 0;
     ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
-    const oldTpv = ST.historialTPV[custId+'_'+threeDaysAgoStr];
-    const isInactivo = oldTpv !== undefined && oldTpv === tpvCurrent && tpvCurrent > 0;
+    const inactivoDias = contarDiasInactivo(custId, tpvCurrent, todayStr);
+    const isInactivo = inactivoDias >= 3;
     const valido = iValido >= 0 ? Math.round(gasNum(row[iValido])) : 0;
     if (valido === 1) convertidos++;
     parsed.push({
@@ -891,11 +918,12 @@ const parsed = [];
       fcstTpv:    iFcstTpv >= 0 ? gasNum(row[iFcstTpv]) : 0,
       fcstVc: iFcstInc >= 0 ? gasNum(row[iFcstInc]) : 0,
       m2completo: iM2Comp >= 0 ? String(row[iM2Comp]||'') : '',      rawCols: (() => { const rc = {}; for (let ci = 8; ci <= 45 && ci < headers.length; ci++) { const h = headers[ci]; if (h) rc[h] = gasNum(row[ci]); } return rc; })(),
-      isInactivo,        potenciado: iPotenciado >= 0 ? String(row[iPotenciado]||'') : '',
+      isInactivo, inactivoDias, potenciado: iPotenciado >= 0 ? String(row[iPotenciado]||'') : '',
     });
   }
   ST.lookerData = parsed;
   ST.lastLoadDate = todayStr;
+  purgarHistorialTPV(15);
   return convertidos;
 }
 
@@ -1317,6 +1345,7 @@ function renderSegCohorte() {
         <div>
           <span style="font-weight:700;font-size:16px">${cohort.label}</span>
           <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
+          ${(()=>{ const n=filtered.filter(r=>r.isInactivo).length; return n>0?`<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700">📞 ${n} sin actividad</span>`:''; })()}
                   </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:13px">VC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
@@ -1373,7 +1402,7 @@ function renderSegCohorte() {
             <div class="convert-card-title">${nombreComercio}</div>
             <span class="badge badge-blue">${row.asesor}</span>
             <span class="potenciado-badge ${isPotenciado?'yes':'no'}">${isPotenciado?'⚡ POTENCIADO':'❌ NO POTENCIADO'}</span>
-            ${row.isInactivo ? '<span class="inactivo-badge pulse">⚠️ INACTIVO</span>' : ''}
+            ${row.isInactivo ? `<span class="inactivo-badge pulse">📞 Sin actividad ${row.inactivoDias}d — Llamar</span>` : ''}
             <code style="font-size:11px;color:var(--g400);font-family:var(--mono)">${row.custId}</code>
           </div>
           ${!isPotenciado ? `<div class="no-potenciado-reasons">Criterios no cumplidos: ${!crit1?'• FCST Inc < $2.000.000 ':''}${!crit2?'• FCST TPV crecimiento < 30% ':''}${!crit3?'• DC actual no supera DC M-1':''}</div>` : ''}
@@ -1617,6 +1646,33 @@ function renderAlertas() {
       </div>
     </div>`;
   }
+  // ---- Sección: TPV sin actividad 3+ días ----
+  const inactivosAll = ST.lookerData.filter(r => r.isInactivo && (alertasFilter === 'Todos' || matchAsesor(r.asesor, alertasFilter)));
+  if (inactivosAll.length > 0) {
+    const byAsesor = {};
+    inactivosAll.forEach(r => { const a = r.asesor||'Sin asesor'; if (!byAsesor[a]) byAsesor[a]=[]; byAsesor[a].push(r); });
+    let htmlInactivos = `<div style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;font-size:14px;color:#991b1b;margin-bottom:12px">📞 Comercios sin movimiento de TPV (${inactivosAll.length} total) — Acción: llamar</div>`;
+    Object.entries(byAsesor).forEach(([asesor, rows]) => {
+      htmlInactivos += `<div style="margin-bottom:10px"><div style="font-weight:600;font-size:13px;color:#7f1d1d;margin-bottom:6px">${asesor} (${rows.length})</div>`;
+      rows.sort((a,b)=>b.inactivoDias-a.inactivoDias).forEach(r => {
+        const bm = ST.baseMadreData[r.custId]||{};
+        const nombre = bm.nombre || r.custId;
+        const cohortLabel = r.mes=='202603'?'M2 Mar':r.mes=='202604'?'M1 Abr':'M0 May';
+        htmlInactivos += `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:#fff;border:1px solid #fecaca;border-radius:6px;margin-bottom:4px;font-size:12px">
+          <span style="font-weight:700;color:#991b1b">📞 ${r.inactivoDias}d</span>
+          <span style="font-weight:600">${nombre}</span>
+          <code style="color:#6b7280;font-size:11px">${r.custId}</code>
+          <span style="background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:11px">${cohortLabel}</span>
+          <span style="color:#6b7280">TPV: ${fmt(r.tpv)}</span>
+        </div>`;
+      });
+      htmlInactivos += '</div>';
+    });
+    htmlInactivos += '</div>';
+    html = htmlInactivos + html;
+  }
+
   content.innerHTML = html || '<div class="empty-state"><div class="icon">🔔</div><p>Sin datos disponibles.</p></div>';
 }
 
