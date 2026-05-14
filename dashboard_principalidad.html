@@ -1287,7 +1287,7 @@ function renderSegCohorte() {
   for (const cohortKey of [M2_KEY, M1_KEY, M0_KEY]) {
     const cohort = COHORTS[cohortKey];
     if (!cohort) continue;
-    const rows = ST.lookerData.filter(r => r.mes == cohortKey && r.valido === 1);
+    const rows = ST.lookerData.filter(r => r.mes == cohortKey);
     const equipoRows = rows;
     const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => matchAsesor(r.asesor, segCohorteFilter));
     const _pf=filtered.filter(r=>{const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0);const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0);return (ft-(r.tpvM1||0))>=2000000&&vi>0;});const totalDcIncr=_pf.reduce((s,r)=>{const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0);return s+vi;},0);
