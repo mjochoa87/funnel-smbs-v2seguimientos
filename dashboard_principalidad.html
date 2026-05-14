@@ -23,10 +23,15 @@ header{background:linear-gradient(135deg,#1a56db 0%,#1e40af 60%,#1d3a8a 100%);co
 header h1{font-size:19px;font-weight:500;letter-spacing:-.2px;line-height:1.2}
 header .sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px;font-weight:400}
 header .date{font-size:12px;color:rgba(255,255,255,.45);font-family:var(--mono)}
-nav{background:var(--w);border-bottom:2px solid var(--g200);padding:0 24px;display:flex;gap:0;overflow-x:auto}
-nav button{padding:14px 18px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .2s}
-nav button:hover{color:var(--g900);background:var(--g50)}
-nav button.active{color:var(--blue-d);border-bottom-color:var(--blue-d);font-weight:600}
+nav{background:var(--w);border-bottom:1px solid var(--g200);padding:10px 24px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav button{padding:7px 16px;border:1.5px solid var(--g200);border-radius:20px;background:var(--w);font-family:var(--font);font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;white-space:nowrap;transition:all .2s}
+nav button:hover{background:var(--g50);border-color:var(--g400)}
+nav button.active{font-weight:600;border-color:currentColor}
+nav button[data-tab="pipeline"].active{color:#185FA5;background:#E6F1FB;border-color:#378ADD}
+nav button[data-tab="seguimiento"].active{color:#5b21b6;background:#EEEDFE;border-color:#7F77DD}
+nav button[data-tab="gestion"].active{color:#854F0B;background:#FAEEDA;border-color:#BA7517}
+nav button[data-tab="medallero"].active{color:#92400e;background:#fef3c7;border-color:#f5c971}
+nav button[data-tab="incentivos"].active{color:#92400e;background:#FAEEDA;border-color:#D4A017}
 .container{max-width:1400px;margin:0 auto;padding:24px}
 .tab-content{display:none}
 .tab-content.active{display:block}
@@ -176,11 +181,11 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 </header>
 
 <nav id="mainNav">
-  <button class="active" onclick="switchTab('pipeline',this)">📋 Pipeline</button>
-  <button onclick="switchTab('seguimiento',this)">📅 Seguimiento</button>
-  <button onclick="switchTab('gestion',this)">⚠️ Gestión</button>
-  <button onclick="switchTab('medallero',this)">🏆 Medallero</button>
-  <button onclick="switchTab('incentivos',this)">💰 Incentivos</button>
+  <button data-tab="pipeline" class="active" onclick="switchTab('pipeline',this)">📋 Pipeline</button>
+  <button data-tab="seguimiento" onclick="switchTab('seguimiento',this)">📅 Seguimiento</button>
+  <button data-tab="gestion" onclick="switchTab('gestion',this)">⚠️ Gestión</button>
+  <button data-tab="medallero" onclick="switchTab('medallero',this)">🏆 Medallero</button>
+  <button data-tab="incentivos" onclick="switchTab('incentivos',this)">💰 Incentivos</button>
 </nav>
 
 <!-- Sync status bar -->
@@ -1957,8 +1962,14 @@ function renderIncentivos() {
 
   const cards = ST.asesores.map(asesor => {
     // Get M2 achievement
-    const rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre) && (r.rawCols&&r.rawCols['FCST TPV M2']||0)-(r.tpvM1||0)>=2000000 && (r.rawCols&&r.rawCols['VC INC M2']||0)>0);
-    const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols['VC INC M2']||0), 0);
+    const rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+    const dcIncr = rows.reduce((s,r) => {
+      const vi = (r.rawCols&&r.rawCols['VC INC M2'])||0;
+      const ft = (r.rawCols&&r.rawCols['FCST TPV M2'])||0;
+      const ispot = (ft-(r.tpvM1||0))>=2000000 && vi>0;
+      if(ispot) return s+vi;
+      return s+(vi<0?vi:0);
+    }, 0);
     const obj = getObjetivo(asesor.nombre, M2_KEY);
     const pct = obj > 0 ? (dcIncr/obj*100) : 0;
     const tier = asesor.tier || 'bronce';
