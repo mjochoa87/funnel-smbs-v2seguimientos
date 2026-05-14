@@ -14,8 +14,9 @@ const BASE_MADRE_ID = '1ymNdH1UnJ2VQZEiHJuHCrQbu2JT180_VVIlzbRXXXHQ';
 const BASE_MADRE_TAB = 'base de mes actual';
 const REPAGOS_ID = '11xFxl_XYFIhLGmokYJM9HpBUu53uRoUhWNqdqfHVPs8';
 const REPAGOS_TAB = 'lookerv2';
+const REPAGOS_TARGET_TAB = 'target por asesor';
 const MAX_ROWS = 5000;
-const CACHE_KEY = 'dash_data_v1';
+const CACHE_KEY = 'dash_data_v2';
 const CACHE_TTL = 300; // 5 minutos
 
 function doGet(e) {
@@ -41,7 +42,7 @@ function doGet(e) {
         timestamp: new Date().toISOString(),
         cached: false,
         baseMadre: baseMadre,
-        lookerv2: lookerv2
+        lookerv2: lookerv2,        targetPorAsesor: getTargetPorAsesor(),
       };
       json = JSON.stringify(output);
       // Guardar en caché (límite 100KB del CacheService)
@@ -93,6 +94,32 @@ function readSheet(spreadsheetId, sheetName) {
     return [];
   }
 }
+
+/**
+ *  * Lee la hoja "target por asesor" y devuelve un array de [asesor, cohortMes, objetivoAjustado]
+  * Columna A (idx 0) = ASESOR, Columna C (idx 2) = MES-COHORT, Columna I (idx 8) = OBJETIVO DC AJUSTADO
+   */
+   function getTargetPorAsesor() {
+     try {
+         const rows = readSheet(REPAGOS_ID, REPAGOS_TARGET_TAB);
+             if (!rows || rows.length < 2) return [];
+                 const result = [];
+                     for (let i = 1; i < rows.length; i++) {
+                           const row = rows[i];
+                                 const asesor = String(row[0] || '').trim();
+                                       const cohort = String(row[2] || '').trim();
+                                             const objetivo = row[8];
+                                                   if (asesor && cohort && objetivo !== '' && objetivo !== null && objetivo !== undefined) {
+                                                           result.push([asesor, cohort, objetivo]);
+                                                                 }
+                                                                     }
+                                                                         Logger.log('Target por asesor - filas procesadas: ' + result.length);
+                                                                             return result;
+                                                                               } catch(e) {
+                                                                                   Logger.log('Error getTargetPorAsesor: ' + e.message);
+                                                                                       return [];
+                                                                                         }
+                                                                                         }
 
 function testRead() {
   const bm = readSheet(BASE_MADRE_ID, BASE_MADRE_TAB);
