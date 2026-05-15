@@ -165,6 +165,26 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 .pos-1{color:#ffd700}
 .pos-2{color:#c0c0c0}
 .pos-3{color:#cd7f32}
+
+/* Upload Modal */
+.upload-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center}
+.upload-modal{background:#fff;border-radius:14px;padding:28px 32px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.upload-modal h2{font-size:17px;font-weight:700;margin-bottom:6px;color:var(--g900)}
+.upload-modal .sub{font-size:12px;color:var(--g600);margin-bottom:20px;line-height:1.5}
+.upload-modal .sub a{color:var(--blue-d);text-decoration:none}
+.upload-zone{border:2px dashed var(--g200);border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px}
+.upload-zone:hover{border-color:var(--blue-d);background:var(--blue-l)}
+.upload-zone .uz-icon{font-size:22px;flex-shrink:0}
+.upload-zone .uz-info{flex:1}
+.upload-zone .uz-title{font-size:13px;font-weight:600;color:var(--g800)}
+.upload-zone .uz-sub{font-size:11px;color:var(--g600);margin-top:2px}
+.upload-zone .uz-file{font-size:11px;color:var(--green-d);font-weight:600;margin-top:3px}
+.upload-modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.btn-upload{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600}
+.btn-upload.primary{background:#1a56db;color:#fff}
+.btn-upload.primary:hover{background:#1e40af}
+.btn-upload.secondary{background:var(--g100);color:var(--g700)}
+.btn-upload.secondary:hover{background:var(--g200)}
 </style>
 </head>
 <body>
@@ -990,93 +1010,71 @@ function processTargetPorAsesorFromGAS(rows) {
                                                 }
 
 function fetchGASData() {
-  if (_fetching) return;
-  _fetching = true;
-  setGasStatus('loading','⏳ Sincronizando con Google Sheets...');
+  showUploadModal();
+}
 
-  const sheets = [
-    { id: REPAGOS_ID,    sheet: 'lookerv2',            key: 'lookerv2' },
-    { id: BASE_MADRE_ID, sheet: 'base de mes actual',  key: 'baseMadre' },
-    { id: REPAGOS_ID,    sheet: 'target por asesor',   key: 'targetPorAsesor' },
-  ];
-
-  const results = {};
-  let pending = sheets.length;
-  let timedOut = false;
-
-  const timeout = setTimeout(() => {
-    timedOut = true;
-    _fetching = false;
-    sheets.forEach(s => {
-      const el = document.getElementById('_gviz_' + s.key);
-      if (el) el.remove();
-      delete window['__gvizCB_' + s.key];
-    });
-    setGasStatus('error',
-      '⏱ Tiempo agotado — ' +
-      '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
-    );
-  }, 120000);
-
-  function gvizToRows(table) {
-    if (!table || !table.cols) return [];
-    const headers = table.cols.map(c => c.label || c.id || '');
-    const rows = (table.rows || []).map(r =>
-      (r.c || []).map(cell => (cell && cell.v != null) ? cell.v : '')
-    );
-    return [headers, ...rows];
-  }
-
-  function checkDone() {
-    if (pending > 0) return;
-    clearTimeout(timeout);
-    _fetching = false;
-    try {
-      const bmCount = processBaseMadreFromGAS(results.baseMadre || []);
-      processLookerv2FromGAS(results.lookerv2 || []);
-      processTargetPorAsesorFromGAS(results.targetPorAsesor || []);
-      save();
-      const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-      setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
-      renderPipeline(); renderSeguimiento(); renderAlertas();
-      renderGestion(); renderMedallero(); renderIncentivos();
-    } catch(err) {
-      console.error('gviz process error:', err);
-      setGasStatus('error', `❌ Error procesando datos: <b>${err.message}</b> — <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
+function parseCSV(text) {
+  const rows = [];
+  const lines = text.split(/\r?\n/);
+  for (const line of lines) {
+    if (!line.trim()) continue;
+    const row = [];
+    let inQ = false, cur = '';
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') { inQ = !inQ; }
+      else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
+      else { cur += c; }
     }
+    row.push(cur);
+    rows.push(row);
   }
+  return rows;
+}
 
-  sheets.forEach(s => {
-    const cbName = '__gvizCB_' + s.key;
-    window[cbName] = function(response) {
-      if (timedOut) return;
-      const el = document.getElementById('_gviz_' + s.key);
-      if (el) el.remove();
-      delete window[cbName];
-      try {
-        results[s.key] = gvizToRows(response.table);
-      } catch(e) {
-        console.warn('gviz parse error for ' + s.key, e);
-        results[s.key] = [];
-      }
+function processUploadedFiles(files) {
+  const results = { lookerv2: null, baseMadre: null, targetPorAsesor: null };
+  let pending = 0;
+
+  Object.keys(files).forEach(key => {
+    if (!files[key]) return;
+    pending++;
+    const reader = new FileReader();
+    reader.onload = e => {
+      results[key] = parseCSV(e.target.result);
       pending--;
-      checkDone();
+      if (pending === 0) applyUploadedData(results);
     };
-    const script = document.createElement('script');
-    script.id = '_gviz_' + s.key;
-    script.onerror = function() {
-      if (timedOut) return;
-      this.remove();
-      delete window[cbName];
-      console.warn('gviz load error for ' + s.key);
-      results[s.key] = [];
-      pending--;
-      checkDone();
-    };
-    // gviz/tq JSONP — usa cookies de Google, sin CORS, sin Apps Script
-    script.src = `https://docs.google.com/spreadsheets/d/${s.id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(s.sheet)}&callback=${cbName}&_t=${Date.now()}`;
-    document.head.appendChild(script);
+    reader.readAsText(files[key]);
   });
+
+  if (pending === 0) applyUploadedData(results);
+}
+
+function applyUploadedData(results) {
+  try {
+    let bmCount = 0;
+    if (results.baseMadre) bmCount = processBaseMadreFromGAS(results.baseMadre);
+    if (results.lookerv2) processLookerv2FromGAS(results.lookerv2);
+    if (results.targetPorAsesor) processTargetPorAsesorFromGAS(results.targetPorAsesor);
+    save();
+    const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+    setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
+    renderPipeline(); renderSeguimiento(); renderAlertas();
+    renderGestion(); renderMedallero(); renderIncentivos();
+    closeUploadModal();
+  } catch(err) {
+    setGasStatus('error', `❌ Error: ${err.message}`);
+  }
+}
+
+function showUploadModal() {
+  document.getElementById('uploadModal').style.display = 'flex';
+}
+function closeUploadModal() {
+  document.getElementById('uploadModal').style.display = 'none';
+  ['fileL','fileBM','fileTgt'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  ['labelL','labelBM','labelTgt'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent=''; });
 }
 // ============================================================
 // BANNER HELPER
@@ -2122,5 +2120,61 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(fetchGASData, 60 * 60 * 1000);
 });
 </script>
+
+<!-- Upload Modal -->
+<div id="uploadModal" class="upload-modal-overlay" onclick="if(event.target===this)closeUploadModal()">
+  <div class="upload-modal">
+    <h2>📂 Actualizar datos</h2>
+    <p class="sub">
+      Descargá cada hoja como CSV desde Google Sheets:<br>
+      <a href="https://docs.google.com/spreadsheets/d/11xFxl_XYFIhLGmokYJM9HpBUu53uRoUhWNqdqfHVPs8/edit" target="_blank">🔗 Abrir planilla REPAGOS 2025 PRINCIPALIDAD</a>
+    </p>
+
+    <div class="upload-zone" onclick="document.getElementById('fileL').click()">
+      <span class="uz-icon">📊</span>
+      <div class="uz-info">
+        <div class="uz-title">Hoja "lookerv2" <span style="color:var(--red-d)">*</span></div>
+        <div class="uz-sub">Archivo → Descargar → CSV → hoja "lookerv2"</div>
+        <div id="labelL" class="uz-file"></div>
+      </div>
+    </div>
+    <input type="file" id="fileL" accept=".csv" style="display:none"
+      onchange="document.getElementById('labelL').textContent='✓ '+this.files[0]?.name">
+
+    <div class="upload-zone" onclick="document.getElementById('fileTgt').click()">
+      <span class="uz-icon">🎯</span>
+      <div class="uz-info">
+        <div class="uz-title">Hoja "target por asesor" <span style="color:var(--red-d)">*</span></div>
+        <div class="uz-sub">Archivo → Descargar → CSV → hoja "target por asesor"</div>
+        <div id="labelTgt" class="uz-file"></div>
+      </div>
+    </div>
+    <input type="file" id="fileTgt" accept=".csv" style="display:none"
+      onchange="document.getElementById('labelTgt').textContent='✓ '+this.files[0]?.name">
+
+    <div class="upload-zone" onclick="document.getElementById('fileBM').click()">
+      <span class="uz-icon">🏠</span>
+      <div class="uz-info">
+        <div class="uz-title">Hoja "base de mes actual" (opcional)</div>
+        <div class="uz-sub">De la planilla Base Madre — para nombres de comercios</div>
+        <div id="labelBM" class="uz-file"></div>
+      </div>
+    </div>
+    <input type="file" id="fileBM" accept=".csv" style="display:none"
+      onchange="document.getElementById('labelBM').textContent='✓ '+this.files[0]?.name">
+
+    <div class="upload-modal-footer">
+      <button class="btn-upload secondary" onclick="closeUploadModal()">Cancelar</button>
+      <button class="btn-upload primary" onclick="
+        const l=document.getElementById('fileL').files[0];
+        const bm=document.getElementById('fileBM').files[0];
+        const t=document.getElementById('fileTgt').files[0];
+        if(!l||!t){alert('Subí al menos lookerv2 y target por asesor');return;}
+        processUploadedFiles({lookerv2:l,baseMadre:bm||null,targetPorAsesor:t});
+      ">Cargar datos ✓</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
