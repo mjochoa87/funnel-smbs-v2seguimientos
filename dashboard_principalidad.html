@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8">h
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Seguimientos Principalidad — MercadoPago SMB</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -768,7 +768,7 @@ function loadLookerv2(input) {
 
     // FCST columns
     const iFcstTpv = headers.findIndex(h => /fcst/i.test(h) && /tpv/i.test(h) && !/inc/i.test(h));
-    const iFcstInc = headers.findIndex(h => /fcst/i.test(h) && (/inc/i.test(h)));
+    const iFcstInc = headers.findIndex(h => /fcst/i.test(h) && /vc/i.test(h) && /m0/i.test(h) && !/1x|cuotas/i.test(h));
     const iM2Comp = headers.findIndex(h => /m2.*completo/i.test(h) || /completo/i.test(h));
 
     const todayStr = hoy.toISOString().split('T')[0];
