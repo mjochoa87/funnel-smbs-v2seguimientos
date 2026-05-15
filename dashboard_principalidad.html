@@ -813,10 +813,9 @@ function loadLookerv2(input) {
 
 // ⚠️  IMPORTANTE: Esta URL necesita ser redeployada con acceso "Cualquier persona"
 // en Google Apps Script. Pasos:
-//   1. script.google.com → tu proyecto → Implementar → Administrar implementaciones
-//   2. Editar → "Quién puede acceder" → Cualquier persona (no solo organización)
-//   3. Guardar e implementar → copiá la nueva URL aquí
-const GAS_URL = 'https://script.google.com/a/macros/mercadolibre.com/s/AKfycbzZf7JjCNwYeJWylyKSujJ9cD1aNu-999AgsRXYziCbitffz5tqarcV_JjwRB9WP221AQ/exec';
+// Fuentes de datos directas (Google Sheets gviz/tq — sin Apps Script)
+const REPAGOS_ID     = '11xFxl_XYFIhLGmokYJM9HpBUu53uRoUhWNqdqfHVPs8';
+const BASE_MADRE_ID  = '1ymNdH1UnJ2VQZEiHJuHCrQbu2JT180_VVIlzbRXXXHQ';
 
 function gasNum(val) {
   if (typeof val === 'number') return isFinite(val) ? val : 0;
@@ -995,64 +994,90 @@ function fetchGASData() {
   _fetching = true;
   setGasStatus('loading','⏳ Sincronizando con Google Sheets...');
 
-  // Limpiamos cualquier script JSONP anterior
-  const old = document.getElementById('_gasJsonpScript');
-  if (old) old.remove();
-  const CB = '__gasJsonpCB';
+  const sheets = [
+    { id: REPAGOS_ID,    sheet: 'lookerv2',            key: 'lookerv2' },
+    { id: BASE_MADRE_ID, sheet: 'base de mes actual',  key: 'baseMadre' },
+    { id: REPAGOS_ID,    sheet: 'target por asesor',   key: 'targetPorAsesor' },
+  ];
 
-  let _timeout = setTimeout(() => {
-    const s = document.getElementById('_gasJsonpScript');
-    if (s) s.remove();
-    delete window[CB];
+  const results = {};
+  let pending = sheets.length;
+  let timedOut = false;
+
+  const timeout = setTimeout(() => {
+    timedOut = true;
     _fetching = false;
+    sheets.forEach(s => {
+      const el = document.getElementById('_gviz_' + s.key);
+      if (el) el.remove();
+      delete window['__gvizCB_' + s.key];
+    });
     setGasStatus('error',
-      '⏱ Tiempo agotado (3 min) — ' +
+      '⏱ Tiempo agotado — ' +
       '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
     );
-  }, 180000); // 3 minutos — GAS tarda en hacer cold start + leer planillas grandes
+  }, 120000);
 
-  window[CB] = function(data) {
-    clearTimeout(_timeout);
-    const s = document.getElementById('_gasJsonpScript');
-    if (s) s.remove();
-    delete window[CB];
+  function gvizToRows(table) {
+    if (!table || !table.cols) return [];
+    const headers = table.cols.map(c => c.label || c.id || '');
+    const rows = (table.rows || []).map(r =>
+      (r.c || []).map(cell => (cell && cell.v != null) ? cell.v : '')
+    );
+    return [headers, ...rows];
+  }
+
+  function checkDone() {
+    if (pending > 0) return;
+    clearTimeout(timeout);
     _fetching = false;
     try {
-      if (data.error) throw new Error(data.error);
-      const bmCount = processBaseMadreFromGAS(data.baseMadre || []);
-      processLookerv2FromGAS(data.lookerv2 || []); processTargetPorAsesorFromGAS(data.targetPorAsesor || []);
+      const bmCount = processBaseMadreFromGAS(results.baseMadre || []);
+      processLookerv2FromGAS(results.lookerv2 || []);
+      processTargetPorAsesorFromGAS(results.targetPorAsesor || []);
       save();
       const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
       setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
-      renderPipeline();
-      renderSeguimiento();
-      renderAlertas();
-      renderGestion();
-      renderMedallero();
-      renderIncentivos();
+      renderPipeline(); renderSeguimiento(); renderAlertas();
+      renderGestion(); renderMedallero(); renderIncentivos();
     } catch(err) {
-      console.error('GAS process error:', err);
+      console.error('gviz process error:', err);
       setGasStatus('error', `❌ Error procesando datos: <b>${err.message}</b> — <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
     }
-  };
+  }
 
-  const script = document.createElement('script');
-  script.id = '_gasJsonpScript';
-  script.onerror = function() {
-    clearTimeout(_timeout);
-    this.remove();
-    delete window[CB];
-    _fetching = false;
-    setGasStatus('error',
-      '❌ Sin respuesta del Apps Script — asegurate de estar logueada con tu cuenta MeLi en Chrome · ' +
-      '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
-    );
-  };
-  // JSONP: script tag no tiene restricciones CORS y envía cookies de Google automáticamente
-  script.src = GAS_URL + '?callback=' + CB + '&_t=' + Date.now();
-  document.head.appendChild(script);
+  sheets.forEach(s => {
+    const cbName = '__gvizCB_' + s.key;
+    window[cbName] = function(response) {
+      if (timedOut) return;
+      const el = document.getElementById('_gviz_' + s.key);
+      if (el) el.remove();
+      delete window[cbName];
+      try {
+        results[s.key] = gvizToRows(response.table);
+      } catch(e) {
+        console.warn('gviz parse error for ' + s.key, e);
+        results[s.key] = [];
+      }
+      pending--;
+      checkDone();
+    };
+    const script = document.createElement('script');
+    script.id = '_gviz_' + s.key;
+    script.onerror = function() {
+      if (timedOut) return;
+      this.remove();
+      delete window[cbName];
+      console.warn('gviz load error for ' + s.key);
+      results[s.key] = [];
+      pending--;
+      checkDone();
+    };
+    // gviz/tq JSONP — usa cookies de Google, sin CORS, sin Apps Script
+    script.src = `https://docs.google.com/spreadsheets/d/${s.id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(s.sheet)}&callback=${cbName}&_t=${Date.now()}`;
+    document.head.appendChild(script);
+  });
 }
-
 // ============================================================
 // BANNER HELPER
 // ============================================================
