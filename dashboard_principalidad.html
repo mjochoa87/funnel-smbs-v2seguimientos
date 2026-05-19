@@ -1727,8 +1727,10 @@ function renderGestion() {
         return s + vi;
       }, 0);
       const obj = getObjetivo(asesor.nombre, k);
-      const hasData = rows.length > 0;
-      return {pct: obj > 0 ? (dcIncr/obj*100) : 0, dcIncr, obj, hasData};
+      const _rgPct = getResumenPct(asesor.nombre, k);
+      const hasData = rows.length > 0 || _rgPct !== null;
+      const pct = _rgPct !== null ? _rgPct : (obj > 0 ? (dcIncr/obj*100) : 0);
+      return {pct, dcIncr, obj, hasData};
     });
     const tresRojo = pcts.every(p => p.hasData && p.pct < 80);
     const hayDatos = pcts.some(p => p.hasData);
@@ -1765,7 +1767,7 @@ function renderGestion() {
   function pctCell(p) {
     const color = p.pct >= 100 ? '#15803d' : p.pct >= 80 ? '#ca8a04' : '#991b1b';
     const bg = p.pct >= 100 ? '#dcfce7' : p.pct >= 80 ? '#fef9c3' : '#fee2e2';
-    const bar = Math.min(p.pct, 100);
+    const bar = Math.max(0, Math.min(p.pct, 100));
     if (!p.hasData) return `<td style="text-align:center;color:#9ca3af;font-size:12px">-</td>`;
     return `<td style="text-align:center;background-color:${bg}">
       <div style="font-weight:700;color:${color};font-size:13px">${Math.round(p.pct)}%</div>
@@ -1863,9 +1865,9 @@ function processResumenGestionFromGAS(arr) {
     var nom = row[0];
     if (!nom) return;
     ST.resumenGestion[nom] = {};
-    ST.resumenGestion[nom][String(M2_KEY)] = (row[1] !== null && row[1] !== undefined) ? row[1] : 0;
-    ST.resumenGestion[nom][String(M1_KEY)] = (row[2] !== null && row[2] !== undefined) ? row[2] : 0;
-    ST.resumenGestion[nom][String(M0_KEY)] = (row[3] !== null && row[3] !== undefined) ? row[3] : 0;
+    ST.resumenGestion[nom][String(M2_KEY)] = (row[1] !== undefined) ? row[1] : null;
+    ST.resumenGestion[nom][String(M1_KEY)] = (row[2] !== undefined) ? row[2] : null;
+    ST.resumenGestion[nom][String(M0_KEY)] = (row[3] !== undefined) ? row[3] : null;
   });
 }
 
