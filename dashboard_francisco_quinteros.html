@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Seguimientos Principalidad â MercadoPago SMB</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --dark:#1a1f36; --dark2:#2d3555; --blue:#7ab3f0; --blue-l:#dbeafe; --blue-d:#1e40af;
+  --green:#8ecf8a; --green-l:#dcfce7; --green-d:#166534; --purple:#b5a8f5; --purple-l:#ede9fe; --purple-d:#5b21b6;
+  --amber:#f5c971; --amber-l:#fef3c7; --amber-d:#92400e; --teal:#80d4ba; --teal-l:#ccfbf1; --teal-d:#115e59;
+  --red:#f5a0a0; --red-l:#fee2e2; --red-d:#991b1b;
+  --g50:#f9fafb; --g100:#f3f4f6; --g200:#e5e7eb; --g400:#9ca3af; --g600:#6b7280; --g800:#374151; --g900:#111827;
+  --w:#fff; --font:'DM Sans',sans-serif; --mono:'DM Mono',monospace; --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--g100);color:var(--g900);font-size:14px;min-height:100vh}
+header{background:linear-gradient(135deg,#1a56db 0%,#1e40af 60%,#1d3a8a 100%);color:var(--w);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(30,64,175,.35)}
+.header-inner{display:flex;align-items:center;gap:14px}
+.header-logo{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+header h1{font-size:19px;font-weight:500;letter-spacing:-.2px;line-height:1.2}
+header .sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:3px;font-weight:400}
+header .date{font-size:12px;color:rgba(255,255,255,.45);font-family:var(--mono)}
+nav{background:var(--w);border-bottom:1px solid var(--g200);padding:10px 24px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+nav button{padding:7px 16px;border:1.5px solid var(--g200);border-radius:20px;background:var(--w);font-family:var(--font);font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;white-space:nowrap;transition:all .2s}
+nav button:hover{background:var(--g50);border-color:var(--g400)}
+nav button.active{font-weight:600;border-color:currentColor}
+nav button[data-tab="pipeline"].active{color:#185FA5;background:#E6F1FB;border-color:#378ADD}
+nav button[data-tab="seguimiento"].active{color:#5b21b6;background:#EEEDFE;border-color:#7F77DD}
+nav button[data-tab="gestion"].active{color:#854F0B;background:#FAEEDA;border-color:#BA7517}
+nav button[data-tab="medallero"].active{color:#92400e;background:#fef3c7;border-color:#f5c971}
+nav button[data-tab="incentivos"].active{color:#92400e;background:#FAEEDA;border-color:#D4A017}
+.container{max-width:1400px;margin:0 auto;padding:24px}
+.tab-content{display:none}
+.tab-content.active{display:block}
+.card{background:var(--w);border-radius:var(--r);border:1px solid var(--g200);padding:20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-title{font-size:16px;font-weight:600;margin-bottom:16px;color:var(--g900)}
+.sub-tabs{display:flex;gap:8px;margin-bottom:20px}
+.sub-tab{padding:8px 16px;border:1.5px solid var(--g200);border-radius:20px;background:var(--w);font-family:var(--font);font-size:13px;font-weight:500;color:var(--g600);cursor:pointer;transition:all .2s}
+.sub-tab.active{background:var(--blue-d);color:var(--w);border-color:var(--blue-d)}
+.sub-tab-content{display:none}
+.sub-tab-content.active{display:block}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.chip{padding:5px 12px;border-radius:16px;border:1.5px solid var(--g200);background:var(--w);font-size:12px;font-weight:500;color:var(--g600);cursor:pointer;transition:all .15s}
+.chip.active{background:var(--blue-d);color:var(--w);border-color:var(--blue-d)}
+.chip:hover:not(.active){background:var(--blue-l);border-color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--g50);padding:10px 12px;text-align:left;font-weight:600;font-size:12px;color:var(--g600);border-bottom:1px solid var(--g200);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--g100);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+.btn{padding:8px 16px;border-radius:8px;border:none;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--blue-d);color:var(--w)}
+.btn-primary:hover{background:#1d4ed8}
+.btn-secondary{background:var(--g200);color:var(--g800)}
+.btn-secondary:hover{background:var(--g300,#d1d5db)}
+.btn-danger{background:var(--red-l);color:var(--red-d);border:1px solid var(--red)}
+.btn-danger:hover{background:var(--red);color:var(--w)}
+.btn-sm{padding:5px 10px;font-size:12px}
+input,select,textarea{font-family:var(--font);font-size:13px;border:1.5px solid var(--g200);border-radius:8px;padding:8px 12px;width:100%;background:var(--w);color:var(--g900);outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+label{display:block;font-size:12px;font-weight:600;color:var(--g600);margin-bottom:4px}
+.form-group{margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-bronce{background:#fef3c7;color:#92400e;border:1px solid #f59e0b}
+.badge-plata{background:#f3f4f6;color:#374151;border:1px solid #9ca3af}
+.badge-oro{background:#fef9c3;color:#78350f;border:1px solid #eab308}
+.badge-green{background:var(--green-l);color:var(--green-d)}
+.badge-red{background:var(--red-l);color:var(--red-d)}
+.badge-blue{background:var(--blue-l);color:var(--blue-d)}
+.badge-purple{background:var(--purple-l);color:var(--purple-d)}
+.sem-v{background:var(--green-l);color:#15803d;padding:3px 10px;border-radius:12px;font-weight:700;font-size:12px;display:inline-block}
+.sem-a{background:#fef9c3;color:#a16207;padding:3px 10px;border-radius:12px;font-weight:700;font-size:12px;display:inline-block}
+.sem-r{background:var(--red-l);color:#b91c1c;padding:3px 10px;border-radius:12px;font-weight:700;font-size:12px;display:inline-block}
+.progress-bar{height:8px;border-radius:4px;background:var(--g200);overflow:hidden;margin:6px 0}
+.progress-fill{height:100%;border-radius:4px;transition:width .4s}
+.progress-fill.green{background:var(--green)}
+.progress-fill.amber{background:var(--amber)}
+.progress-fill.red{background:var(--red)}
+.banner{padding:12px 16px;border-radius:var(--r);margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500}
+.banner-success{background:var(--green-l);color:var(--green-d);border:1px solid var(--green)}
+.banner-info{background:var(--blue-l);color:var(--blue-d);border:1px solid var(--blue)}
+.banner-warn{background:var(--amber-l);color:var(--amber-d);border:1px solid var(--amber)}
+.banner-error{background:var(--red-l);color:var(--red-d);border:1px solid var(--red)}
+.kv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin:12px 0}
+.kv-item{background:var(--g50);border-radius:8px;padding:10px 12px;border:1px solid var(--g200)}
+.kv-label{font-size:11px;color:var(--g600);font-weight:500;margin-bottom:2px}
+.kv-val{font-size:15px;font-weight:600;color:var(--g900)}
+.dc-box{background:linear-gradient(135deg,var(--purple-l),var(--blue-l));border:1.5px solid var(--purple);border-radius:var(--r);padding:16px;margin-top:12px}
+.dc-box .dc-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(0,0,0,.07)}
+.dc-box .dc-row:last-child{border-bottom:none;padding-top:8px}
+.dc-box .dc-total{font-size:18px;font-weight:700;color:var(--purple-d)}
+.dc-incr-pos{color:var(--green-d);font-weight:700}
+.dc-incr-neg{color:var(--red-d);font-weight:700}
+.cohort-header{padding:14px 18px;border-radius:var(--r);margin-bottom:12px;border-left:4px solid}
+.convert-card{border:1px solid var(--g200);border-radius:var(--r);padding:16px;margin-bottom:12px;background:var(--w)}
+.convert-card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.convert-card-title{font-size:15px;font-weight:600;flex:1}
+.pulse{animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.empty-state{text-align:center;padding:48px 24px;color:var(--g400)}
+.empty-state .icon{font-size:40px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+.funnel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.funnel-card{background:var(--w);border-radius:var(--r);padding:16px;text-align:center;border:1px solid var(--g200);box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.funnel-card .num{font-size:28px;font-weight:700;margin:8px 0 4px}
+.funnel-card .lbl{font-size:12px;color:var(--g600);font-weight:500}
+.funnel-card.blue .num{color:var(--blue-d)}
+.funnel-card.purple .num{color:var(--purple-d)}
+.funnel-card.green .num{color:var(--green-d)}
+.funnel-card.amber .num{color:var(--amber-d)}
+.upload-zone{border:2px dashed var(--g200);border-radius:var(--r);padding:20px;text-align:center;background:var(--g50);margin-bottom:16px;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:var(--blue);background:var(--blue-l)}
+.upload-zone.loaded{border-color:var(--green);background:var(--green-l)}
+.upload-zone input{display:none}
+.upload-icon{font-size:28px;margin-bottom:8px}
+.asesor-card{border:1px solid var(--g200);border-radius:var(--r);padding:20px;margin-bottom:16px;background:var(--w)}
+.asesor-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.asesor-card-name{font-size:16px;font-weight:600}
+.alert-card{border-left:4px solid var(--red);background:var(--red-l);border-radius:var(--r);padding:20px;margin-bottom:16px}
+.alert-card.critical{border-left-color:#dc2626}
+.ranking-table th{font-size:12px}
+.tier-bronce{color:#92400e;background:#fef3c7;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;border:1px solid #f59e0b}
+.tier-plata{color:#374151;background:#f3f4f6;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;border:1px solid #9ca3af}
+.tier-oro{color:#78350f;background:#fef9c3;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;border:1px solid #eab308}
+.incentivo-card{border:1px solid var(--g200);border-radius:var(--r);padding:16px;background:var(--w);margin-bottom:12px}
+.incentivo-card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.escala-tabs{display:flex;gap:6px;margin-bottom:16px}
+.escala-tab{padding:6px 14px;border-radius:16px;border:1.5px solid var(--g200);background:var(--w);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.escala-tab.bronce.active{background:#fef3c7;color:#92400e;border-color:#f59e0b}
+.escala-tab.plata.active{background:#f3f4f6;color:#374151;border-color:#9ca3af}
+.escala-tab.oro.active{background:#fef9c3;color:#78350f;border-color:#eab308}
+.escala-tab-content{display:none}
+.escala-tab-content.active{display:block}
+.highlight-row td{background:#eff6ff;font-weight:600}
+textarea.comment{width:100%;border:1.5px solid var(--g200);border-radius:8px;padding:8px;font-family:var(--font);font-size:12px;resize:vertical;min-height:60px;margin-top:8px}
+textarea.comment:focus{border-color:var(--blue);outline:none}
+.comment-hist{margin-top:6px;font-size:11px;color:var(--g600);background:var(--g50);border-radius:6px;padding:8px;border-left:3px solid var(--blue)}
+.chart-wrap{position:relative;height:250px}
+.section-title{font-size:17px;font-weight:500;margin-bottom:4px;color:var(--g900);display:flex;align-items:center;gap:10px}
+.section-title-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.section-wrap{background:var(--w);border:1px solid var(--g200);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;border-top-width:3px}
+.section-sub{font-size:13px;color:var(--g600);margin-bottom:20px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){
+  .form-row,.form-row-3{grid-template-columns:1fr}
+  .two-col{grid-template-columns:1fr}
+  nav{gap:0}
+  nav button{padding:12px 10px;font-size:12px}
+  .container{padding:12px}
+  header{padding:12px 16px}
+  header h1{font-size:16px}
+}
+.tooltip-text{font-size:11px;color:var(--g600);margin-top:2px}
+.no-potenciado-reasons{font-size:11px;color:var(--red-d);margin-top:4px;background:var(--red-l);padding:6px 10px;border-radius:6px}
+.potenciado-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.potenciado-badge.yes{background:var(--green-l);color:var(--green-d)}
+.potenciado-badge.no{background:var(--red-l);color:var(--red-d)}
+.inactivo-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;background:var(--red-l);color:var(--red-d)}
+.pos-num{font-size:18px;font-weight:700;width:32px;text-align:center}
+.pos-1{color:#ffd700}
+.pos-2{color:#c0c0c0}
+.pos-3{color:#cd7f32}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-logo">ð</div>
+    <div>
+      <h1>Dashboard Seguimientos Principalidad</h1>
+      <div class="sub">MercadoPago Â· Equipo SMB Asesores</div>
+    </div>
+  </div>
+  <div class="date" id="headerDate"></div>
+</header>
+
+<nav id="mainNav">
+  <button data-tab="pipeline" class="active" onclick="switchTab('pipeline',this)">ð Pipeline</button>
+  <button data-tab="seguimiento" onclick="switchTab('seguimiento',this)">ð Seguimiento</button>
+  <button data-tab="gestion" onclick="switchTab('gestion',this)">â ï¸ GestiÃ³n</button>
+  <button data-tab="medallero" onclick="switchTab('medallero',this)">ð Medallero</button>
+  <button data-tab="incentivos" onclick="switchTab('incentivos',this)">ð° Incentivos</button>
+</nav>
+
+<!-- Sync status bar -->
+<div id="gasStatusBar" style="background:#dbeafe;color:#1e40af;border-bottom:1px solid #93c5fd;padding:8px 24px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:12px">
+  <span id="gasStatusText">â³ Conectando con las planillas de Google Sheets...</span>
+  <button onclick="fetchGASData()" style="margin-left:auto;padding:4px 12px;border:1px solid #93c5fd;border-radius:6px;background:var(--w);font-size:11px;font-weight:600;color:#1e40af;cursor:pointer">ð Actualizar</button>
+</div>
+
+<div class="container">
+
+<!-- ===== TAB 1: PIPELINE ===== -->
+<div id="tab-pipeline" class="tab-content active">
+  <div class="section-wrap" style="border-top-color:#378ADD">
+    <div class="section-title"><span class="section-title-icon" style="background:#E6F1FB">ð</span>Pipeline â Negociaciones y Renegociaciones</div>
+    <div class="section-sub">Comercios en proceso de principalizaciÃ³n</div>
+  </div>
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchSubTab('pipeline','resumen',this)">ð Resumen</button>
+    <button class="sub-tab" onclick="switchSubTab('pipeline','cargar',this)">â Cargar comercio</button>
+  </div>
+  <div id="pipeline-resumen" class="sub-tab-content active">
+    <div id="pipelineChips" class="chips"></div>
+    <div id="pipelineFunnel" class="funnel-grid"></div>
+    <div class="card">
+      <div id="pipelineTable"></div>
+    </div>
+  </div>
+  <div id="pipeline-cargar" class="sub-tab-content">
+    <div class="card">
+      <div class="card-title">ð Cargar Base Madre</div>
+      <div id="baseMadreBanner" class="banner banner-info" style="margin-bottom:8px">â³ Sincronizando Base Madre con Google Sheets...</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <button class="btn btn-sm btn-secondary" onclick="fetchGASData()">ð Sincronizar ahora</button>
+        <label style="font-size:11px;color:var(--g400);cursor:pointer;display:flex;align-items:center;gap:4px">
+          <input type="file" id="baseMadreInput" accept=".csv" onchange="loadBaseMadre(this)" style="display:none">
+          ð Subir CSV manualmente (respaldo)
+        </label>
+      </div>
+      <div id="baseMadreStatus"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">â Nuevo comercio en pipeline</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cust ID *</label>
+          <input type="text" id="f_custId" placeholder="ej: 123456789" oninput="autofillFromBase(this.value)">
+        </div>
+        <div class="form-group">
+          <label>Nombre del comercio *</label>
+          <input type="text" id="f_nombre" placeholder="Nombre del comercio">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Asesor *</label>
+          <select id="f_asesor"></select>
+        </div>
+        <div class="form-group">
+          <label>Rubro</label>
+          <input type="text" id="f_rubro" placeholder="ej: GastronomÃ­a">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estado *</label>
+          <select id="f_estado">
+            <option value="">Seleccionar...</option>
+            <option value="NegociaciÃ³n">NegociaciÃ³n</option>
+            <option value="RenegociaciÃ³n">RenegociaciÃ³n</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>TPV declarado ($)</label>
+          <input type="number" id="f_tpv" placeholder="0" oninput="updateDCCalc()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tasa procesamiento</label>
+          <select id="f_procKey" onchange="updateDCCalc()">
+            <option value="">Sin tasa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tasa financiamiento/round</label>
+          <select id="f_roundKey" onchange="updateDCCalc()">
+            <option value="">Sin tasa</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label>Share dÃ©bito/1 pago (%)</label>
+          <input type="number" id="f_shareDeb" placeholder="0" min="0" max="100" oninput="updateDCCalc()">
+        </div>
+        <div class="form-group">
+          <label>Share cuotas (%)</label>
+          <input type="number" id="f_shareCuotas" placeholder="0" min="0" max="100" oninput="updateDCCalc()">
+        </div>
+        <div class="form-group">
+          <label>TPV M-1 ($)</label>
+          <input type="number" id="f_tpvM1" placeholder="0" oninput="updateDCCalc()">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>DC M-1 ($)</label>
+          <input type="number" id="f_dcM1" placeholder="0" oninput="updateDCCalc()">
+        </div>
+        <div></div>
+      </div>
+      <div class="dc-box" id="dcCalcBox">
+        <div class="dc-row"><span>DC dÃ©bito/1 pago:</span><span id="dc_deb">$0</span></div>
+        <div class="dc-row"><span>DC cuotas:</span><span id="dc_cuotas">$0</span></div>
+        <div class="dc-row"><span style="font-weight:700;color:var(--purple-d)">DC teÃ³rico/mes:</span><span class="dc-total" id="dc_total">$0</span></div>
+        <div class="dc-row"><span>DC M-1:</span><span id="dc_m1_disp">$0</span></div>
+        <div class="dc-row"><span style="font-weight:700">DC incremental:</span><span id="dc_incr_disp" class="dc-incr-pos">$0</span></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-secondary" onclick="clearPipelineForm()">Limpiar</button>
+        <button class="btn btn-primary" onclick="savePipelineEntry()">ð¾ Guardar comercio</button>
+      </div>
+      <div id="pipelineSaveStatus" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: SEGUIMIENTO ===== -->
+<div id="tab-seguimiento" class="tab-content">
+  <div class="section-wrap" style="border-top-color:#7F77DD">
+    <div class="section-title"><span class="section-title-icon" style="background:#EEEDFE">ð</span>Seguimiento de convertidos</div>
+    <div class="section-sub">Monitoreo de comercios convertidos por cohorte</div>
+  </div>
+
+  <div class="card" style="padding:12px 16px">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="font-weight:600;font-size:13px">ð¥ Lookerv2</div>
+      <div id="lookerBannerStatus" style="flex:1;font-size:12px;color:var(--g600)">SincronizaciÃ³n automÃ¡tica activa</div>
+      <button class="btn btn-sm btn-secondary" onclick="fetchGASData()">ð Actualizar</button>
+      <label style="font-size:11px;color:var(--g400);cursor:pointer;display:flex;align-items:center;gap:4px">
+        <input type="file" id="lookerInput" accept=".csv" onchange="loadLookerv2(this)" style="display:none">
+        ð CSV manual
+      </label>
+    </div>
+  </div>
+
+  <div class="sub-tabs">
+    <button class="sub-tab active" onclick="switchSubTab('seg','cohorte',this)">ð Por cohorte</button>
+    <button class="sub-tab" onclick="switchSubTab('seg','asesor',this)">ð¤ Por asesor</button>
+  </div>
+
+  <div id="seg-cohorte" class="sub-tab-content active">
+    <div id="segCohorteChips" class="chips"></div>
+    <div id="segCohorteContent"></div>
+  </div>
+
+  <div id="seg-asesor" class="sub-tab-content">
+    <div id="segAsesorContent"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: ALERTAS M0 ===== -->
+<div id="tab-alertas" class="tab-content" style="display:none">
+  <div class="section-title">ð Alertas â Escenario M0 (mes actual)</div>
+  <div class="section-sub">ProyecciÃ³n: si todos los comercios convertidos este mes cumplen su TPV declarado, Â¿llegÃ¡s al objetivo?</div>
+  <div id="alertasChips" class="chips"></div>
+  <div id="alertasContent"></div>
+</div>
+
+<!-- ===== TAB 4: GESTIÃN ===== -->
+<div id="tab-gestion" class="tab-content">
+  <div class="section-wrap" style="border-top-color:#BA7517">
+    <div class="section-title"><span class="section-title-icon" style="background:#FAEEDA">â ï¸</span>GestiÃ³n â Performance por asesor</div>
+    <div class="section-sub">% alcance de objetivo por cohorte â asesores en rojo los Ãºltimos 3 meses</div>
+  </div>
+  <div id="gestionContent"></div>
+</div>
+
+<!-- ===== TAB 5: MEDALLERO ===== -->
+<div id="tab-medallero" class="tab-content">
+  <div class="section-wrap" style="border-top-color:#f5c971">
+    <div class="section-title"><span class="section-title-icon" style="background:#fef3c7">ð</span>Medallero â Ranking del equipo</div>
+    <div class="section-sub">Performance del equipo en los Ãºltimos 3 perÃ­odos</div>
+  </div>
+  <div id="medalleroContent"></div>
+</div>
+
+<!-- ===== TAB 6: INCENTIVOS ===== -->
+<div id="tab-incentivos" class="tab-content">
+  <div class="section-wrap" style="border-top-color:#D4A017">
+    <div class="section-title"><span class="section-title-icon" style="background:#FAEEDA">ð°</span>Incentivos â Escala de comisiones</div>
+    <div class="section-sub">EstimaciÃ³n de incentivos por asesor segÃºn cumplimiento M2</div>
+  </div>
+  <div id="incentivosCards"></div>
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">ð Tabla de escala de incentivos</div>
+    <div class="escala-tabs">
+      <button class="escala-tab bronce active" onclick="switchEscalaTab('bronce',this)">ð¥ Bronce</button>
+      <button class="escala-tab plata" onclick="switchEscalaTab('plata',this)">ð¥ Plata</button>
+      <button class="escala-tab oro" onclick="switchEscalaTab('oro',this)">ð¥ Oro</button>
+    </div>
+    <div id="escala-bronce" class="escala-tab-content active"></div>
+    <div id="escala-plata" class="escala-tab-content"></div>
+    <div id="escala-oro" class="escala-tab-content"></div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const EQUIPO = [
+    {nombre: 'Barbara Nuñez', objetivos: {"202601":1000000}},
+    {nombre: 'Diana Fraser', objetivos: {"202601":1000000}},
+    {nombre: 'Francelys Perez', objetivos: {"202601":1000000}},
+    {nombre: 'Luciana Pisacco', objetivos: {"202601":1000000}},
+    {nombre: 'Sebastian Jansa', objetivos: {"202601":1000000}},
+    {nombre: 'Niurka Pinzon', objetivos: {"202601":1000000}},
+    {nombre: 'Azul Pacioni', objetivos: {"202604":1000000}},
+    {nombre: 'Joaquin Lescano', objetivos: {"202604":1000000}},
+    {nombre: 'Micaela Marsuzi', objetivos: {"202604":1000000}},
+    {nombre: 'Nicolas Barrios', objetivos: {"202605":350000}},
+    {nombre: 'Juan Capria', objetivos: {"202605":350000}},
+    {nombre: 'Santiago Cordoba', objetivos: {"202605":350000}}
+  ];
+
+const TASAS_PROC = {
+  mar_abierto:{label:'Mar abierto',pct:2.03},
+  nivel1:{label:'Nivel 1',pct:2.03}, nivel2:{label:'Nivel 2',pct:1.75}, nivel3:{label:'Nivel 3',pct:1.47},
+  nivel4:{label:'Nivel 4',pct:1.24}, nivel5:{label:'Nivel 5',pct:0.82}, nivel6:{label:'Nivel 6',pct:0.45},
+  eco_n1:{label:'Eco N1',pct:2.03}, eco_n2:{label:'Eco N2',pct:1.75}, eco_n3:{label:'Eco N3',pct:1.47},
+  eco_n4:{label:'Eco N4',pct:1.24}, eco_n5:{label:'Eco N5',pct:0.82}, eco_n6:{label:'Eco N6',pct:0.45},
+  plazos_largos:{label:'Plazos Largos',pct:0.30},
+  tag_pl_n1:{label:'Tag PL-N1',pct:2.03}, tag_pl_n3:{label:'Tag PL-N3',pct:1.47}, tag_pl_n6:{label:'Tag PL-N6',pct:0.45},
+  promo_cuotas_t:{label:'Promo Cuotas',pct:0.45}, a1:{label:'1 a 1',pct:0.35},
+  suscripciones:{label:'Suscripciones',pct:0.45}, promo_3meses:{label:'Promo 3 meses',pct:0.40},
+  promo_parity:{label:'Promo Parity',pct:0.35}
+};
+
+const TASAS_ROUND = {
+  mar_abierto_fin:{label:'Mar abierto',pct:7.04},
+  r3_mar:{label:'R3 Mar',pct:5.31}, r3_n1:{label:'R3 N1',pct:5.12}, r3_n2:{label:'R3 N2',pct:5.03},
+  r3_n3:{label:'R3 N3',pct:4.94}, r3_n4:{label:'R3 N4',pct:4.47}, r3_n5:{label:'R3 N5',pct:4.01}, r3_n6:{label:'R3 N6',pct:3.98},
+  r4_mar:{label:'R4 Mar',pct:4.71}, r4_n1:{label:'R4 N1',pct:4.52}, r4_n2:{label:'R4 N2',pct:4.43},
+  r4_n3:{label:'R4 N3',pct:4.34}, r4_n4:{label:'R4 N4',pct:3.87}, r4_n5:{label:'R4 N5',pct:3.41}, r4_n6:{label:'R4 N6',pct:3.42},
+  r5_mar:{label:'R5 Mar',pct:3.73}, r5_n1:{label:'R5 N1',pct:3.55}, r5_n2:{label:'R5 N2',pct:3.46},
+  r5_n3:{label:'R5 N3',pct:3.36}, r5_n4:{label:'R5 N4',pct:2.90}, r5_n5:{label:'R5 N5',pct:2.44}, r5_n6:{label:'R5 N6',pct:2.45},
+  r3_eco_n1:{label:'R3 Eco N1',pct:5.12}, r3_eco_n2:{label:'R3 Eco N2',pct:5.03}, r3_eco_n3:{label:'R3 Eco N3',pct:4.94},
+  r3_eco_n4:{label:'R3 Eco N4',pct:4.47}, r3_eco_n5:{label:'R3 Eco N5',pct:4.01}, r3_eco_n6:{label:'R3 Eco N6',pct:3.98},
+  r4_eco_n1:{label:'R4 Eco N1',pct:4.52}, r4_eco_n2:{label:'R4 Eco N2',pct:4.43}, r4_eco_n3:{label:'R4 Eco N3',pct:4.34},
+  r4_eco_n4:{label:'R4 Eco N4',pct:3.87}, r4_eco_n5:{label:'R4 Eco N5',pct:3.41}, r4_eco_n6:{label:'R4 Eco N6',pct:3.42},
+  r5_eco_n1:{label:'R5 Eco N1',pct:3.55}, r5_eco_n2:{label:'R5 Eco N2',pct:3.46}, r5_eco_n3:{label:'R5 Eco N3',pct:3.36},
+  r5_eco_n4:{label:'R5 Eco N4',pct:2.90}, r5_eco_n5:{label:'R5 Eco N5',pct:2.44}, r5_eco_n6:{label:'R5 Eco N6',pct:2.45},
+  promo_cuotas_fin:{label:'Promo Cuotas fin.',pct:1.70},
+  pl_mar:{label:'PL Mar',pct:5.14}, pl_n1:{label:'PL N1',pct:6.74}, pl_n3:{label:'PL N3',pct:6.46}, pl_n6:{label:'PL N6',pct:5.43},
+  a1_mar:{label:'1a1 Mar',pct:5.14}, a1_n1:{label:'1a1 N1',pct:6.74}, a1_n3:{label:'1a1 N3',pct:6.46}, a1_n6:{label:'1a1 N6',pct:5.43},
+  suscripciones_fin:{label:'Suscripciones fin.',pct:5.43},
+  promo_3m_fin:{label:'Promo 3m fin.',pct:5.43},
+  promo_parity_fin:{label:'Promo Parity fin.',pct:5.14}
+};
+
+const ESCALA = {
+  bronce: [
+    {desde:0,   hasta:79.99,  variable:0,         bruto:1322500, neto:1097675},
+    {desde:80,  hasta:89.99,  variable:134400,     bruto:1456900, neto:1209227},
+    {desde:90,  hasta:99.99,  variable:264600,     bruto:1587100, neto:1317293},
+    {desde:100, hasta:119.99, variable:483000,     bruto:1805500, neto:1498565},
+    {desde:120, hasta:169.99, variable:637560,     bruto:1960060, neto:1626849},
+    {desde:170, hasta:219.99, variable:985320,     bruto:2307820, neto:1915490},
+    {desde:220, hasta:269.99, variable:1381380,    bruto:2703880, neto:2244220},
+    {desde:270, hasta:319.99, variable:1857540,    bruto:3180040, neto:2639433},
+    {desde:320, hasta:9999,   variable:2318400,    bruto:3640900, neto:3021947},
+  ],
+  plata: [
+    {desde:100, hasta:119.99, variable:579600,     bruto:1902100, neto:1578743},
+    {desde:120, hasta:169.99, variable:765072,     bruto:2087572, neto:1732684},
+    {desde:170, hasta:219.99, variable:1182384,    bruto:2504884, neto:2079053},
+    {desde:220, hasta:269.99, variable:1657656,    bruto:2980156, neto:2473529},
+    {desde:270, hasta:319.99, variable:2190888,    bruto:3513388, neto:2916112},
+    {desde:320, hasta:9999,   variable:2887200,    bruto:4209700, neto:3494051},
+  ],
+  oro: [
+    {desde:100, hasta:119.99, variable:695520,     bruto:2018020, neto:1674956},
+    {desde:120, hasta:169.99, variable:918864,     bruto:2241364, neto:1860332},
+    {desde:170, hasta:219.99, variable:1414861,    bruto:2737361, neto:2272009},
+    {desde:220, hasta:269.99, variable:1997688,    bruto:3320188, neto:2755756},
+    {desde:270, hasta:319.99, variable:2629066,    bruto:3951566, neto:3279799},
+    {desde:320, hasta:9999,   variable:3338496,    bruto:4660996, neto:3868626},
+  ]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let ST = {
+  asesores: JSON.parse(JSON.stringify(EQUIPO)),
+  pipeline: [],
+  comentarios: {},
+  lookerData: [],
+  baseMadreData: {},
+  historialTPV: {},
+  lastLoadDate: null, targetObjetivos: {}, resumenGestion: {},
+};
+
+// ============================================================
+// COHORT HELPERS
+// ============================================================
+const hoy = new Date();
+
+function getYYYYMM(d, offset) {
+  const dt = new Date(d.getFullYear(), d.getMonth()+offset, 1);
+  return String(dt.getFullYear()) + String(dt.getMonth()+1).padStart(2,'0');
+}
+
+function getMesLabel(d, offset) {
+  const dt = new Date(d.getFullYear(), d.getMonth()+offset, 1);
+  const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  return meses[dt.getMonth()] + ' ' + dt.getFullYear();
+}
+
+const M0_KEY = getYYYYMM(hoy, 0);
+const M1_KEY = getYYYYMM(hoy, -1);
+const M2_KEY = getYYYYMM(hoy, -2);
+
+const COHORTS = {
+  [M0_KEY]: {tag:'M0', label:'M0 â '+getMesLabel(hoy,0), color:'#eff6ff', border:'#93c5fd', text:'#1e40af'},
+  [M1_KEY]: {tag:'M1', label:'M1 â '+getMesLabel(hoy,-1), color:'#f5f3ff', border:'#c4b5fd', text:'#5b21b6'},
+  [M2_KEY]: {tag:'M2', label:'M2 â '+getMesLabel(hoy,-2), color:'#f0fdf4', border:'#86efac', text:'#166534'},
+};
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+function fmt(n) {
+  return '$' + Math.round(parseFloat(n)||0).toLocaleString('es-AR');
+}
+
+function fmtPct(p) {
+  return (parseFloat(p)||0).toFixed(1) + '%';
+}
+
+function semaforo(pct) {
+  const p = parseFloat(pct)||0;
+  const label = fmtPct(p);
+  if (p >= 100) return '<span class="sem-v">ð¢ '+label+'</span>';
+  if (p >= 80)  return '<span class="sem-a">ð¡ '+label+'</span>';
+  return '<span class="sem-r">ð´ '+label+'</span>';
+}
+
+function semColor(pct) {
+  const p = parseFloat(pct)||0;
+  if (p >= 100) return 'green';
+  if (p >= 80) return 'amber';
+  return 'red';
+}
+
+function normalizarNombre(n) { return (n||'').normalize('NFD').replace(/[Ì-Í¯]/g,'').toLowerCase().trim(); } function getObjetivo(nombre, cohortYYYYMM) { const key=normalizarNombre(nombre); if(ST.targetObjetivos[key]){const v=ST.targetObjetivos[key][String(cohortYYYYMM)];if(v!==undefined&&v!==null&&v!=='')return parseFloat(v)||0;return 0;} const a=ST.asesores.find(x=>x.nombre===nombre); if(!a)return 0; if(a.objetivos[cohortYYYYMM]!==undefined)return a.objetivos[cohortYYYYMM]; if(a.objetivos.default!==undefined)return a.objetivos.default; return 0; } function _dummy_replaced() {
+  const a = ST.asesores.find(x => x.nombre === nombre);
+  if (!a) return 0;
+  if (a.objetivos[cohortYYYYMM] !== undefined) return a.objetivos[cohortYYYYMM];
+  if (a.objetivos.default !== undefined) return a.objetivos.default;
+  return 0;
+}
+
+function getIncentivo(pct, tier) {
+  const t = tier || 'bronce';
+  const escala = ESCALA[t] || ESCALA.bronce;
+  const p = parseFloat(pct)||0;
+  for (const row of escala) {
+    if (p >= row.desde && p <= row.hasta) return {variable:row.variable, bruto:row.bruto, neto:row.neto};
+  }
+  // below range â first row
+  if (p < escala[0].desde) return {variable:escala[0].variable, bruto:escala[0].bruto, neto:escala[0].neto};
+  // above range â last row
+  const last = escala[escala.length-1];
+  return {variable:last.variable, bruto:last.bruto, neto:last.neto};
+}
+
+function calcTier(asesorNombre) {
+  return ST.asesores.find(a => a.nombre === asesorNombre)?.tier || 'bronce';
+}
+
+function calcDCVal(tpv, shareDeb, shareCuotas, procKey, roundKey) {
+  const tp = TASAS_PROC[procKey], tr = TASAS_ROUND[roundKey];
+  const deb = tp ? (tpv * (parseFloat(shareDeb)||0)/100) * (tp.pct/100) : 0;
+  const cuotas = tr ? (tpv * (parseFloat(shareCuotas)||0)/100) * (tr.pct/100) : 0;
+  return {deb, cuotas, total: deb+cuotas};
+}
+
+function save() {
+  try { localStorage.setItem('dash_francisco_v1', JSON.stringify(ST)); } catch(e) {}
+}
+
+// Cuenta cuÃ¡ntos dÃ­as consecutivos (hacia atrÃ¡s desde hoy) el TPV se mantuvo igual
+function contarDiasInactivo(custId, tpvCurrent, todayStr) {
+  if (tpvCurrent <= 0) return 0;
+  let dias = 1;
+  const d = new Date(todayStr + 'T12:00:00');
+  for (let i = 1; i <= 14; i++) {
+    d.setDate(d.getDate() - 1);
+    const ds = d.toISOString().split('T')[0];
+    const v = ST.historialTPV[custId + '_' + ds];
+    if (v === undefined || v === null) break;
+    if (Number(v) !== Number(tpvCurrent)) break;
+    dias++;
+  }
+  return dias;
+}
+
+// Elimina entradas de historialTPV mÃ¡s viejas que maxDias dÃ­as
+function purgarHistorialTPV(maxDias) {
+  try {
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - maxDias);
+    const cutoffStr = cutoff.toISOString().split('T')[0];
+    Object.keys(ST.historialTPV).forEach(k => {
+      const parts = k.split('_');
+      const dateStr = parts[parts.length - 1];
+      if (dateStr < cutoffStr) delete ST.historialTPV[k];
+    });
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('dash_francisco_v1')||'null');
+    if (saved) {
+      ST.pipeline = saved.pipeline || [];
+      ST.comentarios = saved.comentarios || {};
+      ST.lookerData = saved.lookerData || [];
+      ST.baseMadreData = saved.baseMadreData || {};
+      ST.historialTPV = saved.historialTPV || {};
+      ST.lastLoadDate = saved.lastLoadDate || null; ST.targetObjetivos = saved.targetObjetivos || {};
+      // Merge EQUIPO with saved asesores (fuzzy match to avoid duplicates like "Carol Delgado" vs "Carolina Delgado")
+      ST.asesores = JSON.parse(JSON.stringify(EQUIPO));
+      if (saved.asesores) {
+        for (const sa of saved.asesores) {
+          const idx = ST.asesores.findIndex(a => a.nombre === sa.nombre || matchAsesor(sa.nombre, a.nombre));
+          if (idx >= 0) { ST.asesores[idx] = {...ST.asesores[idx], ...sa, nombre: ST.asesores[idx].nombre}; }
+          else { ST.asesores.push(sa); }
+        }
+      }
+      // Dedup: remove any entry not in EQUIPO that fuzzy-matches an EQUIPO member
+      const equipoNames = EQUIPO.map(e => e.nombre);
+      ST.asesores = ST.asesores.filter(a => {
+        if (equipoNames.includes(a.nombre)) return true;
+        const matchesEquipo = equipoNames.some(en => matchAsesor(a.nombre, en));
+        return !matchesEquipo;
+      });
+    }
+  } catch(e) {}
+}
+
+// ============================================================
+// CSV PARSER
+// ============================================================
+function parseCSVRows(text) {
+  const rows = [];
+  let i = 0;
+  while (i < text.length) {
+    const row = [];
+    while (i < text.length && text[i] !== '\n' && text[i] !== '\r') {
+      let field = '';
+      if (text[i] === '"') {
+        i++;
+        while (i < text.length) {
+          if (text[i] === '"' && text[i+1] === '"') { field += '"'; i += 2; }
+          else if (text[i] === '"') { i++; break; }
+          else { field += text[i++]; }
+        }
+      } else {
+        while (i < text.length && text[i] !== ',' && text[i] !== '\n' && text[i] !== '\r') {
+          field += text[i++];
+        }
+      }
+      row.push(field.trim());
+      if (i < text.length && text[i] === ',') i++;
+    }
+    if (text[i] === '\r') i++;
+    if (text[i] === '\n') i++;
+    if (row.length > 0 && !(row.length === 1 && row[0] === '')) rows.push(row);
+  }
+  return rows;
+}
+
+function findColIdx(headers, ...names) {
+  for (const n of names) {
+    const idx = headers.findIndex(h => h.toLowerCase().replace(/[^a-z0-9]/g,'').includes(n.toLowerCase().replace(/[^a-z0-9]/g,'')));
+    if (idx >= 0) return idx;
+  }
+  return -1;
+}
+
+// ============================================================
+// LOAD BASE MADRE
+// ============================================================
+function loadBaseMadre(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const rows = parseCSVRows(e.target.result);
+    if (rows.length < 2) { showBanner('baseMadreStatus','error','Archivo vacÃ­o o invÃ¡lido'); return; }
+    const headers = rows[0].map(h => h.toLowerCase());
+    const iId = findColIdx(headers,'cust_id','custid','cust id','id');
+    const iNombre = findColIdx(headers,'nombre_comercio','nombrecomercio','nombre comercio','nombre');
+        const iDc = findColIdx(headers,'dc_point','dcpoint','dc point','dc');
+      const iTpv = headers.findIndex(h => /tpv/i.test(h));
+    const iAsesor = findColIdx(headers,'nombre_asesor','nombreasesor','asesor');
+    const iRubro = findColIdx(headers,'rubro');
+    let count = 0;
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row[iId]) continue;
+      const custId = row[iId];
+      ST.baseMadreData[custId] = {
+        nombre: iNombre >= 0 ? row[iNombre] : '',
+        tpvM1: iTpv >= 0 ? parseFloat((row[iTpv]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        dcM1: iDc >= 0 ? parseFloat((row[iDc]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        asesor: iAsesor >= 0 ? row[iAsesor] : '',
+        rubro: iRubro >= 0 ? row[iRubro] : '',
+      };
+      count++;
+    }
+    save();
+    const zone = document.getElementById('baseMadreBanner');
+    if (zone) { zone.className = 'banner banner-success'; zone.textContent = `â ${count} comercios cargados desde CSV (manual)`; }
+    showBanner('baseMadreStatus','success',`â ${count} comercios cargados en Base Madre`);
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// LOAD LOOKERV2
+// ============================================================
+function loadLookerv2(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const rows = parseCSVRows(e.target.result);
+    if (rows.length < 2) { showBanner('lookerBannerStatus','error','Archivo vacÃ­o o invÃ¡lido'); return; }
+    const headers = rows[0].map(h => h.trim());
+    const headersL = headers.map(h => h.toLowerCase());
+
+    const iCustId = findColIdx(headersL,'cust_id','custid');
+    const iMes = findColIdx(headersL,'mes');
+    const iAsesor = findColIdx(headersL,'asesor');
+    const iValido = findColIdx(headersL,'valido');
+    
+    // Find M-1, M0, M1, M2 columns
+    const iTpvM1 = headers.findIndex(h => /tpv\s*m-?1/i.test(h) || /tpv\s*m1/i.test(h));
+    const iVcM1 = headers.findIndex(h => /vc\s*m-?1/i.test(h) || /vc\s*m1\b/i.test(h) || /dc\s*m-?1/i.test(h));
+    const iTpvM0 = headers.findIndex(h => /tpv\s*m0/i.test(h));
+    const iVcM0 = headers.findIndex(h => /vc\s*m0/i.test(h) || /dc\s*m0/i.test(h));
+    const iTpvM1real = headers.findIndex(h => /tpv\s*m1\b/i.test(h) && !/m-1/i.test(h) && headers.indexOf(h) !== iTpvM1);
+    const iVcM1real = headers.findIndex(h => /vc\s*m1\b/i.test(h) && !/m-1/i.test(h) && headers.indexOf(h) !== iVcM1);
+    const iTpvM2 = headers.findIndex(h => /tpv\s*m2/i.test(h));
+    const iVcM2 = headers.findIndex(h => /vc\s*m2/i.test(h) || /dc\s*m2/i.test(h));
+
+    // FCST columns
+    const iFcstTpv = headers.findIndex(h => /fcst/i.test(h) && /tpv/i.test(h) && !/inc/i.test(h));
+    const iFcstInc = headers.findIndex(h => /fcst/i.test(h) && (/inc/i.test(h)));
+    const iM2Comp = headers.findIndex(h => /m2.*completo/i.test(h) || /completo/i.test(h));
+
+    const todayStr = hoy.toISOString().split('T')[0];
+
+    const iTpv = iTpvM0 >= 0 ? iTpvM0 : headers.findIndex(h => /tpv/i.test(h));
+      const iVc  = iVcM0  >= 0 ? iVcM0  : headers.findIndex(h => /\bvc\b|\bdc\b/i.test(h));
+      const parsed = [];
+    let convertidos = 0;
+    for (let r = 1; r < rows.length; r++) {
+      const row = rows[r];
+      if (!row[iCustId]) continue;
+      const custId = row[iCustId];
+      const tpvCurrent = parseFloat((row[(parseInt(row[iMes])||0)===202603&&iTpvM2>=0?iTpvM2:(parseInt(row[iMes])||0)===202604&&iTpvM1real>=0?iTpvM1real:iTpvM0>=0?iTpvM0:iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
+      // Registrar TPV de hoy y contar dÃ­as consecutivos sin cambio
+      ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
+      const inactivoDias = contarDiasInactivo(custId, tpvCurrent, todayStr);
+      const isInactivo = inactivoDias >= 3;
+
+      const valido = parseInt(row[iValido]||'0')||0;
+      if (valido === 1) convertidos++;
+
+      parsed.push({
+        custId,
+        mes: (parseInt(row[iMes])||0) > 0 ? String(parseInt(row[iMes])) : (gasMes(row[iMes])||''),
+        asesor: iAsesor >= 0 ? row[iAsesor] : '',
+        valido,
+        tpv: tpvCurrent,
+        vc: parseFloat((row[(parseInt(row[iMes])||0)===202603&&iVcM2>=0?iVcM2:(parseInt(row[iMes])||0)===202604&&iVcM1real>=0?iVcM1real:iVcM0>=0?iVcM0:iVc]||'0').replace(/[^0-9.-]/g,''))||0,
+        tpvM1: iTpvM1 >= 0 ? parseFloat((row[iTpvM1]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        vcM1: iVcM1 >= 0 ? parseFloat((row[iVcM1]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        tpvM0: iTpvM0 >= 0 ? parseFloat((row[iTpvM0]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        vcM0: iVcM0 >= 0 ? parseFloat((row[iVcM0]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        tpvM1real: iTpvM1real >= 0 ? parseFloat((row[iTpvM1real]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        vcM1real: iVcM1real >= 0 ? parseFloat((row[iVcM1real]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        tpvM2: iTpvM2 >= 0 ? parseFloat((row[iTpvM2]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        vcM2: iVcM2 >= 0 ? parseFloat((row[iVcM2]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        fcstTpv: iFcstTpv >= 0 ? parseFloat((row[iFcstTpv]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        fcstVc: iFcstInc >= 0 ? parseFloat((row[iFcstInc]||'0').replace(/[^0-9.-]/g,''))||0 : 0,
+        m2completo: iM2Comp >= 0 ? row[iM2Comp] : '',
+        isInactivo,
+        inactivoDias,
+      });
+    }
+    ST.lookerData = parsed;
+    ST.lastLoadDate = todayStr;
+    purgarHistorialTPV(15);
+    save();
+    const msg = `â ${parsed.length} filas cargadas â ${convertidos} convertidos`;
+    showBanner('lookerBannerStatus','success',msg);
+    renderSeguimiento();
+    renderAlertas();
+    renderGestion();
+    renderMedallero();
+    renderIncentivos();
+  };
+  reader.readAsText(file);
+}
+
+// ============================================================
+// GOOGLE APPS SCRIPT AUTO-FETCH
+// ============================================================
+
+// â ï¸  IMPORTANTE: Esta URL necesita ser redeployada con acceso "Cualquier persona"
+// en Google Apps Script. Pasos:
+//   1. script.google.com â tu proyecto â Implementar â Administrar implementaciones
+//   2. Editar â "QuiÃ©n puede acceder" â Cualquier persona (no solo organizaciÃ³n)
+//   3. Guardar e implementar â copiÃ¡ la nueva URL aquÃ­
+const GAS_URL = 'https://script.google.com/a/macros/mercadolibre.com/s/AKfycbzZf7JjCNwYeJWylyKSujJ9cD1aNu-999AgsRXYziCbitffz5tqarcV_JjwRB9WP221AQ/exec';
+
+function gasNum(val) {
+  if (typeof val === 'number') return isFinite(val) ? val : 0;
+  if (!val && val !== 0) return 0;
+  return parseFloat(String(val).replace(/[^0-9.-]/g,''))||0;
+}
+
+function gasMes(val) {
+  if (!val) return '';
+  if (typeof val === 'number') return String(Math.round(val));
+  const s = String(val).trim();
+  // ISO date string â YYYYMM
+  if (s.match(/^\d{4}-\d{2}-\d{2}/)) return s.slice(0,4) + s.slice(5,7);
+  if (s.match(/^\d{6}(\.\d+)?$/)) return String(parseInt(s));
+    return s;
+}
+
+function processBaseMadreFromGAS(rows) {
+  if (!rows || rows.length < 2) return 0;
+  const headers = rows[0].map(h => String(h||'').toLowerCase().replace(/[^a-z0-9]/g,''));
+  const iId = headers.findIndex(h => h.includes('custid') || h.includes('custid') || h === 'custid' || h === 'cust_id'.replace(/_/,''));
+  // fallback: col D (index 3)
+  const custIdx = iId >= 0 ? iId : 3;
+  const iNombre = headers.findIndex(h => h.includes('nombrecomercio') || h.includes('nombre')) || 5;
+    const iDc = headers.findIndex(h => h.includes('dcpoint') || (h.includes('dc') && !h.includes('tpv')));
+      const iTpv = headers.findIndex(h => /tpv/i.test(h));
+  const iAsesor = headers.findIndex(h => h.includes('nombreasesor') || h.includes('asesor'));
+  const iRubro = headers.findIndex(h => h.includes('rubro'));
+  let count = 0;
+  ST.baseMadreData = {};
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (!row || row.length === 0) continue;
+    const custId = String(row[custIdx]||'').trim();
+    if (!custId || custId === '') continue;
+    ST.baseMadreData[custId] = {
+      nombre: iNombre >= 0 ? String(row[iNombre]||'') : '',
+      tpvM1: iTpv >= 0 ? gasNum(row[iTpv]) : 0,
+      dcM1: iDc >= 0 ? gasNum(row[iDc]) : 0,
+      asesor: iAsesor >= 0 ? String(row[iAsesor]||'') : '',
+      rubro: iRubro >= 0 ? String(row[iRubro]||'') : '',
+    };
+    count++;
+  }
+  return count;
+}
+
+function normHeader(s) {
+  // Normaliza: minusculas + quita tildes para comparacion robusta
+  return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+
+function processLookerv2FromGAS(rows) {
+  if (!rows || rows.length < 2) return 0;
+  const headers = rows[0].map(h => String(h||'').trim());
+  const headersL = headers.map(h => h.toLowerCase());
+  const headersN = headers.map(normHeader); // sin tildes
+
+  // Indices de columnas (con normalizacion de tildes)
+  const iCustId  = headersN.findIndex(h => h.includes('cust id') || h.includes('cust_id') || h.includes('custid'));
+  const iMes     = headersN.findIndex(h => h === 'mes');
+  const iAsesor  = headersN.findIndex(h => h === 'asesor');
+  const iValido  = headersN.findIndex(h => h === 'valido');
+  const iTeam    = headersN.findIndex(h => h.includes('team') || h.includes('lider'));
+  const iPotenc  = headersN.findIndex(h => h.includes('potenc'));
+
+  // Columnas TPV/VC por mes
+  const iTpvM1   = headers.findIndex(h => /tpv\s*m-?1\b/i.test(h));
+  const iVcM1    = headers.findIndex(h => /vc\s*m-?1\b/i.test(h) || /dc\s*m-?1\b/i.test(h));
+  const iTpvM0   = headers.findIndex(h => /tpv\s*m0\b/i.test(h));
+  const iVcM0    = headers.findIndex(h => /vc\s*m0\b/i.test(h) || /dc\s*m0\b/i.test(h));
+      const iTpv = iTpvM0 >= 0 ? iTpvM0 : headers.findIndex(h => /tpv/i.test(h));
+      const iVc  = iVcM0  >= 0 ? iVcM0  : headers.findIndex(h => /\bvc\b|\bdc\b/i.test(h));
+  const iTpvM1r  = headers.findIndex((h,i) => /tpv\s*m1\b/i.test(h) && i !== iTpvM1);
+  const iVcM1r   = headers.findIndex((h,i) => /vc\s*m1\b/i.test(h) && i !== iVcM1);
+  const iTpvM2   = headers.findIndex(h => /tpv\s*m2\b/i.test(h));
+  const iVcM2    = headers.findIndex(h => /vc\s*m2\b/i.test(h) || /dc\s*m2\b/i.test(h));
+  const iTpvIncM0= headers.findIndex(h => /tpv\s*inc\s*m0/i.test(h));
+  const iVcIncM0 = headers.findIndex(h => /vc\s*inc\s*m0/i.test(h));
+  const iTpvIncM1= headers.findIndex(h => /tpv\s*inc\s*m1\b/i.test(h));
+  const iVcIncM1 = headers.findIndex(h => /vc\s*inc\s*m1\b/i.test(h));
+  const iTpvIncM2= headers.findIndex(h => /tpv\s*inc\s*m2\b/i.test(h));
+  const iVcIncM2 = headers.findIndex(h => /vc\s*inc\s*m2\b/i.test(h));
+  const iFcstTpv0= headers.findIndex(h => /fcst\s*tpv\s*m0\b/i.test(h));
+  const iFcstVc0 = headers.findIndex(h => /fcst\s*vc\s*m0\b/i.test(h));
+  const iFcstTpv1= headers.findIndex(h => /fcst\s*tpv\s*m1\b/i.test(h));
+  const iFcstVc1 = headers.findIndex(h => /fcst\s*vc\s*m1\b/i.test(h));
+  const iFcstTpv2= headers.findIndex(h => /fcst\s*tpv\s*m2\b/i.test(h));
+      const iFcstTpv = iFcstTpv0 >= 0 ? iFcstTpv0 : headers.findIndex(h => /fcst.*tpv/i.test(h));
+      const iFcstInc = headers.findIndex(h => /fcst.*inc/i.test(h) || /inc.*fcst/i.test(h));
+  const iFcstVc2 = headers.findIndex(h => /fcst\s*vc\s*m2\b/i.test(h));
+  const iM0Comp  = headers.findIndex(h => /m0\s*completo/i.test(h));
+  const iM1Comp  = headers.findIndex(h => /m1\s*completo/i.test(h));
+  const iM2Comp  = headers.findIndex(h => /m2\s*completo/i.test(h));
+      const iPotenciado = headers.findIndex(h => /^POTENCIADO$/i.test(h.trim()));
+
+  const todayStr = hoy.toISOString().split('T')[0];
+
+const parsed = [];
+  let convertidos = 0;
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (!row || row.length === 0) continue;
+    const custId = String(row[iCustId >= 0 ? iCustId : 0]||'').trim();
+    if (!custId) continue;
+    const tpvCurrent = iTpv >= 0 ? gasNum(row[iTpv]) : 0;
+    ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
+    const inactivoDias = contarDiasInactivo(custId, tpvCurrent, todayStr);
+    const isInactivo = inactivoDias >= 3;
+    const valido = iValido >= 0 ? Math.round(gasNum(row[iValido])) : 0;
+    if (valido === 1) convertidos++;
+    parsed.push({
+      custId,
+      mes: iMes >= 0 ? gasMes(row[iMes]) : '',
+      asesor: iAsesor >= 0 ? String(row[iAsesor]||'').trim() : '',
+      valido,
+      tpv: tpvCurrent,
+      vc: iVc >= 0 ? gasNum(row[iVc]) : 0,
+      tpvM1: iTpvM1 >= 0 ? gasNum(row[iTpvM1]) : 0,
+      vcM1:  iVcM1  >= 0 ? gasNum(row[iVcM1])  : 0,
+      tpvM0: iTpvM0 >= 0 ? gasNum(row[iTpvM0]) : 0,
+      vcM0:  iVcM0  >= 0 ? gasNum(row[iVcM0])  : 0,
+      tpvM1real: iTpvM1r >= 0 ? gasNum(row[iTpvM1r]) : 0,
+      vcM1real:  iVcM1r  >= 0 ? gasNum(row[iVcM1r])  : 0,
+      tpvM2: iTpvM2 >= 0 ? gasNum(row[iTpvM2]) : 0,
+      vcM2:  iVcM2  >= 0 ? gasNum(row[iVcM2])  : 0,
+      fcstTpv:    iFcstTpv >= 0 ? gasNum(row[iFcstTpv]) : 0,
+      fcstVc: iFcstInc >= 0 ? gasNum(row[iFcstInc]) : 0,
+      m2completo: iM2Comp >= 0 ? String(row[iM2Comp]||'') : '',      rawCols: (() => { const rc = {}; for (let ci = 8; ci <= 45 && ci < headers.length; ci++) { const h = headers[ci]; if (h) rc[h] = gasNum(row[ci]); } return rc; })(),
+      isInactivo, inactivoDias, potenciado: iPotenciado >= 0 ? String(row[iPotenciado]||'') : '',
+    });
+  }
+  ST.lookerData = parsed;
+  ST.lastLoadDate = todayStr;
+  purgarHistorialTPV(15);
+  return convertidos;
+}
+
+function setGasStatus(type, msg) {
+  const bar = document.getElementById('gasStatusBar');
+  const txt = document.getElementById('gasStatusText');
+  if (bar) {
+    bar.style.background = type==='success'?'#dcfce7':type==='error'?'#fee2e2':'#dbeafe';
+    bar.style.color       = type==='success'?'#166534':type==='error'?'#991b1b':'#1e40af';
+    bar.style.borderBottomColor = type==='success'?'#86efac':type==='error'?'#fca5a5':'#93c5fd';
+  }
+  if (txt) txt.innerHTML = msg;
+  // Mirror to per-tab banners
+  const bm = document.getElementById('baseMadreBanner');
+  if (bm) { bm.className = 'banner banner-'+(type==='success'?'success':type==='error'?'error':'info'); bm.innerHTML = msg; }
+  const lk = document.getElementById('lookerBannerStatus');
+  if (lk) lk.innerHTML = '<span style="font-size:12px;color:var(--g600)">'+msg+'</span>';
+}
+
+let _fetching = false;
+function processTargetPorAsesorFromGAS(rows) {
+    ST.targetObjetivos = {};
+      if (!rows || rows.length === 0) return 0;
+        let count = 0;
+          for (const row of rows) {
+              const asesor = String(row[0] || '').trim();
+                  const cohort = String(row[1] || '').trim();
+                      const objetivo = row[2];
+                          if (!asesor || !cohort || objetivo === '' || objetivo === null || objetivo === undefined) continue;
+                              const key = normalizarNombre(asesor);
+                                  if (!ST.targetObjetivos[key]) ST.targetObjetivos[key] = {};
+                                      ST.targetObjetivos[key][cohort] = parseFloat(objetivo) || 0;
+                                          count++;
+                                            }
+                                              console.log('Target por asesor procesado:', count, 'entradas,', Object.keys(ST.targetObjetivos).length, 'asesores');
+                                                return count;
+                                                }
+
+function fetchGASData() {
+  if (_fetching) return;
+  _fetching = true;
+  setGasStatus('loading','â³ Sincronizando con Google Sheets...');
+
+  // Limpiamos cualquier script JSONP anterior
+  const old = document.getElementById('_gasJsonpScript');
+  if (old) old.remove();
+  const CB = '__gasJsonpCB';
+
+  let _timeout = setTimeout(() => {
+    const s = document.getElementById('_gasJsonpScript');
+    if (s) s.remove();
+    delete window[CB];
+    _fetching = false;
+    setGasStatus('error',
+      'â± Tiempo agotado (3 min) â ' +
+      '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
+    );
+  }, 180000); // 3 minutos â GAS tarda en hacer cold start + leer planillas grandes
+
+  window[CB] = function(data) {
+    clearTimeout(_timeout);
+    const s = document.getElementById('_gasJsonpScript');
+    if (s) s.remove();
+    delete window[CB];
+    _fetching = false;
+    try {
+      if (data.error) throw new Error(data.error);
+      const bmCount = processBaseMadreFromGAS(data.baseMadre || []);
+      processLookerv2FromGAS(data.lookerv2 || []); processTargetPorAsesorFromGAS(data.targetPorAsesor || []);
+      save();
+      const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+      setGasStatus('success', `â Actualizado ${now} â ${bmCount} comercios Â· ${ST.lookerData.length} filas Lookerv2`);
+      renderPipeline();
+      renderSeguimiento();
+      renderAlertas();
+      renderGestion();
+      if (data.resumenGestion && data.resumenGestion.length) processResumenGestionFromGAS(data.resumenGestion);
+      renderMedallero();
+      renderIncentivos();
+    } catch(err) {
+      console.error('GAS process error:', err);
+      setGasStatus('error', `â Error procesando datos: <b>${err.message}</b> â <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
+    }
+  };
+
+  const script = document.createElement('script');
+  script.id = '_gasJsonpScript';
+  script.onerror = function() {
+    clearTimeout(_timeout);
+    this.remove();
+    delete window[CB];
+    _fetching = false;
+    setGasStatus('error',
+      'â Sin respuesta del Apps Script â asegurate de estar logueada con tu cuenta MeLi en Chrome Â· ' +
+      '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
+    );
+  };
+  // JSONP: script tag no tiene restricciones CORS y envÃ­a cookies de Google automÃ¡ticamente
+  script.src = GAS_URL + '?callback=' + CB + '&_t=' + Date.now();
+  document.head.appendChild(script);
+}
+
+// ============================================================
+// BANNER HELPER
+// ============================================================
+function showBanner(elementId, type, msg) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.innerHTML = `<div class="banner banner-${type}">${msg}</div>`;
+  setTimeout(() => { if(el) el.innerHTML = ''; }, 8000);
+}
+
+// ============================================================
+// TAB NAVIGATION
+// ============================================================
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  // Render on switch
+  if (name === 'pipeline') renderPipeline();
+  if (name === 'seguimiento') renderSeguimiento();
+  if (name === 'alertas') renderAlertas();
+  if (name === 'gestion') renderGestion();
+  if (name === 'medallero') renderMedallero();
+  if (name === 'incentivos') renderIncentivos();
+}
+
+function switchSubTab(prefix, name, btn) {
+  const allContents = document.querySelectorAll(`[id^="${prefix}-"]`);
+  allContents.forEach(c => { if(c.classList.contains('sub-tab-content')) c.classList.remove('active'); });
+  const parentTabs = btn.closest('.sub-tabs');
+  if (parentTabs) parentTabs.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(prefix+'-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function switchEscalaTab(tier, btn) {
+  document.querySelectorAll('.escala-tab-content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.escala-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('escala-'+tier).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// PIPELINE FORM & SELECTORS
+// ============================================================
+function populateSelects() {
+  // Asesor select
+  const sel = document.getElementById('f_asesor');
+  if (sel) {
+    sel.innerHTML = '<option value="">Seleccionar asesor...</option>';
+    ST.asesores.forEach(a => {
+      const o = document.createElement('option');
+      o.value = a.nombre; o.textContent = a.nombre;
+      sel.appendChild(o);
+    });
+  }
+  // Proc key select
+  const proc = document.getElementById('f_procKey');
+  if (proc) {
+    proc.innerHTML = '<option value="">Sin tasa proc.</option>';
+    const groups = {
+      'Mercado Abierto': ['mar_abierto'],
+      'Niveles': ['nivel1','nivel2','nivel3','nivel4','nivel5','nivel6'],
+      'Eco': ['eco_n1','eco_n2','eco_n3','eco_n4','eco_n5','eco_n6'],
+      'Especiales': ['plazos_largos','tag_pl_n1','tag_pl_n3','tag_pl_n6','promo_cuotas_t','a1','suscripciones','promo_3meses','promo_parity'],
+    };
+    for (const [grp, keys] of Object.entries(groups)) {
+      const og = document.createElement('optgroup');
+      og.label = grp;
+      keys.forEach(k => {
+        const o = document.createElement('option');
+        o.value = k; o.textContent = TASAS_PROC[k].label + ' ('+TASAS_PROC[k].pct+'%)';
+        og.appendChild(o);
+      });
+      proc.appendChild(og);
+    }
+  }
+  // Round key select
+  const round = document.getElementById('f_roundKey');
+  if (round) {
+    round.innerHTML = '<option value="">Sin tasa round.</option>';
+    const groups2 = {
+      'Mercado Abierto': ['mar_abierto_fin'],
+      'R3': ['r3_mar','r3_n1','r3_n2','r3_n3','r3_n4','r3_n5','r3_n6'],
+      'R4': ['r4_mar','r4_n1','r4_n2','r4_n3','r4_n4','r4_n5','r4_n6'],
+      'R5': ['r5_mar','r5_n1','r5_n2','r5_n3','r5_n4','r5_n5','r5_n6'],
+      'R3 Eco': ['r3_eco_n1','r3_eco_n2','r3_eco_n3','r3_eco_n4','r3_eco_n5','r3_eco_n6'],
+      'R4 Eco': ['r4_eco_n1','r4_eco_n2','r4_eco_n3','r4_eco_n4','r4_eco_n5','r4_eco_n6'],
+      'R5 Eco': ['r5_eco_n1','r5_eco_n2','r5_eco_n3','r5_eco_n4','r5_eco_n5','r5_eco_n6'],
+      'Especiales': ['promo_cuotas_fin','pl_mar','pl_n1','pl_n3','pl_n6','a1_mar','a1_n1','a1_n3','a1_n6','suscripciones_fin','promo_3m_fin','promo_parity_fin'],
+    };
+    for (const [grp, keys] of Object.entries(groups2)) {
+      const og = document.createElement('optgroup');
+      og.label = grp;
+      keys.forEach(k => {
+        const o = document.createElement('option');
+        o.value = k; o.textContent = TASAS_ROUND[k].label + ' ('+TASAS_ROUND[k].pct+'%)';
+        og.appendChild(o);
+      });
+      round.appendChild(og);
+    }
+  }
+}
+
+function autofillFromBase(custId) {
+  const data = ST.baseMadreData[custId] || ST.baseMadreData[String(custId)] || ST.baseMadreData[+custId] || null;
+  if (!data) return;
+  const n = document.getElementById('f_nombre');
+  const a = document.getElementById('f_asesor');
+  const r = document.getElementById('f_rubro');
+  const t = document.getElementById('f_tpvM1');
+  const d = document.getElementById('f_dcM1');
+  if (n && !n.value) n.value = data.nombre || '';
+  if (r && !r.value) r.value = data.rubro || '';
+  if (t && !t.value) t.value = data.tpvM1 || '';
+  if (d && !d.value) d.value = data.dcM1 || '';
+  if (a && !a.value && data.asesor) {
+    const match = ST.asesores.find(x => x.nombre.toLowerCase().includes(data.asesor.toLowerCase()) || data.asesor.toLowerCase().includes(x.nombre.toLowerCase()));
+    if (match) a.value = match.nombre;
+  }
+  updateDCCalc();
+}
+
+function updateDCCalc() {
+  const tpv = parseFloat(document.getElementById('f_tpv')?.value)||0;
+  const shareDeb = parseFloat(document.getElementById('f_shareDeb')?.value)||0;
+  const shareCuotas = parseFloat(document.getElementById('f_shareCuotas')?.value)||0;
+  const procKey = document.getElementById('f_procKey')?.value||'';
+  const roundKey = document.getElementById('f_roundKey')?.value||'';
+  const dcM1 = parseFloat(document.getElementById('f_dcM1')?.value)||0;
+  const dc = calcDCVal(tpv, shareDeb, shareCuotas, procKey, roundKey);
+  const incr = dc.total - dcM1;
+  document.getElementById('dc_deb').textContent = fmt(dc.deb);
+  document.getElementById('dc_cuotas').textContent = fmt(dc.cuotas);
+  document.getElementById('dc_total').textContent = fmt(dc.total);
+  document.getElementById('dc_m1_disp').textContent = fmt(dcM1);
+  const incrEl = document.getElementById('dc_incr_disp');
+  incrEl.textContent = fmt(incr);
+  incrEl.className = incr >= 0 ? 'dc-incr-pos' : 'dc-incr-neg';
+}
+
+function clearPipelineForm() {
+  ['f_custId','f_nombre','f_rubro','f_tpv','f_shareDeb','f_shareCuotas','f_tpvM1','f_dcM1'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const sel = [document.getElementById('f_asesor'), document.getElementById('f_estado'), document.getElementById('f_procKey'), document.getElementById('f_roundKey')];
+  sel.forEach(s => { if(s) s.selectedIndex = 0; });
+  updateDCCalc();
+}
+
+function savePipelineEntry() {
+  const custId = document.getElementById('f_custId')?.value?.trim();
+  const nombre = document.getElementById('f_nombre')?.value?.trim();
+  const asesor = document.getElementById('f_asesor')?.value;
+  const estado = document.getElementById('f_estado')?.value;
+  if (!custId || !nombre || !asesor || !estado) {
+    showBanner('pipelineSaveStatus','error','â ï¸ CompletÃ¡ los campos obligatorios: Cust ID, Nombre, Asesor, Estado');
+    return;
+  }
+  const procKey = document.getElementById('f_procKey')?.value||'';
+  const roundKey = document.getElementById('f_roundKey')?.value||'';
+  const tpv = parseFloat(document.getElementById('f_tpv')?.value)||0;
+  const shareDeb = parseFloat(document.getElementById('f_shareDeb')?.value)||0;
+  const shareCuotas = parseFloat(document.getElementById('f_shareCuotas')?.value)||0;
+  const tpvM1 = parseFloat(document.getElementById('f_tpvM1')?.value)||0;
+  const dcM1 = parseFloat(document.getElementById('f_dcM1')?.value)||0;
+  const rubro = document.getElementById('f_rubro')?.value?.trim()||'';
+  const dc = calcDCVal(tpv, shareDeb, shareCuotas, procKey, roundKey);
+  const entry = {
+    custId, nombre, asesor, estado, procKey, roundKey,
+    tpv, shareDeb, shareCuotas, tpvM1, dcM1, rubro,
+    dcTeorico: dc.total, dcIncremental: dc.total - dcM1,
+    createdAt: new Date().toISOString(),
+  };
+  // Remove duplicate custId
+  ST.pipeline = ST.pipeline.filter(p => p.custId !== custId);
+  ST.pipeline.push(entry);
+  save();
+  clearPipelineForm();
+  showBanner('pipelineSaveStatus','success',`â ${nombre} guardado en pipeline`);
+  renderPipeline();
+}
+
+function deletePipelineEntry(custId) {
+  ST.pipeline = ST.pipeline.filter(p => p.custId !== custId);
+  save();
+  renderPipeline();
+}
+
+// ============================================================
+// RENDER PIPELINE
+// ============================================================
+let pipelineAsesorFilter = 'Todos';
+
+function renderPipeline() {
+  // Chips
+  const chips = document.getElementById('pipelineChips');
+  if (!chips) return;
+  const asesores = ['Todos', ...new Set(ST.pipeline.map(p => p.asesor).filter(Boolean))];
+  chips.innerHTML = asesores.map(a =>
+    `<button class="chip ${pipelineAsesorFilter===a?'active':''}" onclick="pipelineAsesorFilter='${a}';renderPipeline()">${a}</button>`
+  ).join('');
+
+  const filtered = pipelineAsesorFilter === 'Todos' ? ST.pipeline : ST.pipeline.filter(p => p.asesor === pipelineAsesorFilter);
+
+  // Funnel
+  const neg = filtered.filter(p => p.estado === 'NegociaciÃ³n').length;
+  const reneg = filtered.filter(p => p.estado === 'RenegociaciÃ³n').length;
+  const dcTeoTotal = filtered.reduce((s,p) => s+(p.dcTeorico||0), 0);
+  const dcIncrTotal = filtered.reduce((s,p) => s+(p.dcIncremental||0), 0);
+  document.getElementById('pipelineFunnel').innerHTML = `
+    <div class="funnel-card blue"><div style="font-size:20px">ð¤</div><div class="num">${neg}</div><div class="lbl">En NegociaciÃ³n</div></div>
+    <div class="funnel-card amber"><div style="font-size:20px">ð</div><div class="num">${reneg}</div><div class="lbl">En RenegociaciÃ³n</div></div>
+    <div class="funnel-card purple"><div style="font-size:20px">ð³</div><div class="num">${fmt(dcTeoTotal)}</div><div class="lbl">DC TeÃ³rico Total</div></div>
+    <div class="funnel-card green"><div style="font-size:20px">ð</div><div class="num">${fmt(dcIncrTotal)}</div><div class="lbl">DC Incremental Total</div></div>
+  `;
+
+  // Table
+  const tableDiv = document.getElementById('pipelineTable');
+  if (filtered.length === 0) {
+    tableDiv.innerHTML = '<div class="empty-state"><div class="icon">ð</div><p>No hay comercios en pipeline. Â¡CargÃ¡ uno nuevo!</p></div>';
+    return;
+  }
+  tableDiv.innerHTML = `
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th>Comercio</th><th>Cust ID</th><th>Asesor</th><th>Estado</th>
+        <th>Tasa Proc.</th><th>Tasa Round</th><th>TPV M-1</th><th>DC M-1</th>
+        <th>TPV Decl.</th><th>DC TeÃ³rico</th><th>DC Incr.</th><th>AcciÃ³n</th>
+      </tr></thead>
+      <tbody>
+      ${filtered.map(p => {
+        const incrClass = (p.dcIncremental||0) >= 0 ? 'color:var(--green-d);font-weight:700' : 'color:var(--red-d);font-weight:700';
+        const estadoBadge = p.estado === 'NegociaciÃ³n' ? 'badge-blue' : 'badge-purple';
+        const procLabel = p.procKey && TASAS_PROC[p.procKey] ? TASAS_PROC[p.procKey].label : 'â';
+        const roundLabel = p.roundKey && TASAS_ROUND[p.roundKey] ? TASAS_ROUND[p.roundKey].label : 'â';
+        return `<tr>
+          <td><strong>${p.nombre}</strong>${p.rubro?'<br><span style="font-size:11px;color:var(--g600)">'+p.rubro+'</span>':''}</td>
+          <td><code style="font-family:var(--mono);font-size:12px">${p.custId}</code></td>
+          <td>${p.asesor}</td>
+          <td><span class="badge ${estadoBadge}">${p.estado}</span></td>
+          <td style="font-size:12px">${procLabel}</td>
+          <td style="font-size:12px">${roundLabel}</td>
+          <td>${fmt(p.tpvM1)}</td>
+          <td>${fmt(p.dcM1)}</td>
+          <td>${fmt(p.tpv)}</td>
+          <td style="color:var(--purple-d);font-weight:600">${fmt(p.dcTeorico)}</td>
+          <td style="${incrClass}">${fmt(p.dcIncremental)}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deletePipelineEntry('${p.custId}')">ðï¸</button></td>
+        </tr>`;
+      }).join('')}
+      </tbody>
+    </table>
+    </div>
+  `;
+}
+
+// ============================================================
+// RENDER SEGUIMIENTO
+// ============================================================
+let segCohorteFilter = 'Todos';
+const segAsesorCharts = {};
+
+function renderSeguimiento() {
+  renderSegCohorte();
+  renderSegAsesor();
+}
+
+function esAsesorEquipo(nombre) {
+  if (!nombre) return false;
+  const la = nombre.trim().toLowerCase();
+  const laToks = la.split(' ');
+  const laLast = laToks[laToks.length - 1];
+  const laFirst0 = laToks[0][0];
+  return EQUIPO.some(e => {
+    const ea = e.nombre.trim().toLowerCase();
+    const eaToks = ea.split(' ');
+    const eaLast = eaToks[eaToks.length - 1];
+    const eaFirst0 = eaToks[0][0];
+    return la === ea || (laLast === eaLast && laFirst0 === eaFirst0);
+  });
+}
+
+function matchAsesor(n,e){function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[Ì-Í¯]/g,'').trim();}const la=norm(n),ea=norm(e);if(!la||!ea)return false;if(la===ea)return true;const lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lf===ef&&Math.abs(ll.length-el.length)<=2&&(ll.startsWith(el)||el.startsWith(ll)))return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
+
+function renderSegCohorte() {
+  const chips = document.getElementById('segCohorteChips');
+  if (!chips) return;
+  const asesores = ['Todos', ...ST.asesores.map(a => a.nombre)];
+  chips.innerHTML = asesores.map(a =>
+    `<button class="chip ${segCohorteFilter===a?'active':''}" onclick="segCohorteFilter='${a}';renderSegCohorte()">${a.split(' ')[0]}</button>`
+  ).join('');
+
+  const content = document.getElementById('segCohorteContent');
+  if (!content) return;
+
+  if (ST.lookerData.length === 0) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">ð</div><p>SubÃ­ el archivo Lookerv2 para ver el seguimiento de convertidos.</p></div>';
+    return;
+  }
+
+  let html = '';
+  for (const cohortKey of [M2_KEY, M1_KEY, M0_KEY]) {
+    const cohort = COHORTS[cohortKey];
+    if (!cohort) continue;
+    const rows = ST.lookerData.filter(r => r.mes == cohortKey);
+    const equipoRows = rows;
+    const filtered = segCohorteFilter === 'Todos' ? equipoRows : equipoRows.filter(r => matchAsesor(r.asesor, segCohorteFilter));
+    const _pf=filtered.filter(r=>{const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0);const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0);return (ft-(r.tpvM1||0))>=2000000&&vi>0;});const totalDcIncr=filtered.reduce((s,r)=>{const vi=cohortKey==202603?(r.rawCols&&r.rawCols['VC INC M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['VC INC M1']||0):(r.rawCols&&r.rawCols['VC INC M0']||0);const ft=cohortKey==202603?(r.rawCols&&r.rawCols['FCST TPV M2']||0):cohortKey==202604?(r.rawCols&&r.rawCols['FCST TPV M1']||0):(r.rawCols&&r.rawCols['FCST TPV M0']||r.fcstTpv||0);const ispot=(ft-(r.tpvM1||0))>=2000000&&vi>0;if(ispot)return s+vi;return s+(vi<0?vi:0);},0);
+    const objCohort=[...new Set(_pf.map(r=>r.asesor))].reduce((s,n)=>s+getObjetivo(n,cohortKey),0);
+    const pctCohort = objCohort > 0 ? (totalDcIncr/objCohort*100) : 0;
+
+    html += `<div class="cohort-header" style="background:${cohort.color};border-left-color:${cohort.border};color:${cohort.text}">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <span style="font-weight:700;font-size:16px">${cohort.label}</span>
+          <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
+          ${(()=>{ const n=filtered.filter(r=>r.isInactivo).length; return n>0?`<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700">ð ${n} sin actividad</span>`:''; })()}
+                  </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:13px">VC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
+          ${semaforo(pctCohort)}
+        </div>
+      </div>
+    </div>`;
+
+    if (filtered.length === 0) {
+      html += '<div class="empty-state" style="padding:24px"><p>Sin convertidos en esta cohorte' + (segCohorteFilter!=='Todos'?' para '+segCohorteFilter:'')+'. </p></div>';
+    } else {
+      for (const row of filtered) {
+        const bm = ST.baseMadreData[row.custId] || {};
+        const nombreComercio = bm.nombre || row.custId;
+        const dcM1 = row.vcM1 || bm.dcM1 || 0;
+        const dcActual = cohortKey==202603?(row.rawCols&&row.rawCols['VC INC M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['VC INC M1']||0):(row.rawCols&&row.rawCols['VC INC M0']||row.vcM0||row.vc||0);
+        const dcIncr = dcActual;
+        const tpvM1 = row.tpvM1 || bm.tpvM1 || 0;
+        const tpvActual = cohortKey==202603?(row.rawCols&&row.rawCols['TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['TPV M1']||0):(row.tpvM0||row.tpv||0);
+
+        // Potenciado criteria
+        const fcstVcr = row.fcstVc || 0;
+        const fcstTpv = cohortKey==202603?(row.rawCols&&row.rawCols['FCST TPV M2']||0):cohortKey==202604?(row.rawCols&&row.rawCols['FCST TPV M1']||0):(row.rawCols&&row.rawCols['FCST TPV M0']||row.fcstTpv||0);
+        const tpvGrowth = tpvM1 > 0 ? (fcstTpv/tpvM1 - 1) : 0;
+        const crit1 = (fcstTpv - tpvM1) >= 2000000;
+        const crit2 = tpvGrowth >= 0.30;
+        const crit3 = dcActual > 0;
+        const isPotenciado = crit1 && crit3;const rc=(k)=>(row.rawCols&&row.rawCols[k])||0;
+                    const fcstTpv1x=cohortKey==202603?rc('FCST TPV M2 - 1X'):cohortKey==202604?rc('FCST M1 - 1X'):rc('FCST TPV M0-1X');
+                                const fcstTpvCuotas=cohortKey==202603?rc('FCST TPV M2 - CUOTAS'):cohortKey==202604?rc('FCST M1- Cuotas'):rc('FCST TPV M0- cuotas');
+                                            const fcstVcCol=cohortKey==202603?rc('FCST VC M2'):cohortKey==202604?rc('FCST VC M1'):rc('FCST VC M0');
+                                                        const difTpv=cohortKey==202603?rc('DIF TPV M2'):cohortKey==202604?rc('DIF TPV M1'):rc('DIF TPV M0');
+                                                                    const difVc=cohortKey==202603?rc('DIF VC M2'):cohortKey==202604?rc('DIF VC M1'):rc('DIF VC M0');
+                                                                                const tpvInc=cohortKey==202603?rc('TPV INC M2'):cohortKey==202604?rc('TPV INC M1'):rc('TPV INC M0');
+                                                                                            const vcIncRow=cohortKey==202603?rc('VC INC M2'):cohortKey==202604?rc('VC INC M1'):rc('VC INC M0');
+
+        // Progress asesor vs objetivo cohort
+        const objAsesor = getObjetivo(row.asesor, cohortKey);
+        const asesorRows=ST.lookerData.filter(r2=>r2.mes==cohortKey&&r2.asesor===row.asesor&&r2.valido===1);
+                    const _getVI=(r2)=>cohortKey==202603?(r2.rawCols&&r2.rawCols['VC INC M2']||0):cohortKey==202604?(r2.rawCols&&r2.rawCols['VC INC M1']||0):(r2.rawCols&&r2.rawCols['VC INC M0']||0);
+                                const _getFT=(r2)=>cohortKey==202603?(r2.rawCols&&r2.rawCols['FCST TPV M2']||0):cohortKey==202604?(r2.rawCols&&r2.rawCols['FCST TPV M1']||0):(r2.rawCols&&r2.rawCols['FCST TPV M0']||0);
+                                            const _isP=(r2)=>(_getFT(r2)-(r2.tpvM1||0))>=2000000&&_getVI(r2)>0;
+                                                        const vcIncPot=asesorRows.filter(_isP).reduce((s,r2)=>s+_getVI(r2),0);
+                                                                    const vcIncNeg=asesorRows.filter(r2=>!_isP(r2)&&_getVI(r2)<0).reduce((s,r2)=>s+_getVI(r2),0);
+                                                                                const asesorDcIncr=vcIncPot+vcIncNeg;
+        const pctAsesor = objAsesor > 0 ? (asesorDcIncr/objAsesor*100) : 0;
+        const barColor = semColor(pctAsesor);
+
+        const commentKey = row.custId+'_'+cohortKey;
+        const existingComment = ST.comentarios[commentKey] || '';
+
+        html += `<div class="convert-card">
+          <div class="convert-card-header">
+            <div class="convert-card-title">${nombreComercio}</div>
+            <span class="badge badge-blue">${row.asesor}</span>
+            <span class="potenciado-badge ${isPotenciado?'yes':'no'}">${isPotenciado?'â¡ POTENCIADO':'â NO POTENCIADO'}</span>
+            ${row.isInactivo ? `<span class="inactivo-badge pulse">ð Sin actividad ${row.inactivoDias}d â Llamar</span>` : ''}
+            <code style="font-size:11px;color:var(--g400);font-family:var(--mono)">${row.custId}</code>
+          </div>
+          ${!isPotenciado ? `<div class="no-potenciado-reasons">Criterios no cumplidos: ${!crit1?'â¢ FCST Inc < $2.000.000 ':''}${!crit2?'â¢ FCST TPV crecimiento < 30% ':''}${!crit3?'â¢ DC actual no supera DC M-1':''}</div>` : ''}
+          <div class="kv-grid">
+                                <div class="kv-item"><div class="kv-label">TPV M-1</div><div class="kv-value">${fmt(row.tpvM1)}</div></div>
+                                                    <div class="kv-item"><div class="kv-label">VC M-1</div><div class="kv-value">${fmt(row.vcM1)}</div></div>
+                                                                        <div class="kv-item"><div class="kv-label">${cohortKey==202603?'TPV M2':cohortKey==202604?'TPV M1':'TPV M0'}</div><div class="kv-value">${fmt(row.tpv)}</div></div>
+                                                                                            <div class="kv-item"><div class="kv-label">${cohortKey==202603?'VC M2':cohortKey==202604?'VC M1':'VC M0'}</div><div class="kv-value">${fmt(row.vc)}</div></div>
+                                                                                                                <div class="kv-item"><div class="kv-label">${cohortKey==202603?'FCST TPV M2':cohortKey==202604?'FCST TPV M1':'FCST TPV M0'}</div><div class="kv-value">${fmt(cohortKey==202603?rc('FCST TPV M2'):cohortKey==202604?rc('FCST TPV M1'):rc('FCST TPV M0'))}</div></div>
+                                                                                                                                    <div class="kv-item"><div class="kv-label">${cohortKey==202603?'FCST TPV M2 - 1X':cohortKey==202604?'FCST M1 - 1x':'FCST TPV M0-1X'}</div><div class="kv-value">${fmt(fcstTpv1x)}</div></div>
+                                                                                                                                                        <div class="kv-item"><div class="kv-label">${cohortKey==202603?'FCST TPV M2 - CUOTAS':cohortKey==202604?'FCST M1- Cuotas':'FCST TPV M0- cuotas'}</div><div class="kv-value">${fmt(fcstTpvCuotas)}</div></div>
+                                                                                                                                                                            <div class="kv-item"><div class="kv-label">${cohortKey==202603?'FCST VC M2':cohortKey==202604?'FCST VC M1':'FCST VC M0'}</div><div class="kv-value">${fmt(fcstVcCol)}</div></div>
+                                                                                                                                                                                                <div class="kv-item"><div class="kv-label">${cohortKey==202603?'DIF TPV M2':cohortKey==202604?'DIF TPV M1':'Dif TPV M0'}</div><div class="kv-value" style="color:${difTpv>=0?'var(--green)':'var(--red)'}">${fmt(difTpv)}</div></div>
+                                                                                                                                                                                                                    <div class="kv-item"><div class="kv-label">${cohortKey==202603?'DIF VC M2':cohortKey==202604?'DIF VC M1':'Dif VC MO'}</div><div class="kv-value" style="color:${difVc>=0?'var(--green)':'var(--red)'}">${fmt(difVc)}</div></div>
+                                                                                                                                                                                                                                        <div class="kv-item"><div class="kv-label">${cohortKey==202603?'TPV INC M2':cohortKey==202604?'TPV INC M1':'TPV INC M0'}</div><div class="kv-value">${fmt(tpvInc)}</div></div>
+                                                                                                                                                                                                                                                            <div class="kv-item"><div class="kv-label">${cohortKey==202603?'VC INC M2':cohortKey==202604?'VC INC M1':'VC INC M0'}</div><div class="kv-value">${fmt(vcIncRow)}</div></div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:4px">
+                                    <span><b>${row.asesor}</b> â <span style="color:var(--green)">Pot: ${fmt(vcIncPot)}</span> | <span style="color:var(--red)">Neg: ${fmt(vcIncNeg)}</span> | <b>Total VC INC: ${fmt(asesorDcIncr)}</b></span>
+              ${semaforo(pctAsesor)}
+            </div>
+            <div class="progress-bar"><div class="progress-fill ${barColor}" style="width:${Math.min(pctAsesor,100)}%"></div></div>
+          </div>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--g100)">
+            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">ð¬ Comentario</div>
+            <textarea class="comment" placeholder="Ej: LlamÃ© el 12/5, acordamos aumentar cuotas. Seguimiento el viernes..." onblur="saveComment('${commentKey}',this.value)">${existingComment}</textarea>
+            ${existingComment ? `<div class="comment-hist">Guardado: ${existingComment}</div>` : ''}
+          </div>
+        </div>`;
+      }
+    }
+  }
+  content.innerHTML = html;
+}
+
+function renderSegAsesor() {
+  const content = document.getElementById('segAsesorContent');
+  if (!content) return;
+
+  // Destroy existing charts
+  for (const k in segAsesorCharts) {
+    try { segAsesorCharts[k].destroy(); } catch(e) {}
+    delete segAsesorCharts[k];
+  }
+
+  if (ST.lookerData.length === 0) {
+    content.innerHTML = '<div class="empty-state"><div class="icon">ð¤</div><p>SubÃ­ el archivo Lookerv2 para ver el seguimiento por asesor.</p></div>';
+    return;
+  }
+
+  let html = '';
+  for (const asesor of ST.asesores) {
+    const cohortData = [M0_KEY, M1_KEY, M2_KEY].map(k => {
+      const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+      const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
+      const obj = getObjetivo(asesor.nombre, k);
+      const pct = obj > 0 ? (dcIncr/obj*100) : 0;
+      return {key:k, label:COHORTS[k]?.tag||k, dcIncr, obj, pct, count:rows.length};
+    });
+
+    const convertidos = ST.lookerData.filter(r => r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+
+    html += `<div class="asesor-card">
+      <div class="asesor-card-header">
+        <div class="asesor-card-name">ð¤ ${asesor.nombre}</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${cohortData.map(c => semaforo(c.pct) + `<span style="font-size:11px;color:var(--g600)">${c.label}</span>`).join('')}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div class="chart-wrap"><canvas id="chart_asesor_${asesor.nombre.replace(/\s+/g,'_')}"></canvas></div>
+        </div>
+        <div>
+          ${cohortData.map(c => `
+            <div style="margin-bottom:10px">
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:3px">
+                <span>${c.label} â ${c.count} convertidos</span>
+                <span>${fmt(c.dcIncr)} / ${fmt(c.obj)}</span>
+              </div>
+              <div class="progress-bar"><div class="progress-fill ${semColor(c.pct)}" style="width:${Math.min(c.pct,100)}%"></div></div>
+            </div>
+          `).join('')}
+          <div style="margin-top:12px">
+            <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:6px">Ãltimos convertidos:</div>
+            ${convertidos.slice(0,5).map(r => {
+              const bm = ST.baseMadreData[r.custId]||{};
+              return `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--g100)">${bm.nombre||r.custId} <span style="color:var(--g400)">${r.mes}</span></div>`;
+            }).join('')}
+            ${convertidos.length > 5 ? `<div style="font-size:11px;color:var(--g400);margin-top:4px">+ ${convertidos.length-5} mÃ¡s</div>` : ''}
+            ${convertidos.length === 0 ? '<div style="font-size:12px;color:var(--g400)">Sin convertidos aÃºn</div>' : ''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  content.innerHTML = html;
+
+  // Render charts after DOM is updated
+  setTimeout(() => {
+    for (const asesor of ST.asesores) {
+      const canvasId = 'chart_asesor_'+asesor.nombre.replace(/\s+/g,'_');
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) continue;
+      const cohortData = [M0_KEY, M1_KEY, M2_KEY].map(k => {
+        const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+        const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
+        const obj = getObjetivo(asesor.nombre, k);
+        return {key:k, label:COHORTS[k]?.tag||k, dcIncr, obj};
+      });
+      try {
+        const chart = new Chart(canvas, {
+          type:'bar',
+          data:{
+            labels: cohortData.map(c => c.label),
+            datasets:[
+              {label:'DC Incremental', data:cohortData.map(c=>c.dcIncr), backgroundColor:['#60a5fa','#a78bfa','#34d399'], borderRadius:6},
+              {label:'Objetivo', data:cohortData.map(c=>c.obj), type:'line', borderColor:'#f59e0b', borderWidth:2, pointRadius:4, fill:false, tension:0},
+            ]
+          },
+          options:{
+            responsive:true, maintainAspectRatio:false,
+            plugins:{legend:{display:true,position:'bottom',labels:{font:{size:11}}}},
+            scales:{
+              y:{ticks:{callback:v=>'$'+Math.round(v/1000)+'k',font:{size:10}},grid:{color:'rgba(0,0,0,.05)'}},
+              x:{ticks:{font:{size:11}},grid:{display:false}}
+            }
+          }
+        });
+        segAsesorCharts[canvasId] = chart;
+      } catch(e) {}
+    }
+  }, 100);
+}
+
+function saveComment(key, val) {
+  ST.comentarios[key] = val;
+  save();
+}
+
+// ============================================================
+// RENDER ALERTAS M0
+// ============================================================
+let alertasFilter = 'Todos';
+
+function renderAlertas() {
+  const chips = document.getElementById('alertasChips');
+  if (!chips) return;
+  const asesores = ['Todos', ...ST.asesores.map(a => a.nombre)];
+  chips.innerHTML = asesores.map(a =>
+    `<button class="chip ${alertasFilter===a?'active':''}" onclick="alertasFilter='${a}';renderAlertas()">${a.split(' ')[0]}</button>`
+  ).join('');
+
+  const content = document.getElementById('alertasContent');
+  if (!content) return;
+
+  const asesoresFiltrados = alertasFilter === 'Todos' ? ST.asesores : ST.asesores.filter(a => a.nombre === alertasFilter);
+  let html = '';
+
+  for (const asesor of asesoresFiltrados) {
+    const objM0 = getObjetivo(asesor.nombre, M0_KEY);
+    // Get M0 convertidos from looker
+    const lookerM0 = ST.lookerData.filter(r => r.mes == M0_KEY && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+    // Get from pipeline (all pipeline entries for this asesor as potential conversions)
+    const pipelineEntries = ST.pipeline.filter(p => p.asesor === asesor.nombre);
+
+    // Combine both sources
+    const allEntries = [];
+    for (const r of lookerM0) {
+      const bm = ST.baseMadreData[r.custId]||{};
+      allEntries.push({
+        custId: r.custId,
+        nombre: bm.nombre || r.custId,
+        tpvDecl: r.tpv || 0,
+        tpvM1: r.tpvM1 || bm.tpvM1 || 0,
+        dcM1: r.vcM1 || bm.dcM1 || 0,
+        shareDeb: 0, shareCuotas: 0,
+        dcTeorico: r.vcM0||r.vc||0,
+        dcIncr: (r.vcM0||r.vc||0) - (r.vcM1||0),
+        source: 'looker',
+      });
+    }
+    for (const p of pipelineEntries) {
+      if (!lookerM0.find(r => r.custId === p.custId)) {
+        allEntries.push({
+          custId: p.custId, nombre: p.nombre,
+          tpvDecl: p.tpv, tpvM1: p.tpvM1, dcM1: p.dcM1,
+          shareDeb: p.shareDeb, shareCuotas: p.shareCuotas,
+          dcTeorico: p.dcTeorico, dcIncr: p.dcIncremental,
+          source: 'pipeline',
+        });
+      }
+    }
+
+    const totalDcIncr = allEntries.reduce((s,e) => s+(e.dcIncr||0), 0);
+    const pct = objM0 > 0 ? (totalDcIncr/objM0*100) : 0;
+    const barColor = semColor(pct);
+    const missing = objM0 - totalDcIncr;
+    const avgDcPerConv = allEntries.length > 0 ? totalDcIncr/allEntries.length : 50000;
+    const needMore = missing > 0 && avgDcPerConv > 0 ? Math.ceil(missing/avgDcPerConv) : 0;
+
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:600">ð¤ ${asesor.nombre}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:13px;color:var(--g600)">Objetivo M0: <strong>${fmt(objM0)}</strong></span>
+          ${semaforo(pct)}
+        </div>
+      </div>
+      ${allEntries.length > 0 ? `
+      <div style="overflow-x:auto;margin-bottom:16px">
+      <table>
+        <thead><tr>
+          <th>Cust ID</th><th>Nombre</th><th>TPV Decl.</th><th>TPV M-1</th><th>DC M-1</th>
+          <th>DC TeÃ³rico</th><th>DC Incremental</th><th>Fuente</th>
+        </tr></thead>
+        <tbody>
+          ${allEntries.map(e => `<tr>
+            <td><code style="font-size:11px;font-family:var(--mono)">${e.custId}</code></td>
+            <td>${e.nombre}</td>
+            <td>${fmt(e.tpvDecl)}</td>
+            <td>${fmt(e.tpvM1)}</td>
+            <td>${fmt(e.dcM1)}</td>
+            <td style="color:var(--purple-d);font-weight:600">${fmt(e.dcTeorico)}</td>
+            <td style="${(e.dcIncr||0)>=0?'color:var(--green-d)':'color:var(--red-d)'};font-weight:600">${fmt(e.dcIncr)}</td>
+            <td><span class="badge ${e.source==='looker'?'badge-blue':'badge-purple'}">${e.source==='looker'?'Looker':'Pipeline'}</span></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      </div>
+      ` : '<div class="empty-state" style="padding:16px"><p>Sin conversiones registradas para M0.</p></div>'}
+      <div style="background:var(--g50);border-radius:8px;padding:12px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:13px">
+          <span>Total DC Incremental: <strong>${fmt(totalDcIncr)}</strong></span>
+          <span>vs Objetivo: <strong>${fmt(objM0)}</strong></span>
+        </div>
+        <div class="progress-bar" style="height:12px"><div class="progress-fill ${barColor}" style="width:${Math.min(pct,100)}%"></div></div>
+        ${needMore > 0 ? `
+        <div class="banner banner-warn" style="margin-top:12px;margin-bottom:0">
+          â¡ NecesitÃ¡s <strong>${needMore} comercio${needMore>1?'s':''} mÃ¡s</strong> para llegar al 100%.
+          Con el promedio actual de DC por conversiÃ³n (<strong>${fmt(avgDcPerConv)}</strong>), te faltan ${fmt(missing)}.
+        </div>` : pct >= 100 ? `<div class="banner banner-success" style="margin-top:12px;margin-bottom:0">ð Â¡Objetivo alcanzado! Cumplimiento: ${fmtPct(pct)}</div>` : ''}
+      </div>
+    </div>`;
+  }
+  // ---- SecciÃ³n: TPV sin actividad 3+ dÃ­as ----
+  const inactivosAll = ST.lookerData.filter(r => r.isInactivo && (alertasFilter === 'Todos' || matchAsesor(r.asesor, alertasFilter)));
+  if (inactivosAll.length > 0) {
+    const byAsesor = {};
+    inactivosAll.forEach(r => { const a = r.asesor||'Sin asesor'; if (!byAsesor[a]) byAsesor[a]=[]; byAsesor[a].push(r); });
+    let htmlInactivos = `<div style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;font-size:14px;color:#991b1b;margin-bottom:12px">ð Comercios sin movimiento de TPV (${inactivosAll.length} total) â AcciÃ³n: llamar</div>`;
+    Object.entries(byAsesor).forEach(([asesor, rows]) => {
+      htmlInactivos += `<div style="margin-bottom:10px"><div style="font-weight:600;font-size:13px;color:#7f1d1d;margin-bottom:6px">${asesor} (${rows.length})</div>`;
+      rows.sort((a,b)=>b.inactivoDias-a.inactivoDias).forEach(r => {
+        const bm = ST.baseMadreData[r.custId]||{};
+        const nombre = bm.nombre || r.custId;
+        const cohortLabel = r.mes=='202603'?'M2 Mar':r.mes=='202604'?'M1 Abr':'M0 May';
+        htmlInactivos += `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:#fff;border:1px solid #fecaca;border-radius:6px;margin-bottom:4px;font-size:12px">
+          <span style="font-weight:700;color:#991b1b">ð ${r.inactivoDias}d</span>
+          <span style="font-weight:600">${nombre}</span>
+          <code style="color:#6b7280;font-size:11px">${r.custId}</code>
+          <span style="background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:11px">${cohortLabel}</span>
+          <span style="color:#6b7280">TPV: ${fmt(r.tpv)}</span>
+        </div>`;
+      });
+      htmlInactivos += '</div>';
+    });
+    htmlInactivos += '</div>';
+    html = htmlInactivos + html;
+  }
+
+  content.innerHTML = html || '<div class="empty-state"><div class="icon">ð</div><p>Sin datos disponibles.</p></div>';
+}
+
+// ============================================================
+// RENDER GESTIÃN
+// ============================================================
+function renderGestion() {
+  const content = document.getElementById('gestionContent');
+  if (!content) return;
+
+  const cohorts = [M2_KEY, M1_KEY, M0_KEY];
+  const cohortLabels = {[M2_KEY]:'M2 Mar', [M1_KEY]:'M1 Abr', [M0_KEY]:'M0 May'};
+
+  // Calcular % por asesor y cohorte
+  const asesorStats = ST.asesores.map(asesor => {
+    const pcts = cohorts.map(k => {
+      const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+      const dcIncr = rows.reduce((s,r) => {
+        const vi = r.mes==M2_KEY?(r.rawCols&&r.rawCols['VC INC M2']||r.vcM2||0):r.mes==M1_KEY?(r.rawCols&&r.rawCols['VC INC M1']||r.vcM1real||0):(r.rawCols&&r.rawCols['VC INC M0']||r.vcM0||r.vc||0);
+        return s + vi;
+      }, 0);
+      const obj = getObjetivo(asesor.nombre, k);
+      const _rgPct = getResumenPct(asesor.nombre, k);
+      const hasData = rows.length > 0 || _rgPct !== null;
+      const pct = _rgPct !== null ? _rgPct : (obj > 0 ? (dcIncr/obj*100) : 0);
+      return {pct, dcIncr, obj, hasData};
+    });
+    const tresRojo = pcts.every(p => p.hasData && p.pct < 80);
+    const hayDatos = pcts.some(p => p.hasData);
+    return {asesor, pcts, tresRojo, hayDatos};
+  }).filter(s => s.hayDatos || Object.values(ST.baseMadreData).some(r => matchAsesor(r.nombre || r.asesor || '', s.asesor.nombre)));
+
+  // ---- Seccion: TPV sin actividad ----
+  const inactivosAll = ST.lookerData.filter(r => r.isInactivo);
+  let htmlInactivos = '';
+  if (inactivosAll.length > 0) {
+    const byAsesor = {};
+    inactivosAll.forEach(r => { const a=r.asesor||'Sin asesor'; if(!byAsesor[a])byAsesor[a]=[]; byAsesor[a].push(r); });
+    htmlInactivos = `<div style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px">
+      <div style="font-weight:700;font-size:14px;color:#991b1b;margin-bottom:10px">Llamar sin movimiento TPV (${inactivosAll.length})</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${inactivosAll.sort((a,b)=>b.inactivoDias-a.inactivoDias).map(r => {
+          const bm = ST.baseMadreData[r.custId]||{};
+          const nombre = bm.nombre || r.custId;
+          const cohortLabel = r.mes=='202603'?'M2':r.mes=='202604'?'M1':'M0';
+          return `<div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:#fff;border:1px solid #fecaca;border-radius:8px;font-size:12px">
+            <span style="font-weight:700;color:#991b1b">${r.inactivoDias}d</span>
+            <span style="font-weight:600">${nombre}</span>
+            <span style="color:#9ca3af;font-size:11px">${r.asesor?.split(' ')[0]||''} ${cohortLabel}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ---- Tabla principal por asesor ----
+  const rojos3 = asesorStats.filter(s => s.tresRojo);
+  const resto = asesorStats.filter(s => !s.tresRojo);
+
+  function pctCell(p) {
+    const color = p.pct >= 100 ? '#15803d' : p.pct >= 80 ? '#ca8a04' : '#991b1b';
+    const bg = p.pct >= 100 ? '#dcfce7' : p.pct >= 80 ? '#fef9c3' : '#fee2e2';
+    const bar = Math.max(0, Math.min(p.pct, 100));
+    if (!p.hasData) return `<td style="text-align:center;color:#9ca3af;font-size:12px">-</td>`;
+    return `<td style="text-align:center;background-color:${bg}">
+      <div style="font-weight:700;color:${color};font-size:13px">${Math.round(p.pct)}%</div>
+      <div style="height:4px;background:#e5e7eb;border-radius:2px;margin:3px 4px 0">
+        <div style="height:4px;background:${color};border-radius:2px;width:${bar}%"></div>
+      </div>
+      <div style="font-size:10px;color:#6b7280;margin-top:2px">${fmt(p.dcIncr)} / ${fmt(p.obj)}</div>
+    </td>`;
+  }
+  function asesorRow(s, highlight) {
+    const planKey = 'plan_'+s.asesor.nombre;
+    const existingPlan = ST.comentarios[planKey] || '';
+    const rowStyle = highlight ? 'background:#fff5f5;' : '';
+    return `<tr style="${rowStyle}">
+      <td style="font-weight:600;font-size:13px;vertical-align:middle">
+        ${highlight ? '<span style="color:#dc2626;margin-right:4px">â</span>' : ''}
+        ${s.asesor.nombre}
+        ${highlight ? '<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700">3 meses rojo</span>' : ''}
+      </td>
+      ${s.pcts.map(p => pctCell(p)).join('')}
+    </tr>
+    <tr style="${rowStyle}">
+      <td colspan="4" style="padding:2px 4px 8px">
+        <textarea class="comment" style="width:100%;min-height:48px;font-size:12px;padding:6px 8px;background:${highlight?'rgba(255,255,255,.8)':'var(--g50)'};box-sizing:border-box"
+          placeholder="Plan de accion..."
+          onblur="saveComment('${planKey}',this.value)">${existingPlan}</textarea>
+      </td>
+    </tr>`;
+  }
+  let html = htmlInactivos + `
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th style="min-width:160px">Asesor</th>
+      ${cohorts.map(k => `<th style="text-align:center;min-width:120px">${cohortLabels[k]}</th>`).join('')}
+      
+    </tr></thead>
+    <tbody>
+      ${rojos3.map(s => asesorRow(s, true)).join('')}
+      ${rojos3.length > 0 && resto.length > 0 ? `<tr><td colspan="4" style="padding:4px 0;background:transparent"><hr style="border:none;border-top:1px solid var(--g200);margin:4px 0"></td></tr>` : ''}
+      ${resto.map(s => asesorRow(s, false)).join('')}
+    </tbody>
+  </table>
+  </div>`;
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// RENDER MEDALLERO
+// ============================================================
+// ============================================================
+// RESUMEN GESTION â valores oficiales de cumplimiento
+// ============================================================
+function processResumenGestion(csvText) {
+  try {
+    function _pL(line) { var r=[],q=false,c2=''; for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c2);c2='';}else{c2+=ch;}} r.push(c2);return r; }
+    var lines=csvText.split('\n');
+    var hLine=lines.find(function(l){return l.includes('202603');});
+    if(!hLine) return;
+    var hdr=_pL(hLine);
+    var keys=[String(M2_KEY),String(M1_KEY),String(M0_KEY)];
+    var idx={}; keys.forEach(function(k){idx[k]=hdr.indexOf(k);});
+    ST.resumenGestion={};
+    lines.forEach(function(line){
+      if(!line.includes('Francisco Quinteros')) return;
+      var cols=_pL(line); var nom=cols[1]||'';
+      if(!nom) return;
+      ST.resumenGestion[nom]={};
+      keys.forEach(function(k){ var raw=(cols[idx[k]]||''). replace('%','').replace(',','.'); ST.resumenGestion[nom][k]=parseFloat(raw)||0; });
+    });
+  } catch(e){console.error('processResumenGestion err',e);}
+}
+
+function getResumenPct(asesorNombre, mesKey) {
+  var k=String(mesKey); if(!ST.resumenGestion) return null;
+  if(ST.resumenGestion[asesorNombre]!==undefined) return ST.resumenGestion[asesorNombre][k]!==undefined?ST.resumenGestion[asesorNombre][k]:null;
+  var ks=Object.keys(ST.resumenGestion);
+  for(var i=0;i<ks.length;i++){var n=ks[i]; if(matchAsesor(n,asesorNombre)||matchAsesor(asesorNombre,n)) return ST.resumenGestion[n][k]!==undefined?ST.resumenGestion[n][k]:null;}
+  return null;
+}
+
+function fetchResumenGestion() {
+  var id='11xFxl_XYFIhLGmokYJM9HpBUu53uRoUhWNqdqfHVPs8';
+  fetch('https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv&sheet=RESUMEN%20GESTI%C3%B3N')
+    .then(function(r){return r.text();})
+    .then(function(txt){processResumenGestion(txt);renderMedallero();renderIncentivos();})
+    .catch(function(e){console.error('fetchResumenGestion err',e);});
+}
+
+function processResumenGestionFromGAS(arr) {
+  ST.resumenGestion = {};
+  if (!arr || !arr.length) return;
+  arr.forEach(function(row) {
+    var nom = row[0];
+    if (!nom) return;
+    ST.resumenGestion[nom] = {};
+    ST.resumenGestion[nom][String(M2_KEY)] = (row[1] !== undefined) ? row[1] : null;
+    ST.resumenGestion[nom][String(M1_KEY)] = (row[2] !== undefined) ? row[2] : null;
+    ST.resumenGestion[nom][String(M0_KEY)] = (row[3] !== undefined) ? row[3] : null;
+  });
+}
+
+const medalleroCharts = {};
+
+function renderMedallero() {
+  const content = document.getElementById('medalleroContent');
+  if (!content) return;
+
+  // Destroy old charts
+  for (const k in medalleroCharts) {
+    try { medalleroCharts[k].destroy(); } catch(e) {}
+    delete medalleroCharts[k];
+  }
+
+  // Compute rankings based on M2
+  const asesorStats = ST.asesores.map(asesor => {
+    const computeForCohort = (k) => {
+      const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+      const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
+      const obj = getObjetivo(asesor.nombre, k);
+      const _rgPct = getResumenPct(asesor.nombre, k);
+      const pct = _rgPct !== null ? _rgPct : (obj > 0 ? (dcIncr/obj*100) : 0);
+      return {dcIncr, obj, pct};
+    };
+    const m0 = computeForCohort(M0_KEY);
+    const m1 = computeForCohort(M1_KEY);
+    const m2 = computeForCohort(M2_KEY);
+    const totalDcIncr = m0.dcIncr + m1.dcIncr + m2.dcIncr;
+    return {asesor, m0, m1, m2, totalDcIncr};
+  });
+
+  // Sort by M2 pct desc
+  const sorted = [...asesorStats].sort((a,b) => b.m2.pct - a.m2.pct);
+  const topPerformers = sorted.filter(s => s.m2.pct >= 100);
+  const lowPerformers = sorted.filter(s => s.m2.pct < 80);
+
+  let html = '<div class="two-col" style="margin-bottom:20px">';
+
+  // Top performers
+  html += '<div class="card" style="border-top:3px solid #639922"><div class="card-title">ð¥ Top Performers (M2 â¥ 100%)</div>';
+  if (topPerformers.length === 0) {
+    html += '<div class="empty-state" style="padding:20px"><p>Sin asesores en top performers para M2.</p></div>';
+  } else {
+    html += topPerformers.map((s,i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
+        <span class="pos-num pos-${i+1}">${i===0?'ð¥':i===1?'ð¥':i===2?'ð¥':'#'+(i+1)}</span>
+        <span style="flex:1;font-weight:500">${s.asesor.nombre}</span>
+        ${semaforo(s.m2.pct)}
+        <span style="font-size:12px;color:var(--g600)">${fmt(s.m2.dcIncr)}</span>
+      </div>
+    `).join('');
+  }
+  html += '</div>';
+
+  // Low performers
+  html += '<div class="card" style="border-top:3px solid #E24B4A"><div class="card-title">â ï¸ Bajo Rendimiento (M2 < 80%)</div>';
+  if (lowPerformers.length === 0) {
+    html += '<div class="empty-state" style="padding:20px"><p style="color:var(--green-d)">Sin asesores bajo el 80% en M2.</p></div>';
+  } else {
+    html += lowPerformers.map(s => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
+        <span style="font-size:18px">â ï¸</span>
+        <span style="flex:1;font-weight:500">${s.asesor.nombre}</span>
+        ${semaforo(s.m2.pct)}
+        <span style="font-size:12px;color:var(--g600)">${fmt(s.m2.dcIncr)}</span>
+      </div>
+    `).join('');
+  }
+  html += '</div></div>';
+
+  // Main ranking table
+  html += `<div class="card">
+    <div class="card-title">ð Ranking completo del equipo</div>
+    <div style="overflow-x:auto">
+    <table class="ranking-table">
+      <thead><tr>
+        <th>Pos.</th><th>Asesor</th><th>Tier</th>
+        <th>M0 %</th><th>M1 %</th><th>M2 %</th>
+        <th>DC Incr. Total</th><th>Estado M2</th>
+      </tr></thead>
+      <tbody>
+      ${sorted.map((s,i) => `<tr>
+        <td><span class="pos-num ${i<3?'pos-'+(i+1):''}">${i===0?'ð¥':i===1?'ð¥':i===2?'ð¥':'#'+(i+1)}</span></td>
+        <td><strong>${s.asesor.nombre}</strong></td>
+        <td><span class="tier-${s.asesor.tier||'bronce'}">${(s.asesor.tier||'bronce').charAt(0).toUpperCase()+(s.asesor.tier||'bronce').slice(1)}</span></td>
+        <td>${semaforo(s.m0.pct)}</td>
+        <td>${semaforo(s.m1.pct)}</td>
+        <td>${semaforo(s.m2.pct)}</td>
+        <td style="font-weight:600">${fmt(s.totalDcIncr)}</td>
+        <td>${semaforo(s.m2.pct)}</td>
+      </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>
+  </div>`;
+
+  // Bar chart
+  html += `<div class="card"><div class="card-title">ð DC Incremental por asesor (vs objetivo M2)</div>
+    <div style="height:320px"><canvas id="medalleroChart"></canvas></div>
+  </div>`;
+
+  content.innerHTML = html;
+
+  setTimeout(() => {
+    const canvas = document.getElementById('medalleroChart');
+    if (!canvas) return;
+    try {
+      const chart = new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: sorted.map(s => s.asesor.nombre.split(' ')[0]+' '+s.asesor.nombre.split(' ')[1]),
+          datasets: [
+            {
+              label: 'DC Incremental M2',
+              data: sorted.map(s => s.m2.dcIncr),
+              backgroundColor: sorted.map(s => s.m2.pct >= 100 ? '#34d399' : s.m2.pct >= 80 ? '#fbbf24' : '#f87171'),
+              borderRadius: 6,
+            },
+            {
+              label: 'Objetivo M2',
+              data: sorted.map(s => s.m2.obj),
+              type: 'line', borderColor: '#7c3aed', borderWidth: 2,
+              pointRadius: 5, pointBackgroundColor: '#7c3aed', fill: false, tension: 0,
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {legend: {position:'bottom',labels:{font:{size:12}}}},
+          scales: {
+            y: {ticks:{callback:v=>'$'+Math.round(v/1000)+'k',font:{size:11}},grid:{color:'rgba(0,0,0,.05)'}},
+            x: {ticks:{font:{size:11}},grid:{display:false}}
+          }
+        }
+      });
+      medalleroCharts['main'] = chart;
+    } catch(e) {}
+  }, 100);
+}
+
+// ============================================================
+// RENDER INCENTIVOS
+// ============================================================
+function renderIncentivos() {
+  const container = document.getElementById('incentivosCards');
+  if (!container) return;
+
+  const cards = ST.asesores.map(asesor => {
+    // Get M2 achievement
+    // Mirror EXACTLY renderSegCohorte asesorDcIncr logic for M2
+    const _lookerName = ST.lookerData.find(r => r.mes == M2_KEY && matchAsesor(r.asesor, asesor.nombre))?.asesor || asesor.nombre;
+    const _m2rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.asesor === _lookerName && r.valido === 1);
+    const _getVI2 = r => (r.rawCols&&r.rawCols['VC INC M2'])||0;
+    const _getFT2 = r => (r.rawCols&&r.rawCols['FCST TPV M2'])||r.fcstTpv||0;
+    const _isP2  = r => (_getFT2(r)-(r.tpvM1||0))>=2000000 && _getVI2(r)>0;
+    const dcIncr = _m2rows.filter(_isP2).reduce((s,r)=>s+_getVI2(r),0)
+                 + _m2rows.filter(r=>!_isP2(r)&&_getVI2(r)<0).reduce((s,r)=>s+_getVI2(r),0);
+    const obj = getObjetivo(asesor.nombre, M2_KEY);
+    const _rgPct2 = getResumenPct(asesor.nombre, M2_KEY);
+    const pct = _rgPct2 !== null ? _rgPct2 : (obj > 0 ? (dcIncr/obj*100) : 0);
+    const tier = asesor.tier || 'bronce';
+    const incentivo = getIncentivo(pct, tier);
+
+    const tierColor = tier === 'oro' ? '#D4A017' : tier === 'plata' ? '#a8a8a8' : '#cd7f32';
+    const tierLabel = tier.charAt(0).toUpperCase()+tier.slice(1);
+
+    return `<div class="incentivo-card" style="border-left:4px solid ${tierColor};border-radius:10px">
+      <div class="incentivo-card-header">
+        <span style="font-size:16px;font-weight:600">${asesor.nombre}</span>
+        <span class="tier-${tier}">${tierLabel}</span>
+        <span style="margin-left:auto">${semaforo(pct)}</span>
+      </div>
+      <div class="kv-grid">
+        <div class="kv-item" style="background:var(--amber-l)">
+          <div class="kv-label">Variable est.</div>
+          <div class="kv-val" style="color:var(--amber-d)">${fmt(incentivo.variable)}</div>
+        </div>
+        <div class="kv-item" style="background:var(--blue-l)">
+          <div class="kv-label">Bruto est.</div>
+          <div class="kv-val" style="color:var(--blue-d)">${fmt(incentivo.bruto)}</div>
+        </div>
+        <div class="kv-item" style="background:var(--green-l)">
+          <div class="kv-label">Neto est.</div>
+          <div class="kv-val" style="color:var(--green-d)">${fmt(incentivo.neto)}</div>
+        </div>
+        <div class="kv-item">
+          <div class="kv-label">Cumplimiento M2</div>
+          <div class="kv-val">${fmtPct(pct)}</div>
+        </div>
+      </div>
+      ${tier === 'bronce' ? `<div class="tooltip-text" style="margin-top:8px;padding:8px;background:var(--g50);border-radius:6px;border-left:3px solid var(--amber)">
+        â Para pasar a <strong>Plata</strong>: necesitÃ¡s 3 M2 seguidos con â¥100% y promedio â¥110%.
+        Para <strong>Oro</strong>: 3 M2 seguidos con â¥100% y promedio >200%.
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  container.innerHTML = cards;
+
+  // Render escala tables
+  for (const tier of ['bronce','plata','oro']) {
+    renderEscalaTable(tier);
+  }
+}
+
+function renderEscalaTable(tier) {
+  const el = document.getElementById('escala-'+tier);
+  if (!el) return;
+  const escala = ESCALA[tier];
+  if (!escala) return;
+
+  // Get M2 pcts for current asesor (use first matching asesor for highlight)
+  const asesorPcts = {};
+  for (const asesor of ST.asesores) {
+    if ((asesor.tier||'bronce') !== tier) continue;
+    const rows = ST.lookerData.filter(r => r.mes == M2_KEY && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
+    const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
+    const obj = getObjetivo(asesor.nombre, M2_KEY);
+    asesorPcts[asesor.nombre] = obj > 0 ? (dcIncr/obj*100) : 0;
+  }
+
+  el.innerHTML = `<div style="overflow-x:auto"><table>
+    <thead><tr>
+      <th>% Cumplimiento</th>
+      <th>Sueldo Fijo</th>
+      <th>Variable</th>
+      <th>Bruto</th>
+      <th>Neto</th>
+    </tr></thead>
+    <tbody>
+    ${escala.map(row => {
+      const fijoEstimado = row.bruto - row.variable;
+      // Check if any asesor of this tier falls in this range
+      const anyInRange = Object.values(asesorPcts).some(p => p >= row.desde && p <= row.hasta);
+      const isHighlight = anyInRange;
+      return `<tr ${isHighlight?'class="highlight-row"':''}>
+        <td>${row.hasta >= 9999 ? 'â¥ 320%' : row.desde+'% â '+row.hasta+'%'}</td>
+        <td>${fmt(fijoEstimado)}</td>
+        <td style="color:var(--amber-d);font-weight:600">${fmt(row.variable)}</td>
+        <td style="color:var(--blue-d);font-weight:600">${fmt(row.bruto)}</td>
+        <td style="color:var(--green-d);font-weight:600">${fmt(row.neto)}</td>
+      </tr>`;
+    }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  // Set header date
+  const options = {weekday:'long', year:'numeric', month:'long', day:'numeric'};
+  document.getElementById('headerDate').textContent = hoy.toLocaleDateString('es-AR', options);
+
+  // Load state
+  loadState();
+
+  // Populate selects
+  populateSelects();
+
+  // Render initial tab
+  renderPipeline();
+
+  // Show cached data status while auto-fetch loads
+  if (ST.lookerData.length > 0) {
+    setGasStatus('success',`â Datos en cachÃ© (${ST.lastLoadDate}) â ${Object.keys(ST.baseMadreData).length} comercios Â· ${ST.lookerData.length} filas Lookerv2`);
+    renderSeguimiento();
+    renderAlertas();
+    renderGestion();
+    renderMedallero();
+    renderIncentivos();
+  }
+
+  // Render escala tables
+  for (const tier of ['bronce','plata','oro']) {
+    renderEscalaTable(tier);
+  }
+
+  // Auto-fetch from Google Sheets
+  fetchGASData();
+  // Refresh every hour
+  setInterval(fetchGASData, 60 * 60 * 1000);
+});
+</script>
+</body>
+</html>
