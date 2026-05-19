@@ -1732,7 +1732,7 @@ function renderGestion() {
     const tresRojo = pcts.every(p => p.hasData && p.pct < 80);
     const hayDatos = pcts.some(p => p.hasData);
     return {asesor, pcts, tresRojo, hayDatos};
-  }).filter(s => s.hayDatos);
+  }).filter(s => s.hayDatos || Object.values(ST.baseMadreData).some(r => matchAsesor(r.nombre || r.asesor || '', s.asesor.nombre)));
 
   // ---- Seccion: TPV sin actividad ----
   const inactivosAll = ST.lookerData.filter(r => r.isInactivo);
@@ -1762,7 +1762,7 @@ function renderGestion() {
   const resto = asesorStats.filter(s => !s.tresRojo);
 
   function pctCell(p) {
-    const color = p.pct >= 100 ? '#15803d' : p.pct >= 80 ? '#92400e' : '#991b1b';
+    const color = p.pct >= 100 ? '#15803d' : p.pct >= 80 ? '#ca8a04' : '#991b1b';
     const bg = p.pct >= 100 ? '#dcfce7' : p.pct >= 80 ? '#fef9c3' : '#fee2e2';
     const bar = Math.min(p.pct, 100);
     if (!p.hasData) return `<td style="text-align:center;color:#9ca3af;font-size:12px">-</td>`;
