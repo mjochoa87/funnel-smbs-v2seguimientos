@@ -1763,10 +1763,10 @@ function renderGestion() {
 
   function pctCell(p) {
     const color = p.pct >= 100 ? '#15803d' : p.pct >= 80 ? '#92400e' : '#991b1b';
-    const bg = p.pct >= 100 ? '#f0fdf4' : p.pct >= 80 ? '#fffbeb' : '#fff5f5';
+    const bg = p.pct >= 100 ? '#dcfce7' : p.pct >= 80 ? '#fef9c3' : '#fee2e2';
     const bar = Math.min(p.pct, 100);
     if (!p.hasData) return `<td style="text-align:center;color:#9ca3af;font-size:12px">-</td>`;
-    return `<td style="text-align:center">
+    return `<td style="text-align:center;background-color:${bg}">
       <div style="font-weight:700;color:${color};font-size:13px">${Math.round(p.pct)}%</div>
       <div style="height:4px;background:#e5e7eb;border-radius:2px;margin:3px 4px 0">
         <div style="height:4px;background:${color};border-radius:2px;width:${bar}%"></div>
@@ -1774,54 +1774,26 @@ function renderGestion() {
       <div style="font-size:10px;color:#6b7280;margin-top:2px">${fmt(p.dcIncr)} / ${fmt(p.obj)}</div>
     </td>`;
   }
-
   function asesorRow(s, highlight) {
     const planKey = 'plan_'+s.asesor.nombre;
     const existingPlan = ST.comentarios[planKey] || '';
     const rowStyle = highlight ? 'background:#fff5f5;' : '';
     return `<tr style="${rowStyle}">
-      <td style="font-weight:600;font-size:13px">
+      <td style="font-weight:600;font-size:13px;vertical-align:middle">
         ${highlight ? '<span style="color:#dc2626;margin-right:4px">●</span>' : ''}
         ${s.asesor.nombre}
         ${highlight ? '<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700">3 meses rojo</span>' : ''}
       </td>
       ${s.pcts.map(p => pctCell(p)).join('')}
-      <td style="min-width:180px">
-        <textarea class="comment" style="min-height:48px;font-size:12px;padding:6px 8px;background:${highlight?'rgba(255,255,255,.8)':'var(--g50)'}"
+    </tr>
+    <tr style="${rowStyle}">
+      <td colspan="4" style="padding:2px 4px 8px">
+        <textarea class="comment" style="width:100%;min-height:48px;font-size:12px;padding:6px 8px;background:${highlight?'rgba(255,255,255,.8)':'var(--g50)'};box-sizing:border-box"
           placeholder="Plan de accion..."
           onblur="saveComment('${planKey}',this.value)">${existingPlan}</textarea>
       </td>
     </tr>`;
   }
-
-  let html = htmlInactivos + `
-  <div style="overflow-x:auto">
-  <table>
-    <thead><tr>
-      <th style="min-width:160px">Asesor</th>
-      ${cohorts.map(k => `<th style="text-align:center;min-width:120px">${cohortLabels[k]}</th>`).join('')}
-      <th style="min-width:180px">Plan de accion</th>
-    </tr></thead>
-    <tbody>
-      ${rojos3.map(s => asesorRow(s, true)).join('')}
-      ${rojos3.length > 0 && resto.length > 0 ? `<tr><td colspan="5" style="padding:4px 0;background:transparent"><hr style="border:none;border-top:1px solid var(--g200);margin:4px 0"></td></tr>` : ''}
-      ${resto.map(s => asesorRow(s, false)).join('')}
-    </tbody>
-  </table>
-  </div>`;
-
-  content.innerHTML = html;
-}
-
-// ============================================================
-// RENDER MEDALLERO
-// ============================================================
-const medalleroCharts = {};
-
-function renderMedallero() {
-  const content = document.getElementById('medalleroContent');
-  if (!content) return;
-
   // Destroy old charts
   for (const k in medalleroCharts) {
     try { medalleroCharts[k].destroy(); } catch(e) {}
