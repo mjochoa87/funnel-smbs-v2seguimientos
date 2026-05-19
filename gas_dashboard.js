@@ -15,8 +15,9 @@ const BASE_MADRE_TAB = 'base de mes actual';
 const REPAGOS_ID = '11xFxl_XYFIhLGmokYJM9HpBUu53uRoUhWNqdqfHVPs8';
 const REPAGOS_TAB = 'lookerv2';
 const REPAGOS_TARGET_TAB = 'target por asesor';
+const RESUMEN_GESTION_TAB = 'RESUMEN GESTIÓN';
 const MAX_ROWS = 5000;
-const CACHE_KEY = 'dash_data_v2';
+const CACHE_KEY = 'dash_data_v3';
 const CACHE_TTL = 300; // 5 minutos
 
 function doGet(e) {
@@ -43,6 +44,7 @@ function doGet(e) {
         cached: false,
         baseMadre: baseMadre,
         lookerv2: lookerv2,        targetPorAsesor: getTargetPorAsesor(),
+        resumenGestion: getResumenGestion(),
       };
       json = JSON.stringify(output);
       // Guardar en caché (límite 100KB del CacheService)
@@ -120,6 +122,37 @@ function readSheet(spreadsheetId, sheetName) {
                                                                                        return [];
                                                                                          }
                                                                                          }
+
+function getResumenGestion() {
+  try {
+    const rows = readSheet(REPAGOS_ID, RESUMEN_GESTION_TAB);
+    if (!rows || rows.length < 2) return [];
+    let headerIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].some(c => String(c).trim() === '202603')) { headerIdx = i; break; }
+    }
+    if (headerIdx < 0) return [];
+    const header = rows[headerIdx].map(c => String(c).trim());
+    const m2Idx = header.indexOf('202603');
+    const m1Idx = header.indexOf('202604');
+    const m0Idx = header.indexOf('202605');
+    const result = [];
+    const toNum = (v) => {
+      if (v === '' || v === null || v === undefined) return null;
+      const n = parseFloat(String(v).replace(',','.'));
+      return isNaN(n) ? null : Math.round(n * 10000) / 100;
+    };
+    for (let i = headerIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const asesor = String(row[1] || '').trim();
+      const team = String(row[2] || '').trim();
+      if (!asesor || !team.includes('Maria Jose Ochoa')) continue;
+      result.push([asesor, toNum(row[m2Idx]), toNum(row[m1Idx]), toNum(row[m0Idx])]);
+    }
+    Logger.log('getResumenGestion - filas: ' + result.length);
+    return result;
+  } catch(e) { Logger.log('getResumenGestion error: ' + e.message); return []; }
+}
 
 function testRead() {
   const bm = readSheet(BASE_MADRE_ID, BASE_MADRE_TAB);
