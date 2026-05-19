@@ -488,7 +488,7 @@ let ST = {
   lookerData: [],
   baseMadreData: {},
   historialTPV: {},
-  lastLoadDate: null, targetObjetivos: {},
+  lastLoadDate: null, targetObjetivos: {}, resumenGestion: {},
 };
 
 // ============================================================
@@ -1028,8 +1028,7 @@ function fetchGASData() {
       renderSeguimiento();
       renderAlertas();
       renderGestion();
-      renderMedallero();
-      renderIncentivos();
+      fetchResumenGestion();
     } catch(err) {
       console.error('GAS process error:', err);
       setGasStatus('error', `❌ Error procesando datos: <b>${err.message}</b> — <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
@@ -1816,6 +1815,45 @@ function renderGestion() {
 // ============================================================
 // RENDER MEDALLERO
 // ============================================================
+// ============================================================
+// RESUMEN GESTION — valores oficiales de cumplimiento
+// ============================================================
+function processResumenGestion(csvText) {
+  try {
+    function _pL(line) { var r=[],q=false,c2=''; for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c2);c2='';}else{c2+=ch;}} r.push(c2);return r; }
+    var lines=csvText.split('\n');
+    var hLine=lines.find(function(l){return l.includes('202603');});
+    if(!hLine) return;
+    var hdr=_pL(hLine);
+    var keys=[String(M2_KEY),String(M1_KEY),String(M0_KEY)];
+    var idx={}; keys.forEach(function(k){idx[k]=hdr.indexOf(k);});
+    ST.resumenGestion={};
+    lines.forEach(function(line){
+      if(!line.includes('Maria Jose Ochoa')) return;
+      var cols=_pL(line); var nom=cols[1]||'';
+      if(!nom) return;
+      ST.resumenGestion[nom]={};
+      keys.forEach(function(k){ var raw=(cols[idx[k]]||''). replace('%','').replace(',','.'); ST.resumenGestion[nom][k]=parseFloat(raw)||0; });
+    });
+  } catch(e){console.error('processResumenGestion err',e);}
+}
+
+function getResumenPct(asesorNombre, mesKey) {
+  var k=String(mesKey); if(!ST.resumenGestion) return null;
+  if(ST.resumenGestion[asesorNombre]!==undefined) return ST.resumenGestion[asesorNombre][k]!==undefined?ST.resumenGestion[asesorNombre][k]:null;
+  var ks=Object.keys(ST.resumenGestion);
+  for(var i=0;i<ks.length;i++){var n=ks[i]; if(matchAsesor(n,asesorNombre)||matchAsesor(asesorNombre,n)) return ST.resumenGestion[n][k]!==undefined?ST.resumenGestion[n][k]:null;}
+  return null;
+}
+
+function fetchResumenGestion() {
+  var id='11xFxl_XYFIhLGmokYJM9HpBUu53uRoUhWNqdqfHVPs8';
+  fetch('https://docs.google.com/spreadsheets/d/'+id+'/gviz/tq?tqx=out:csv&sheet=RESUMEN%20GESTI%C3%B3N')
+    .then(function(r){return r.text();})
+    .then(function(txt){processResumenGestion(txt);renderMedallero();renderIncentivos();})
+    .catch(function(e){console.error('fetchResumenGestion err',e);});
+}
+
 const medalleroCharts = {};
 
 function renderMedallero() {
@@ -1834,7 +1872,8 @@ function renderMedallero() {
       const rows = ST.lookerData.filter(r => r.mes == k && r.valido === 1 && matchAsesor(r.asesor, asesor.nombre));
       const dcIncr = rows.reduce((s,r) => s + (r.rawCols&&r.rawCols[r.mes==M2_KEY?'VC INC M2':r.mes==M1_KEY?'VC INC M1':'VC INC M0']||r.vcM0||r.vc||0), 0);
       const obj = getObjetivo(asesor.nombre, k);
-      const pct = obj > 0 ? (dcIncr/obj*100) : 0;
+      const _rgPct = getResumenPct(asesor.nombre, k);
+      const pct = _rgPct !== null ? _rgPct : (obj > 0 ? (dcIncr/obj*100) : 0);
       return {dcIncr, obj, pct};
     };
     const m0 = computeForCohort(M0_KEY);
@@ -1971,7 +2010,8 @@ function renderIncentivos() {
     const dcIncr = _m2rows.filter(_isP2).reduce((s,r)=>s+_getVI2(r),0)
                  + _m2rows.filter(r=>!_isP2(r)&&_getVI2(r)<0).reduce((s,r)=>s+_getVI2(r),0);
     const obj = getObjetivo(asesor.nombre, M2_KEY);
-    const pct = obj > 0 ? (dcIncr/obj*100) : 0;
+    const _rgPct2 = getResumenPct(asesor.nombre, M2_KEY);
+    const pct = _rgPct2 !== null ? _rgPct2 : (obj > 0 ? (dcIncr/obj*100) : 0);
     const tier = asesor.tier || 'bronce';
     const incentivo = getIncentivo(pct, tier);
 
