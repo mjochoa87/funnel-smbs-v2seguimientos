@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Seguimientos Principalidad â MercadoPago SMB</title>
+<title>Dashboard Seguimientos Principalidad — MercadoPago SMB</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 :root {
-  --dark:#1a1f36; --dark2:#2d3555; --blue:#7ab3f0; --blue-l:#dbeafe; --blue-d:#1e40af;
+  --dark:#1e1b4b; --dark2:#312e81; --blue:#8b5cf6; --blue-l:#ede9fe; --blue-d:#5b21b6;
   --green:#8ecf8a; --green-l:#dcfce7; --green-d:#166534; --purple:#b5a8f5; --purple-l:#ede9fe; --purple-d:#5b21b6;
   --amber:#f5c971; --amber-l:#fef3c7; --amber-d:#92400e; --teal:#80d4ba; --teal-l:#ccfbf1; --teal-d:#115e59;
   --red:#f5a0a0; --red-l:#fee2e2; --red-d:#991b1b;
@@ -171,27 +171,27 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 
 <header>
   <div class="header-inner">
-    <div class="header-logo">ð</div>
+    <div class="header-logo">📈</div>
     <div>
       <h1>Dashboard Seguimientos Principalidad</h1>
-      <div class="sub">MercadoPago Â· Equipo SMB Asesores</div>
+      <div class="sub">MercadoPago · Equipo SMB Asesores</div>
     </div>
   </div>
   <div class="date" id="headerDate"></div>
 </header>
 
 <nav id="mainNav">
-  <button data-tab="pipeline" class="active" onclick="switchTab('pipeline',this)">ð Pipeline</button>
-  <button data-tab="seguimiento" onclick="switchTab('seguimiento',this)">ð Seguimiento</button>
-  <button data-tab="gestion" onclick="switchTab('gestion',this)">â ï¸ GestiÃ³n</button>
-  <button data-tab="medallero" onclick="switchTab('medallero',this)">ð Medallero</button>
-  <button data-tab="incentivos" onclick="switchTab('incentivos',this)">ð° Incentivos</button>
+  <button data-tab="pipeline" class="active" onclick="switchTab('pipeline',this)">📋 Pipeline</button>
+  <button data-tab="seguimiento" onclick="switchTab('seguimiento',this)">📅 Seguimiento</button>
+  <button data-tab="gestion" onclick="switchTab('gestion',this)">⚠️ Gestión</button>
+  <button data-tab="medallero" onclick="switchTab('medallero',this)">🏆 Medallero</button>
+  <button data-tab="incentivos" onclick="switchTab('incentivos',this)">💰 Incentivos</button>
 </nav>
 
 <!-- Sync status bar -->
 <div id="gasStatusBar" style="background:#dbeafe;color:#1e40af;border-bottom:1px solid #93c5fd;padding:8px 24px;font-size:12px;font-weight:500;display:flex;align-items:center;gap:12px">
-  <span id="gasStatusText">â³ Conectando con las planillas de Google Sheets...</span>
-  <button onclick="fetchGASData()" style="margin-left:auto;padding:4px 12px;border:1px solid #93c5fd;border-radius:6px;background:var(--w);font-size:11px;font-weight:600;color:#1e40af;cursor:pointer">ð Actualizar</button>
+  <span id="gasStatusText">⏳ Conectando con las planillas de Google Sheets...</span>
+  <button onclick="fetchGASData()" style="margin-left:auto;padding:4px 12px;border:1px solid #93c5fd;border-radius:6px;background:var(--w);font-size:11px;font-weight:600;color:#1e40af;cursor:pointer">🔄 Actualizar</button>
 </div>
 
 <div class="container">
@@ -199,12 +199,12 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 <!-- ===== TAB 1: PIPELINE ===== -->
 <div id="tab-pipeline" class="tab-content active">
   <div class="section-wrap" style="border-top-color:#378ADD">
-    <div class="section-title"><span class="section-title-icon" style="background:#E6F1FB">ð</span>Pipeline â Negociaciones y Renegociaciones</div>
-    <div class="section-sub">Comercios en proceso de principalizaciÃ³n</div>
+    <div class="section-title"><span class="section-title-icon" style="background:#E6F1FB">📋</span>Pipeline — Negociaciones y Renegociaciones</div>
+    <div class="section-sub">Comercios en proceso de principalización</div>
   </div>
   <div class="sub-tabs">
-    <button class="sub-tab active" onclick="switchSubTab('pipeline','resumen',this)">ð Resumen</button>
-    <button class="sub-tab" onclick="switchSubTab('pipeline','cargar',this)">â Cargar comercio</button>
+    <button class="sub-tab active" onclick="switchSubTab('pipeline','resumen',this)">📊 Resumen</button>
+    <button class="sub-tab" onclick="switchSubTab('pipeline','cargar',this)">➕ Cargar comercio</button>
   </div>
   <div id="pipeline-resumen" class="sub-tab-content active">
     <div id="pipelineChips" class="chips"></div>
@@ -215,19 +215,19 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
   </div>
   <div id="pipeline-cargar" class="sub-tab-content">
     <div class="card">
-      <div class="card-title">ð Cargar Base Madre</div>
-      <div id="baseMadreBanner" class="banner banner-info" style="margin-bottom:8px">â³ Sincronizando Base Madre con Google Sheets...</div>
+      <div class="card-title">📁 Cargar Base Madre</div>
+      <div id="baseMadreBanner" class="banner banner-info" style="margin-bottom:8px">⏳ Sincronizando Base Madre con Google Sheets...</div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <button class="btn btn-sm btn-secondary" onclick="fetchGASData()">ð Sincronizar ahora</button>
+        <button class="btn btn-sm btn-secondary" onclick="fetchGASData()">🔄 Sincronizar ahora</button>
         <label style="font-size:11px;color:var(--g400);cursor:pointer;display:flex;align-items:center;gap:4px">
           <input type="file" id="baseMadreInput" accept=".csv" onchange="loadBaseMadre(this)" style="display:none">
-          ð Subir CSV manualmente (respaldo)
+          📎 Subir CSV manualmente (respaldo)
         </label>
       </div>
       <div id="baseMadreStatus"></div>
     </div>
     <div class="card">
-      <div class="card-title">â Nuevo comercio en pipeline</div>
+      <div class="card-title">➕ Nuevo comercio en pipeline</div>
       <div class="form-row">
         <div class="form-group">
           <label>Cust ID *</label>
@@ -245,7 +245,7 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
         </div>
         <div class="form-group">
           <label>Rubro</label>
-          <input type="text" id="f_rubro" placeholder="ej: GastronomÃ­a">
+          <input type="text" id="f_rubro" placeholder="ej: Gastronomía">
         </div>
       </div>
       <div class="form-row">
@@ -253,8 +253,8 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
           <label>Estado *</label>
           <select id="f_estado">
             <option value="">Seleccionar...</option>
-            <option value="NegociaciÃ³n">NegociaciÃ³n</option>
-            <option value="RenegociaciÃ³n">RenegociaciÃ³n</option>
+            <option value="Negociación">Negociación</option>
+            <option value="Renegociación">Renegociación</option>
           </select>
         </div>
         <div class="form-group">
@@ -278,7 +278,7 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
       </div>
       <div class="form-row-3">
         <div class="form-group">
-          <label>Share dÃ©bito/1 pago (%)</label>
+          <label>Share débito/1 pago (%)</label>
           <input type="number" id="f_shareDeb" placeholder="0" min="0" max="100" oninput="updateDCCalc()">
         </div>
         <div class="form-group">
@@ -298,15 +298,15 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
         <div></div>
       </div>
       <div class="dc-box" id="dcCalcBox">
-        <div class="dc-row"><span>DC dÃ©bito/1 pago:</span><span id="dc_deb">$0</span></div>
+        <div class="dc-row"><span>DC débito/1 pago:</span><span id="dc_deb">$0</span></div>
         <div class="dc-row"><span>DC cuotas:</span><span id="dc_cuotas">$0</span></div>
-        <div class="dc-row"><span style="font-weight:700;color:var(--purple-d)">DC teÃ³rico/mes:</span><span class="dc-total" id="dc_total">$0</span></div>
+        <div class="dc-row"><span style="font-weight:700;color:var(--purple-d)">DC teórico/mes:</span><span class="dc-total" id="dc_total">$0</span></div>
         <div class="dc-row"><span>DC M-1:</span><span id="dc_m1_disp">$0</span></div>
         <div class="dc-row"><span style="font-weight:700">DC incremental:</span><span id="dc_incr_disp" class="dc-incr-pos">$0</span></div>
       </div>
       <div style="display:flex;gap:10px;margin-top:20px">
         <button class="btn btn-secondary" onclick="clearPipelineForm()">Limpiar</button>
-        <button class="btn btn-primary" onclick="savePipelineEntry()">ð¾ Guardar comercio</button>
+        <button class="btn btn-primary" onclick="savePipelineEntry()">💾 Guardar comercio</button>
       </div>
       <div id="pipelineSaveStatus" style="margin-top:10px"></div>
     </div>
@@ -316,25 +316,25 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 <!-- ===== TAB 2: SEGUIMIENTO ===== -->
 <div id="tab-seguimiento" class="tab-content">
   <div class="section-wrap" style="border-top-color:#7F77DD">
-    <div class="section-title"><span class="section-title-icon" style="background:#EEEDFE">ð</span>Seguimiento de convertidos</div>
+    <div class="section-title"><span class="section-title-icon" style="background:#EEEDFE">📅</span>Seguimiento de convertidos</div>
     <div class="section-sub">Monitoreo de comercios convertidos por cohorte</div>
   </div>
 
   <div class="card" style="padding:12px 16px">
     <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <div style="font-weight:600;font-size:13px">ð¥ Lookerv2</div>
-      <div id="lookerBannerStatus" style="flex:1;font-size:12px;color:var(--g600)">SincronizaciÃ³n automÃ¡tica activa</div>
-      <button class="btn btn-sm btn-secondary" onclick="fetchGASData()">ð Actualizar</button>
+      <div style="font-weight:600;font-size:13px">📥 Lookerv2</div>
+      <div id="lookerBannerStatus" style="flex:1;font-size:12px;color:var(--g600)">Sincronización automática activa</div>
+      <button class="btn btn-sm btn-secondary" onclick="fetchGASData()">🔄 Actualizar</button>
       <label style="font-size:11px;color:var(--g400);cursor:pointer;display:flex;align-items:center;gap:4px">
         <input type="file" id="lookerInput" accept=".csv" onchange="loadLookerv2(this)" style="display:none">
-        ð CSV manual
+        📎 CSV manual
       </label>
     </div>
   </div>
 
   <div class="sub-tabs">
-    <button class="sub-tab active" onclick="switchSubTab('seg','cohorte',this)">ð Por cohorte</button>
-    <button class="sub-tab" onclick="switchSubTab('seg','asesor',this)">ð¤ Por asesor</button>
+    <button class="sub-tab active" onclick="switchSubTab('seg','cohorte',this)">📆 Por cohorte</button>
+    <button class="sub-tab" onclick="switchSubTab('seg','asesor',this)">👤 Por asesor</button>
   </div>
 
   <div id="seg-cohorte" class="sub-tab-content active">
@@ -349,17 +349,17 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 
 <!-- ===== TAB 3: ALERTAS M0 ===== -->
 <div id="tab-alertas" class="tab-content" style="display:none">
-  <div class="section-title">ð Alertas â Escenario M0 (mes actual)</div>
-  <div class="section-sub">ProyecciÃ³n: si todos los comercios convertidos este mes cumplen su TPV declarado, Â¿llegÃ¡s al objetivo?</div>
+  <div class="section-title">🔔 Alertas — Escenario M0 (mes actual)</div>
+  <div class="section-sub">Proyección: si todos los comercios convertidos este mes cumplen su TPV declarado, ¿llegás al objetivo?</div>
   <div id="alertasChips" class="chips"></div>
   <div id="alertasContent"></div>
 </div>
 
-<!-- ===== TAB 4: GESTIÃN ===== -->
+<!-- ===== TAB 4: GESTIÓN ===== -->
 <div id="tab-gestion" class="tab-content">
   <div class="section-wrap" style="border-top-color:#BA7517">
-    <div class="section-title"><span class="section-title-icon" style="background:#FAEEDA">â ï¸</span>GestiÃ³n â Performance por asesor</div>
-    <div class="section-sub">% alcance de objetivo por cohorte â asesores en rojo los Ãºltimos 3 meses</div>
+    <div class="section-title"><span class="section-title-icon" style="background:#FAEEDA">⚠️</span>Gestión — Performance por asesor</div>
+    <div class="section-sub">% alcance de objetivo por cohorte — asesores en rojo los últimos 3 meses</div>
   </div>
   <div id="gestionContent"></div>
 </div>
@@ -367,8 +367,8 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 <!-- ===== TAB 5: MEDALLERO ===== -->
 <div id="tab-medallero" class="tab-content">
   <div class="section-wrap" style="border-top-color:#f5c971">
-    <div class="section-title"><span class="section-title-icon" style="background:#fef3c7">ð</span>Medallero â Ranking del equipo</div>
-    <div class="section-sub">Performance del equipo en los Ãºltimos 3 perÃ­odos</div>
+    <div class="section-title"><span class="section-title-icon" style="background:#fef3c7">🏆</span>Medallero — Ranking del equipo</div>
+    <div class="section-sub">Performance del equipo en los últimos 3 períodos</div>
   </div>
   <div id="medalleroContent"></div>
 </div>
@@ -376,16 +376,16 @@ textarea.comment:focus{border-color:var(--blue);outline:none}
 <!-- ===== TAB 6: INCENTIVOS ===== -->
 <div id="tab-incentivos" class="tab-content">
   <div class="section-wrap" style="border-top-color:#D4A017">
-    <div class="section-title"><span class="section-title-icon" style="background:#FAEEDA">ð°</span>Incentivos â Escala de comisiones</div>
-    <div class="section-sub">EstimaciÃ³n de incentivos por asesor segÃºn cumplimiento M2</div>
+    <div class="section-title"><span class="section-title-icon" style="background:#FAEEDA">💰</span>Incentivos — Escala de comisiones</div>
+    <div class="section-sub">Estimación de incentivos por asesor según cumplimiento M2</div>
   </div>
   <div id="incentivosCards"></div>
   <div class="card" style="margin-top:20px">
-    <div class="card-title">ð Tabla de escala de incentivos</div>
+    <div class="card-title">📋 Tabla de escala de incentivos</div>
     <div class="escala-tabs">
-      <button class="escala-tab bronce active" onclick="switchEscalaTab('bronce',this)">ð¥ Bronce</button>
-      <button class="escala-tab plata" onclick="switchEscalaTab('plata',this)">ð¥ Plata</button>
-      <button class="escala-tab oro" onclick="switchEscalaTab('oro',this)">ð¥ Oro</button>
+      <button class="escala-tab bronce active" onclick="switchEscalaTab('bronce',this)">🥉 Bronce</button>
+      <button class="escala-tab plata" onclick="switchEscalaTab('plata',this)">🥈 Plata</button>
+      <button class="escala-tab oro" onclick="switchEscalaTab('oro',this)">🥇 Oro</button>
     </div>
     <div id="escala-bronce" class="escala-tab-content active"></div>
     <div id="escala-plata" class="escala-tab-content"></div>
@@ -512,9 +512,9 @@ const M1_KEY = getYYYYMM(hoy, -1);
 const M2_KEY = getYYYYMM(hoy, -2);
 
 const COHORTS = {
-  [M0_KEY]: {tag:'M0', label:'M0 â '+getMesLabel(hoy,0), color:'#eff6ff', border:'#93c5fd', text:'#1e40af'},
-  [M1_KEY]: {tag:'M1', label:'M1 â '+getMesLabel(hoy,-1), color:'#f5f3ff', border:'#c4b5fd', text:'#5b21b6'},
-  [M2_KEY]: {tag:'M2', label:'M2 â '+getMesLabel(hoy,-2), color:'#f0fdf4', border:'#86efac', text:'#166534'},
+  [M0_KEY]: {tag:'M0', label:'M0 — '+getMesLabel(hoy,0), color:'#eff6ff', border:'#93c5fd', text:'#1e40af'},
+  [M1_KEY]: {tag:'M1', label:'M1 — '+getMesLabel(hoy,-1), color:'#f5f3ff', border:'#c4b5fd', text:'#5b21b6'},
+  [M2_KEY]: {tag:'M2', label:'M2 — '+getMesLabel(hoy,-2), color:'#f0fdf4', border:'#86efac', text:'#166534'},
 };
 
 // ============================================================
@@ -531,9 +531,9 @@ function fmtPct(p) {
 function semaforo(pct) {
   const p = parseFloat(pct)||0;
   const label = fmtPct(p);
-  if (p >= 100) return '<span class="sem-v">ð¢ '+label+'</span>';
-  if (p >= 80)  return '<span class="sem-a">ð¡ '+label+'</span>';
-  return '<span class="sem-r">ð´ '+label+'</span>';
+  if (p >= 100) return '<span class="sem-v">🟢 '+label+'</span>';
+  if (p >= 80)  return '<span class="sem-a">🟡 '+label+'</span>';
+  return '<span class="sem-r">🔴 '+label+'</span>';
 }
 
 function semColor(pct) {
@@ -543,7 +543,7 @@ function semColor(pct) {
   return 'red';
 }
 
-function normalizarNombre(n) { return (n||'').normalize('NFD').replace(/[Ì-Í¯]/g,'').toLowerCase().trim(); } function getObjetivo(nombre, cohortYYYYMM) { const key=normalizarNombre(nombre); if(ST.targetObjetivos[key]){const v=ST.targetObjetivos[key][String(cohortYYYYMM)];if(v!==undefined&&v!==null&&v!=='')return parseFloat(v)||0;return 0;} const a=ST.asesores.find(x=>x.nombre===nombre); if(!a)return 0; if(a.objetivos[cohortYYYYMM]!==undefined)return a.objetivos[cohortYYYYMM]; if(a.objetivos.default!==undefined)return a.objetivos.default; return 0; } function _dummy_replaced() {
+function normalizarNombre(n) { return (n||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); } function getObjetivo(nombre, cohortYYYYMM) { const key=normalizarNombre(nombre); if(ST.targetObjetivos[key]){const v=ST.targetObjetivos[key][String(cohortYYYYMM)];if(v!==undefined&&v!==null&&v!=='')return parseFloat(v)||0;return 0;} const a=ST.asesores.find(x=>x.nombre===nombre); if(!a)return 0; if(a.objetivos[cohortYYYYMM]!==undefined)return a.objetivos[cohortYYYYMM]; if(a.objetivos.default!==undefined)return a.objetivos.default; return 0; } function _dummy_replaced() {
   const a = ST.asesores.find(x => x.nombre === nombre);
   if (!a) return 0;
   if (a.objetivos[cohortYYYYMM] !== undefined) return a.objetivos[cohortYYYYMM];
@@ -558,9 +558,9 @@ function getIncentivo(pct, tier) {
   for (const row of escala) {
     if (p >= row.desde && p <= row.hasta) return {variable:row.variable, bruto:row.bruto, neto:row.neto};
   }
-  // below range â first row
+  // below range → first row
   if (p < escala[0].desde) return {variable:escala[0].variable, bruto:escala[0].bruto, neto:escala[0].neto};
-  // above range â last row
+  // above range → last row
   const last = escala[escala.length-1];
   return {variable:last.variable, bruto:last.bruto, neto:last.neto};
 }
@@ -580,7 +580,7 @@ function save() {
   try { localStorage.setItem('dash_analia_v1', JSON.stringify(ST)); } catch(e) {}
 }
 
-// Cuenta cuÃ¡ntos dÃ­as consecutivos (hacia atrÃ¡s desde hoy) el TPV se mantuvo igual
+// Cuenta cuántos días consecutivos (hacia atrás desde hoy) el TPV se mantuvo igual
 function contarDiasInactivo(custId, tpvCurrent, todayStr) {
   if (tpvCurrent <= 0) return 0;
   let dias = 1;
@@ -596,7 +596,7 @@ function contarDiasInactivo(custId, tpvCurrent, todayStr) {
   return dias;
 }
 
-// Elimina entradas de historialTPV mÃ¡s viejas que maxDias dÃ­as
+// Elimina entradas de historialTPV más viejas que maxDias días
 function purgarHistorialTPV(maxDias) {
   try {
     const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - maxDias);
@@ -688,7 +688,7 @@ function loadBaseMadre(input) {
   const reader = new FileReader();
   reader.onload = function(e) {
     const rows = parseCSVRows(e.target.result);
-    if (rows.length < 2) { showBanner('baseMadreStatus','error','Archivo vacÃ­o o invÃ¡lido'); return; }
+    if (rows.length < 2) { showBanner('baseMadreStatus','error','Archivo vacío o inválido'); return; }
     const headers = rows[0].map(h => h.toLowerCase());
     const iId = findColIdx(headers,'cust_id','custid','cust id','id');
     const iNombre = findColIdx(headers,'nombre_comercio','nombrecomercio','nombre comercio','nombre');
@@ -712,8 +712,8 @@ function loadBaseMadre(input) {
     }
     save();
     const zone = document.getElementById('baseMadreBanner');
-    if (zone) { zone.className = 'banner banner-success'; zone.textContent = `â ${count} comercios cargados desde CSV (manual)`; }
-    showBanner('baseMadreStatus','success',`â ${count} comercios cargados en Base Madre`);
+    if (zone) { zone.className = 'banner banner-success'; zone.textContent = `✅ ${count} comercios cargados desde CSV (manual)`; }
+    showBanner('baseMadreStatus','success',`✅ ${count} comercios cargados en Base Madre`);
   };
   reader.readAsText(file);
 }
@@ -727,7 +727,7 @@ function loadLookerv2(input) {
   const reader = new FileReader();
   reader.onload = function(e) {
     const rows = parseCSVRows(e.target.result);
-    if (rows.length < 2) { showBanner('lookerBannerStatus','error','Archivo vacÃ­o o invÃ¡lido'); return; }
+    if (rows.length < 2) { showBanner('lookerBannerStatus','error','Archivo vacío o inválido'); return; }
     const headers = rows[0].map(h => h.trim());
     const headersL = headers.map(h => h.toLowerCase());
 
@@ -762,7 +762,7 @@ function loadLookerv2(input) {
       if (!row[iCustId]) continue;
       const custId = row[iCustId];
       const tpvCurrent = parseFloat((row[(parseInt(row[iMes])||0)===202603&&iTpvM2>=0?iTpvM2:(parseInt(row[iMes])||0)===202604&&iTpvM1real>=0?iTpvM1real:iTpvM0>=0?iTpvM0:iTpv]||'0').replace(/[^0-9.-]/g,''))||0;
-      // Registrar TPV de hoy y contar dÃ­as consecutivos sin cambio
+      // Registrar TPV de hoy y contar días consecutivos sin cambio
       ST.historialTPV[custId+'_'+todayStr] = tpvCurrent;
       const inactivoDias = contarDiasInactivo(custId, tpvCurrent, todayStr);
       const isInactivo = inactivoDias >= 3;
@@ -796,7 +796,7 @@ function loadLookerv2(input) {
     ST.lastLoadDate = todayStr;
     purgarHistorialTPV(15);
     save();
-    const msg = `â ${parsed.length} filas cargadas â ${convertidos} convertidos`;
+    const msg = `✅ ${parsed.length} filas cargadas — ${convertidos} convertidos`;
     showBanner('lookerBannerStatus','success',msg);
     renderSeguimiento();
     renderAlertas();
@@ -811,11 +811,11 @@ function loadLookerv2(input) {
 // GOOGLE APPS SCRIPT AUTO-FETCH
 // ============================================================
 
-// â ï¸  IMPORTANTE: Esta URL necesita ser redeployada con acceso "Cualquier persona"
+// ⚠️  IMPORTANTE: Esta URL necesita ser redeployada con acceso "Cualquier persona"
 // en Google Apps Script. Pasos:
-//   1. script.google.com â tu proyecto â Implementar â Administrar implementaciones
-//   2. Editar â "QuiÃ©n puede acceder" â Cualquier persona (no solo organizaciÃ³n)
-//   3. Guardar e implementar â copiÃ¡ la nueva URL aquÃ­
+//   1. script.google.com → tu proyecto → Implementar → Administrar implementaciones
+//   2. Editar → "Quién puede acceder" → Cualquier persona (no solo organización)
+//   3. Guardar e implementar → copiá la nueva URL aquí
 const GAS_URL = 'https://script.google.com/a/macros/mercadolibre.com/s/AKfycbzZf7JjCNwYeJWylyKSujJ9cD1aNu-999AgsRXYziCbitffz5tqarcV_JjwRB9WP221AQ/exec';
 
 function gasNum(val) {
@@ -828,7 +828,7 @@ function gasMes(val) {
   if (!val) return '';
   if (typeof val === 'number') return String(Math.round(val));
   const s = String(val).trim();
-  // ISO date string â YYYYMM
+  // ISO date string → YYYYMM
   if (s.match(/^\d{4}-\d{2}-\d{2}/)) return s.slice(0,4) + s.slice(5,7);
   if (s.match(/^\d{6}(\.\d+)?$/)) return String(parseInt(s));
     return s;
@@ -993,7 +993,7 @@ function processTargetPorAsesorFromGAS(rows) {
 function fetchGASData() {
   if (_fetching) return;
   _fetching = true;
-  setGasStatus('loading','â³ Sincronizando con Google Sheets...');
+  setGasStatus('loading','⏳ Sincronizando con Google Sheets...');
 
   // Limpiamos cualquier script JSONP anterior
   const old = document.getElementById('_gasJsonpScript');
@@ -1006,10 +1006,10 @@ function fetchGASData() {
     delete window[CB];
     _fetching = false;
     setGasStatus('error',
-      'â± Tiempo agotado (3 min) â ' +
+      '⏱ Tiempo agotado (3 min) — ' +
       '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
     );
-  }, 180000); // 3 minutos â GAS tarda en hacer cold start + leer planillas grandes
+  }, 180000); // 3 minutos — GAS tarda en hacer cold start + leer planillas grandes
 
   window[CB] = function(data) {
     clearTimeout(_timeout);
@@ -1023,7 +1023,7 @@ function fetchGASData() {
       processLookerv2FromGAS(data.lookerv2 || []); processTargetPorAsesorFromGAS(data.targetPorAsesor || []);
       save();
       const now = new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-      setGasStatus('success', `â Actualizado ${now} â ${bmCount} comercios Â· ${ST.lookerData.length} filas Lookerv2`);
+      setGasStatus('success', `✅ Actualizado ${now} — ${bmCount} comercios · ${ST.lookerData.length} filas Lookerv2`);
       renderPipeline();
       renderSeguimiento();
       renderAlertas();
@@ -1033,7 +1033,7 @@ function fetchGASData() {
       renderIncentivos();
     } catch(err) {
       console.error('GAS process error:', err);
-      setGasStatus('error', `â Error procesando datos: <b>${err.message}</b> â <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
+      setGasStatus('error', `❌ Error procesando datos: <b>${err.message}</b> — <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
     }
   };
 
@@ -1045,11 +1045,11 @@ function fetchGASData() {
     delete window[CB];
     _fetching = false;
     setGasStatus('error',
-      'â Sin respuesta del Apps Script â asegurate de estar logueada con tu cuenta MeLi en Chrome Â· ' +
+      '❌ Sin respuesta del Apps Script — asegurate de estar logueada con tu cuenta MeLi en Chrome · ' +
       '<a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>'
     );
   };
-  // JSONP: script tag no tiene restricciones CORS y envÃ­a cookies de Google automÃ¡ticamente
+  // JSONP: script tag no tiene restricciones CORS y envía cookies de Google automáticamente
   script.src = GAS_URL + '?callback=' + CB + '&_t=' + Date.now();
   document.head.appendChild(script);
 }
@@ -1212,7 +1212,7 @@ function savePipelineEntry() {
   const asesor = document.getElementById('f_asesor')?.value;
   const estado = document.getElementById('f_estado')?.value;
   if (!custId || !nombre || !asesor || !estado) {
-    showBanner('pipelineSaveStatus','error','â ï¸ CompletÃ¡ los campos obligatorios: Cust ID, Nombre, Asesor, Estado');
+    showBanner('pipelineSaveStatus','error','⚠️ Completá los campos obligatorios: Cust ID, Nombre, Asesor, Estado');
     return;
   }
   const procKey = document.getElementById('f_procKey')?.value||'';
@@ -1235,7 +1235,7 @@ function savePipelineEntry() {
   ST.pipeline.push(entry);
   save();
   clearPipelineForm();
-  showBanner('pipelineSaveStatus','success',`â ${nombre} guardado en pipeline`);
+  showBanner('pipelineSaveStatus','success',`✅ ${nombre} guardado en pipeline`);
   renderPipeline();
 }
 
@@ -1262,21 +1262,21 @@ function renderPipeline() {
   const filtered = pipelineAsesorFilter === 'Todos' ? ST.pipeline : ST.pipeline.filter(p => p.asesor === pipelineAsesorFilter);
 
   // Funnel
-  const neg = filtered.filter(p => p.estado === 'NegociaciÃ³n').length;
-  const reneg = filtered.filter(p => p.estado === 'RenegociaciÃ³n').length;
+  const neg = filtered.filter(p => p.estado === 'Negociación').length;
+  const reneg = filtered.filter(p => p.estado === 'Renegociación').length;
   const dcTeoTotal = filtered.reduce((s,p) => s+(p.dcTeorico||0), 0);
   const dcIncrTotal = filtered.reduce((s,p) => s+(p.dcIncremental||0), 0);
   document.getElementById('pipelineFunnel').innerHTML = `
-    <div class="funnel-card blue"><div style="font-size:20px">ð¤</div><div class="num">${neg}</div><div class="lbl">En NegociaciÃ³n</div></div>
-    <div class="funnel-card amber"><div style="font-size:20px">ð</div><div class="num">${reneg}</div><div class="lbl">En RenegociaciÃ³n</div></div>
-    <div class="funnel-card purple"><div style="font-size:20px">ð³</div><div class="num">${fmt(dcTeoTotal)}</div><div class="lbl">DC TeÃ³rico Total</div></div>
-    <div class="funnel-card green"><div style="font-size:20px">ð</div><div class="num">${fmt(dcIncrTotal)}</div><div class="lbl">DC Incremental Total</div></div>
+    <div class="funnel-card blue"><div style="font-size:20px">🤝</div><div class="num">${neg}</div><div class="lbl">En Negociación</div></div>
+    <div class="funnel-card amber"><div style="font-size:20px">🔄</div><div class="num">${reneg}</div><div class="lbl">En Renegociación</div></div>
+    <div class="funnel-card purple"><div style="font-size:20px">💳</div><div class="num">${fmt(dcTeoTotal)}</div><div class="lbl">DC Teórico Total</div></div>
+    <div class="funnel-card green"><div style="font-size:20px">📈</div><div class="num">${fmt(dcIncrTotal)}</div><div class="lbl">DC Incremental Total</div></div>
   `;
 
   // Table
   const tableDiv = document.getElementById('pipelineTable');
   if (filtered.length === 0) {
-    tableDiv.innerHTML = '<div class="empty-state"><div class="icon">ð</div><p>No hay comercios en pipeline. Â¡CargÃ¡ uno nuevo!</p></div>';
+    tableDiv.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>No hay comercios en pipeline. ¡Cargá uno nuevo!</p></div>';
     return;
   }
   tableDiv.innerHTML = `
@@ -1285,14 +1285,14 @@ function renderPipeline() {
       <thead><tr>
         <th>Comercio</th><th>Cust ID</th><th>Asesor</th><th>Estado</th>
         <th>Tasa Proc.</th><th>Tasa Round</th><th>TPV M-1</th><th>DC M-1</th>
-        <th>TPV Decl.</th><th>DC TeÃ³rico</th><th>DC Incr.</th><th>AcciÃ³n</th>
+        <th>TPV Decl.</th><th>DC Teórico</th><th>DC Incr.</th><th>Acción</th>
       </tr></thead>
       <tbody>
       ${filtered.map(p => {
         const incrClass = (p.dcIncremental||0) >= 0 ? 'color:var(--green-d);font-weight:700' : 'color:var(--red-d);font-weight:700';
-        const estadoBadge = p.estado === 'NegociaciÃ³n' ? 'badge-blue' : 'badge-purple';
-        const procLabel = p.procKey && TASAS_PROC[p.procKey] ? TASAS_PROC[p.procKey].label : 'â';
-        const roundLabel = p.roundKey && TASAS_ROUND[p.roundKey] ? TASAS_ROUND[p.roundKey].label : 'â';
+        const estadoBadge = p.estado === 'Negociación' ? 'badge-blue' : 'badge-purple';
+        const procLabel = p.procKey && TASAS_PROC[p.procKey] ? TASAS_PROC[p.procKey].label : '—';
+        const roundLabel = p.roundKey && TASAS_ROUND[p.roundKey] ? TASAS_ROUND[p.roundKey].label : '—';
         return `<tr>
           <td><strong>${p.nombre}</strong>${p.rubro?'<br><span style="font-size:11px;color:var(--g600)">'+p.rubro+'</span>':''}</td>
           <td><code style="font-family:var(--mono);font-size:12px">${p.custId}</code></td>
@@ -1305,7 +1305,7 @@ function renderPipeline() {
           <td>${fmt(p.tpv)}</td>
           <td style="color:var(--purple-d);font-weight:600">${fmt(p.dcTeorico)}</td>
           <td style="${incrClass}">${fmt(p.dcIncremental)}</td>
-          <td><button class="btn btn-danger btn-sm" onclick="deletePipelineEntry('${p.custId}')">ðï¸</button></td>
+          <td><button class="btn btn-danger btn-sm" onclick="deletePipelineEntry('${p.custId}')">🗑️</button></td>
         </tr>`;
       }).join('')}
       </tbody>
@@ -1340,7 +1340,7 @@ function esAsesorEquipo(nombre) {
   });
 }
 
-function matchAsesor(n,e){function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[Ì-Í¯]/g,'').trim();}const la=norm(n),ea=norm(e);if(!la||!ea)return false;if(la===ea)return true;const lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lf===ef&&Math.abs(ll.length-el.length)<=2&&(ll.startsWith(el)||el.startsWith(ll)))return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
+function matchAsesor(n,e){function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}const la=norm(n),ea=norm(e);if(!la||!ea)return false;if(la===ea)return true;const lt=la.split(' '),et=ea.split(' '),ll=lt[lt.length-1],el=et[et.length-1],lf=(lt[0]||'')[0]||'',ef=(et[0]||'')[0]||'';if(ll===el&&lf===ef)return true;if(lf===ef&&Math.abs(ll.length-el.length)<=2&&(ll.startsWith(el)||el.startsWith(ll)))return true;if(lt.length>1&&et.length>1){const sh=lt.length<=et.length?lt:et,lo=lt.length<=et.length?et:lt;if(sh.every(w=>w.length>=2&&lo.includes(w)))return true;}return false;}
 
 function renderSegCohorte() {
   const chips = document.getElementById('segCohorteChips');
@@ -1354,7 +1354,7 @@ function renderSegCohorte() {
   if (!content) return;
 
   if (ST.lookerData.length === 0) {
-    content.innerHTML = '<div class="empty-state"><div class="icon">ð</div><p>SubÃ­ el archivo Lookerv2 para ver el seguimiento de convertidos.</p></div>';
+    content.innerHTML = '<div class="empty-state"><div class="icon">📊</div><p>Subí el archivo Lookerv2 para ver el seguimiento de convertidos.</p></div>';
     return;
   }
 
@@ -1374,7 +1374,7 @@ function renderSegCohorte() {
         <div>
           <span style="font-weight:700;font-size:16px">${cohort.label}</span>
           <span style="margin-left:12px;background:rgba(0,0,0,.08);padding:2px 8px;border-radius:10px;font-size:12px">${filtered.length} convertidos</span>
-          ${(()=>{ const n=filtered.filter(r=>r.isInactivo).length; return n>0?`<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700">ð ${n} sin actividad</span>`:''; })()}
+          ${(()=>{ const n=filtered.filter(r=>r.isInactivo).length; return n>0?`<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:700">📞 ${n} sin actividad</span>`:''; })()}
                   </div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:13px">VC Incr. Total: <strong>${fmt(totalDcIncr)}</strong></span>
@@ -1430,11 +1430,11 @@ function renderSegCohorte() {
           <div class="convert-card-header">
             <div class="convert-card-title">${nombreComercio}</div>
             <span class="badge badge-blue">${row.asesor}</span>
-            <span class="potenciado-badge ${isPotenciado?'yes':'no'}">${isPotenciado?'â¡ POTENCIADO':'â NO POTENCIADO'}</span>
-            ${row.isInactivo ? `<span class="inactivo-badge pulse">ð Sin actividad ${row.inactivoDias}d â Llamar</span>` : ''}
+            <span class="potenciado-badge ${isPotenciado?'yes':'no'}">${isPotenciado?'⚡ POTENCIADO':'❌ NO POTENCIADO'}</span>
+            ${row.isInactivo ? `<span class="inactivo-badge pulse">📞 Sin actividad ${row.inactivoDias}d — Llamar</span>` : ''}
             <code style="font-size:11px;color:var(--g400);font-family:var(--mono)">${row.custId}</code>
           </div>
-          ${!isPotenciado ? `<div class="no-potenciado-reasons">Criterios no cumplidos: ${!crit1?'â¢ FCST Inc < $2.000.000 ':''}${!crit2?'â¢ FCST TPV crecimiento < 30% ':''}${!crit3?'â¢ DC actual no supera DC M-1':''}</div>` : ''}
+          ${!isPotenciado ? `<div class="no-potenciado-reasons">Criterios no cumplidos: ${!crit1?'• FCST Inc < $2.000.000 ':''}${!crit2?'• FCST TPV crecimiento < 30% ':''}${!crit3?'• DC actual no supera DC M-1':''}</div>` : ''}
           <div class="kv-grid">
                                 <div class="kv-item"><div class="kv-label">TPV M-1</div><div class="kv-value">${fmt(row.tpvM1)}</div></div>
                                                     <div class="kv-item"><div class="kv-label">VC M-1</div><div class="kv-value">${fmt(row.vcM1)}</div></div>
@@ -1451,14 +1451,14 @@ function renderSegCohorte() {
           </div>
           <div style="margin-top:10px">
             <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:4px">
-                                    <span><b>${row.asesor}</b> â <span style="color:var(--green)">Pot: ${fmt(vcIncPot)}</span> | <span style="color:var(--red)">Neg: ${fmt(vcIncNeg)}</span> | <b>Total VC INC: ${fmt(asesorDcIncr)}</b></span>
+                                    <span><b>${row.asesor}</b> — <span style="color:var(--green)">Pot: ${fmt(vcIncPot)}</span> | <span style="color:var(--red)">Neg: ${fmt(vcIncNeg)}</span> | <b>Total VC INC: ${fmt(asesorDcIncr)}</b></span>
               ${semaforo(pctAsesor)}
             </div>
             <div class="progress-bar"><div class="progress-fill ${barColor}" style="width:${Math.min(pctAsesor,100)}%"></div></div>
           </div>
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--g100)">
-            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">ð¬ Comentario</div>
-            <textarea class="comment" placeholder="Ej: LlamÃ© el 12/5, acordamos aumentar cuotas. Seguimiento el viernes..." onblur="saveComment('${commentKey}',this.value)">${existingComment}</textarea>
+            <div style="font-size:10px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">💬 Comentario</div>
+            <textarea class="comment" placeholder="Ej: Llamé el 12/5, acordamos aumentar cuotas. Seguimiento el viernes..." onblur="saveComment('${commentKey}',this.value)">${existingComment}</textarea>
             ${existingComment ? `<div class="comment-hist">Guardado: ${existingComment}</div>` : ''}
           </div>
         </div>`;
@@ -1479,7 +1479,7 @@ function renderSegAsesor() {
   }
 
   if (ST.lookerData.length === 0) {
-    content.innerHTML = '<div class="empty-state"><div class="icon">ð¤</div><p>SubÃ­ el archivo Lookerv2 para ver el seguimiento por asesor.</p></div>';
+    content.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>Subí el archivo Lookerv2 para ver el seguimiento por asesor.</p></div>';
     return;
   }
 
@@ -1497,7 +1497,7 @@ function renderSegAsesor() {
 
     html += `<div class="asesor-card">
       <div class="asesor-card-header">
-        <div class="asesor-card-name">ð¤ ${asesor.nombre}</div>
+        <div class="asesor-card-name">👤 ${asesor.nombre}</div>
         <div style="display:flex;gap:8px;align-items:center">
           ${cohortData.map(c => semaforo(c.pct) + `<span style="font-size:11px;color:var(--g600)">${c.label}</span>`).join('')}
         </div>
@@ -1510,20 +1510,20 @@ function renderSegAsesor() {
           ${cohortData.map(c => `
             <div style="margin-bottom:10px">
               <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g600);margin-bottom:3px">
-                <span>${c.label} â ${c.count} convertidos</span>
+                <span>${c.label} — ${c.count} convertidos</span>
                 <span>${fmt(c.dcIncr)} / ${fmt(c.obj)}</span>
               </div>
               <div class="progress-bar"><div class="progress-fill ${semColor(c.pct)}" style="width:${Math.min(c.pct,100)}%"></div></div>
             </div>
           `).join('')}
           <div style="margin-top:12px">
-            <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:6px">Ãltimos convertidos:</div>
+            <div style="font-size:12px;font-weight:600;color:var(--g600);margin-bottom:6px">Últimos convertidos:</div>
             ${convertidos.slice(0,5).map(r => {
               const bm = ST.baseMadreData[r.custId]||{};
               return `<div style="font-size:12px;padding:4px 0;border-bottom:1px solid var(--g100)">${bm.nombre||r.custId} <span style="color:var(--g400)">${r.mes}</span></div>`;
             }).join('')}
-            ${convertidos.length > 5 ? `<div style="font-size:11px;color:var(--g400);margin-top:4px">+ ${convertidos.length-5} mÃ¡s</div>` : ''}
-            ${convertidos.length === 0 ? '<div style="font-size:12px;color:var(--g400)">Sin convertidos aÃºn</div>' : ''}
+            ${convertidos.length > 5 ? `<div style="font-size:11px;color:var(--g400);margin-top:4px">+ ${convertidos.length-5} más</div>` : ''}
+            ${convertidos.length === 0 ? '<div style="font-size:12px;color:var(--g400)">Sin convertidos aún</div>' : ''}
           </div>
         </div>
       </div>
@@ -1636,7 +1636,7 @@ function renderAlertas() {
 
     html += `<div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:16px">
-        <div style="font-size:16px;font-weight:600">ð¤ ${asesor.nombre}</div>
+        <div style="font-size:16px;font-weight:600">👤 ${asesor.nombre}</div>
         <div style="display:flex;align-items:center;gap:10px">
           <span style="font-size:13px;color:var(--g600)">Objetivo M0: <strong>${fmt(objM0)}</strong></span>
           ${semaforo(pct)}
@@ -1647,7 +1647,7 @@ function renderAlertas() {
       <table>
         <thead><tr>
           <th>Cust ID</th><th>Nombre</th><th>TPV Decl.</th><th>TPV M-1</th><th>DC M-1</th>
-          <th>DC TeÃ³rico</th><th>DC Incremental</th><th>Fuente</th>
+          <th>DC Teórico</th><th>DC Incremental</th><th>Fuente</th>
         </tr></thead>
         <tbody>
           ${allEntries.map(e => `<tr>
@@ -1672,19 +1672,19 @@ function renderAlertas() {
         <div class="progress-bar" style="height:12px"><div class="progress-fill ${barColor}" style="width:${Math.min(pct,100)}%"></div></div>
         ${needMore > 0 ? `
         <div class="banner banner-warn" style="margin-top:12px;margin-bottom:0">
-          â¡ NecesitÃ¡s <strong>${needMore} comercio${needMore>1?'s':''} mÃ¡s</strong> para llegar al 100%.
-          Con el promedio actual de DC por conversiÃ³n (<strong>${fmt(avgDcPerConv)}</strong>), te faltan ${fmt(missing)}.
-        </div>` : pct >= 100 ? `<div class="banner banner-success" style="margin-top:12px;margin-bottom:0">ð Â¡Objetivo alcanzado! Cumplimiento: ${fmtPct(pct)}</div>` : ''}
+          ⚡ Necesitás <strong>${needMore} comercio${needMore>1?'s':''} más</strong> para llegar al 100%.
+          Con el promedio actual de DC por conversión (<strong>${fmt(avgDcPerConv)}</strong>), te faltan ${fmt(missing)}.
+        </div>` : pct >= 100 ? `<div class="banner banner-success" style="margin-top:12px;margin-bottom:0">🎉 ¡Objetivo alcanzado! Cumplimiento: ${fmtPct(pct)}</div>` : ''}
       </div>
     </div>`;
   }
-  // ---- SecciÃ³n: TPV sin actividad 3+ dÃ­as ----
+  // ---- Sección: TPV sin actividad 3+ días ----
   const inactivosAll = ST.lookerData.filter(r => r.isInactivo && (alertasFilter === 'Todos' || matchAsesor(r.asesor, alertasFilter)));
   if (inactivosAll.length > 0) {
     const byAsesor = {};
     inactivosAll.forEach(r => { const a = r.asesor||'Sin asesor'; if (!byAsesor[a]) byAsesor[a]=[]; byAsesor[a].push(r); });
     let htmlInactivos = `<div style="background:#fff5f5;border:1.5px solid #fecaca;border-radius:12px;padding:16px;margin-bottom:20px">
-      <div style="font-weight:700;font-size:14px;color:#991b1b;margin-bottom:12px">ð Comercios sin movimiento de TPV (${inactivosAll.length} total) â AcciÃ³n: llamar</div>`;
+      <div style="font-weight:700;font-size:14px;color:#991b1b;margin-bottom:12px">📞 Comercios sin movimiento de TPV (${inactivosAll.length} total) — Acción: llamar</div>`;
     Object.entries(byAsesor).forEach(([asesor, rows]) => {
       htmlInactivos += `<div style="margin-bottom:10px"><div style="font-weight:600;font-size:13px;color:#7f1d1d;margin-bottom:6px">${asesor} (${rows.length})</div>`;
       rows.sort((a,b)=>b.inactivoDias-a.inactivoDias).forEach(r => {
@@ -1692,7 +1692,7 @@ function renderAlertas() {
         const nombre = bm.nombre || r.custId;
         const cohortLabel = r.mes=='202603'?'M2 Mar':r.mes=='202604'?'M1 Abr':'M0 May';
         htmlInactivos += `<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;background:#fff;border:1px solid #fecaca;border-radius:6px;margin-bottom:4px;font-size:12px">
-          <span style="font-weight:700;color:#991b1b">ð ${r.inactivoDias}d</span>
+          <span style="font-weight:700;color:#991b1b">📞 ${r.inactivoDias}d</span>
           <span style="font-weight:600">${nombre}</span>
           <code style="color:#6b7280;font-size:11px">${r.custId}</code>
           <span style="background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:11px">${cohortLabel}</span>
@@ -1705,11 +1705,11 @@ function renderAlertas() {
     html = htmlInactivos + html;
   }
 
-  content.innerHTML = html || '<div class="empty-state"><div class="icon">ð</div><p>Sin datos disponibles.</p></div>';
+  content.innerHTML = html || '<div class="empty-state"><div class="icon">🔔</div><p>Sin datos disponibles.</p></div>';
 }
 
 // ============================================================
-// RENDER GESTIÃN
+// RENDER GESTIÓN
 // ============================================================
 function renderGestion() {
   const content = document.getElementById('gestionContent');
@@ -1783,7 +1783,7 @@ function renderGestion() {
     const rowStyle = highlight ? 'background:#fff5f5;' : '';
     return `<tr style="${rowStyle}">
       <td style="font-weight:600;font-size:13px;vertical-align:middle">
-        ${highlight ? '<span style="color:#dc2626;margin-right:4px">â</span>' : ''}
+        ${highlight ? '<span style="color:#dc2626;margin-right:4px">●</span>' : ''}
         ${s.asesor.nombre}
         ${highlight ? '<span style="margin-left:6px;background:#fee2e2;color:#991b1b;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700">3 meses rojo</span>' : ''}
       </td>
@@ -1820,7 +1820,7 @@ function renderGestion() {
 // RENDER MEDALLERO
 // ============================================================
 // ============================================================
-// RESUMEN GESTION â valores oficiales de cumplimiento
+// RESUMEN GESTION — valores oficiales de cumplimiento
 // ============================================================
 function processResumenGestion(csvText) {
   try {
@@ -1908,13 +1908,13 @@ function renderMedallero() {
   let html = '<div class="two-col" style="margin-bottom:20px">';
 
   // Top performers
-  html += '<div class="card" style="border-top:3px solid #639922"><div class="card-title">ð¥ Top Performers (M2 â¥ 100%)</div>';
+  html += '<div class="card" style="border-top:3px solid #639922"><div class="card-title">🥇 Top Performers (M2 ≥ 100%)</div>';
   if (topPerformers.length === 0) {
     html += '<div class="empty-state" style="padding:20px"><p>Sin asesores en top performers para M2.</p></div>';
   } else {
     html += topPerformers.map((s,i) => `
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
-        <span class="pos-num pos-${i+1}">${i===0?'ð¥':i===1?'ð¥':i===2?'ð¥':'#'+(i+1)}</span>
+        <span class="pos-num pos-${i+1}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
         <span style="flex:1;font-weight:500">${s.asesor.nombre}</span>
         ${semaforo(s.m2.pct)}
         <span style="font-size:12px;color:var(--g600)">${fmt(s.m2.dcIncr)}</span>
@@ -1924,13 +1924,13 @@ function renderMedallero() {
   html += '</div>';
 
   // Low performers
-  html += '<div class="card" style="border-top:3px solid #E24B4A"><div class="card-title">â ï¸ Bajo Rendimiento (M2 < 80%)</div>';
+  html += '<div class="card" style="border-top:3px solid #E24B4A"><div class="card-title">⚠️ Bajo Rendimiento (M2 < 80%)</div>';
   if (lowPerformers.length === 0) {
     html += '<div class="empty-state" style="padding:20px"><p style="color:var(--green-d)">Sin asesores bajo el 80% en M2.</p></div>';
   } else {
     html += lowPerformers.map(s => `
       <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
-        <span style="font-size:18px">â ï¸</span>
+        <span style="font-size:18px">⚠️</span>
         <span style="flex:1;font-weight:500">${s.asesor.nombre}</span>
         ${semaforo(s.m2.pct)}
         <span style="font-size:12px;color:var(--g600)">${fmt(s.m2.dcIncr)}</span>
@@ -1941,7 +1941,7 @@ function renderMedallero() {
 
   // Main ranking table
   html += `<div class="card">
-    <div class="card-title">ð Ranking completo del equipo</div>
+    <div class="card-title">📊 Ranking completo del equipo</div>
     <div style="overflow-x:auto">
     <table class="ranking-table">
       <thead><tr>
@@ -1951,7 +1951,7 @@ function renderMedallero() {
       </tr></thead>
       <tbody>
       ${sorted.map((s,i) => `<tr>
-        <td><span class="pos-num ${i<3?'pos-'+(i+1):''}">${i===0?'ð¥':i===1?'ð¥':i===2?'ð¥':'#'+(i+1)}</span></td>
+        <td><span class="pos-num ${i<3?'pos-'+(i+1):''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span></td>
         <td><strong>${s.asesor.nombre}</strong></td>
         <td><span class="tier-${s.asesor.tier||'bronce'}">${(s.asesor.tier||'bronce').charAt(0).toUpperCase()+(s.asesor.tier||'bronce').slice(1)}</span></td>
         <td>${semaforo(s.m0.pct)}</td>
@@ -1966,7 +1966,7 @@ function renderMedallero() {
   </div>`;
 
   // Bar chart
-  html += `<div class="card"><div class="card-title">ð DC Incremental por asesor (vs objetivo M2)</div>
+  html += `<div class="card"><div class="card-title">📊 DC Incremental por asesor (vs objetivo M2)</div>
     <div style="height:320px"><canvas id="medalleroChart"></canvas></div>
   </div>`;
 
@@ -2060,8 +2060,8 @@ function renderIncentivos() {
         </div>
       </div>
       ${tier === 'bronce' ? `<div class="tooltip-text" style="margin-top:8px;padding:8px;background:var(--g50);border-radius:6px;border-left:3px solid var(--amber)">
-        â Para pasar a <strong>Plata</strong>: necesitÃ¡s 3 M2 seguidos con â¥100% y promedio â¥110%.
-        Para <strong>Oro</strong>: 3 M2 seguidos con â¥100% y promedio >200%.
+        ↑ Para pasar a <strong>Plata</strong>: necesitás 3 M2 seguidos con ≥100% y promedio ≥110%.
+        Para <strong>Oro</strong>: 3 M2 seguidos con ≥100% y promedio >200%.
       </div>` : ''}
     </div>`;
   }).join('');
@@ -2105,7 +2105,7 @@ function renderEscalaTable(tier) {
       const anyInRange = Object.values(asesorPcts).some(p => p >= row.desde && p <= row.hasta);
       const isHighlight = anyInRange;
       return `<tr ${isHighlight?'class="highlight-row"':''}>
-        <td>${row.hasta >= 9999 ? 'â¥ 320%' : row.desde+'% â '+row.hasta+'%'}</td>
+        <td>${row.hasta >= 9999 ? '≥ 320%' : row.desde+'% – '+row.hasta+'%'}</td>
         <td>${fmt(fijoEstimado)}</td>
         <td style="color:var(--amber-d);font-weight:600">${fmt(row.variable)}</td>
         <td style="color:var(--blue-d);font-weight:600">${fmt(row.bruto)}</td>
@@ -2135,7 +2135,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Show cached data status while auto-fetch loads
   if (ST.lookerData.length > 0) {
-    setGasStatus('success',`â Datos en cachÃ© (${ST.lastLoadDate}) â ${Object.keys(ST.baseMadreData).length} comercios Â· ${ST.lookerData.length} filas Lookerv2`);
+    setGasStatus('success',`✅ Datos en caché (${ST.lastLoadDate}) — ${Object.keys(ST.baseMadreData).length} comercios · ${ST.lookerData.length} filas Lookerv2`);
     renderSeguimiento();
     renderAlertas();
     renderGestion();
