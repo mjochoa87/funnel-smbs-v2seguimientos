@@ -1794,6 +1794,34 @@ function renderGestion() {
       </td>
     </tr>`;
   }
+  let html = htmlInactivos + `
+  <div style="overflow-x:auto">
+  <table>
+    <thead><tr>
+      <th style="min-width:160px">Asesor</th>
+      ${cohorts.map(k => `<th style="text-align:center;min-width:120px">${cohortLabels[k]}</th>`).join('')}
+      
+    </tr></thead>
+    <tbody>
+      ${rojos3.map(s => asesorRow(s, true)).join('')}
+      ${rojos3.length > 0 && resto.length > 0 ? `<tr><td colspan="4" style="padding:4px 0;background:transparent"><hr style="border:none;border-top:1px solid var(--g200);margin:4px 0"></td></tr>` : ''}
+      ${resto.map(s => asesorRow(s, false)).join('')}
+    </tbody>
+  </table>
+  </div>`;
+
+  content.innerHTML = html;
+}
+
+// ============================================================
+// RENDER MEDALLERO
+// ============================================================
+const medalleroCharts = {};
+
+function renderMedallero() {
+  const content = document.getElementById('medalleroContent');
+  if (!content) return;
+
   // Destroy old charts
   for (const k in medalleroCharts) {
     try { medalleroCharts[k].destroy(); } catch(e) {}
