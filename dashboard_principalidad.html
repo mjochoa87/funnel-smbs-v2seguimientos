@@ -1028,7 +1028,9 @@ function fetchGASData() {
       renderSeguimiento();
       renderAlertas();
       renderGestion();
-      fetchResumenGestion();
+      if (data.resumenGestion && data.resumenGestion.length) processResumenGestionFromGAS(data.resumenGestion);
+      renderMedallero();
+      renderIncentivos();
     } catch(err) {
       console.error('GAS process error:', err);
       setGasStatus('error', `❌ Error procesando datos: <b>${err.message}</b> — <a href="#" onclick="fetchGASData();return false;" style="color:inherit;font-weight:700;text-decoration:underline">Reintentar</a>`);
@@ -1852,6 +1854,19 @@ function fetchResumenGestion() {
     .then(function(r){return r.text();})
     .then(function(txt){processResumenGestion(txt);renderMedallero();renderIncentivos();})
     .catch(function(e){console.error('fetchResumenGestion err',e);});
+}
+
+function processResumenGestionFromGAS(arr) {
+  ST.resumenGestion = {};
+  if (!arr || !arr.length) return;
+  arr.forEach(function(row) {
+    var nom = row[0];
+    if (!nom) return;
+    ST.resumenGestion[nom] = {};
+    ST.resumenGestion[nom][String(M2_KEY)] = (row[1] !== null && row[1] !== undefined) ? row[1] : 0;
+    ST.resumenGestion[nom][String(M1_KEY)] = (row[2] !== null && row[2] !== undefined) ? row[2] : 0;
+    ST.resumenGestion[nom][String(M0_KEY)] = (row[3] !== null && row[3] !== undefined) ? row[3] : 0;
+  });
 }
 
 const medalleroCharts = {};
